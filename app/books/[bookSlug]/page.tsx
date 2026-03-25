@@ -9,14 +9,13 @@ import {
   Layers,
   FileText,
 } from "lucide-react";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { SearchTrigger } from "@/components/search-dialog";
+import { SettingsDropdown } from "@/components/settings-dropdown";
 import { HomeButton } from "@/components/home-button";
 import { BookProgressBar } from "@/components/book-progress";
 import { ChapterCheckmark } from "@/components/chapter-checkmark";
 import { BookCacheTrigger } from "@/components/book-cache-trigger";
 import { APP_VERSION } from "@/lib/version";
-import { AuthButton } from "@/components/auth-button";
 
 const LEVEL_STYLES: Record<string, string> = {
   green:
@@ -55,11 +54,10 @@ export default async function BookPage({
       <nav className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
         <div className="mx-auto max-w-5xl px-6 flex items-center justify-between h-14">
           <HomeButton />
-          <div className="flex items-center gap-2">
-            <SearchTrigger />
-            <ThemeToggle />
-            <AuthButton />
-          </div>
+            <div className="flex items-center gap-2">
+              <SearchTrigger />
+              <SettingsDropdown />
+            </div>
         </div>
       </nav>
 

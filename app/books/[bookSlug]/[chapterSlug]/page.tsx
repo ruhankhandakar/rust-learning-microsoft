@@ -7,10 +7,9 @@ import { MobileNav } from "@/components/mobile-nav";
 import { ChapterReadMarker } from "@/components/chapter-read-marker";
 import { MarkdownRenderer } from "@/components/markdown-renderer";
 import { ErrorBoundary } from "@/components/error-boundary";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { SearchTrigger } from "@/components/search-dialog";
 import { HomeButton } from "@/components/home-button";
-import { AuthButton } from "@/components/auth-button";
+import { SettingsDropdown } from "@/components/settings-dropdown";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 export function generateStaticParams() {
@@ -72,8 +71,7 @@ export default async function ChapterPage({
           </span>
           <div className="flex items-center gap-2 shrink-0">
             <SearchTrigger />
-            <ThemeToggle />
-            <AuthButton />
+            <SettingsDropdown />
           </div>
         </div>
       </header>
@@ -91,9 +89,9 @@ export default async function ChapterPage({
 
         <main className="flex-1 min-w-0">
           <article className="mx-auto max-w-3xl px-6 md:px-10 py-10">
-            <ErrorBoundary>
-              <MarkdownRenderer content={markdown} />
-            </ErrorBoundary>
+              <ErrorBoundary>
+                <MarkdownRenderer content={markdown} />
+              </ErrorBoundary>
           </article>
 
           <nav className="border-t border-border">

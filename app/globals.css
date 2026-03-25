@@ -7,7 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -50,6 +50,17 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 }
+
+html[data-font="geist"]  { --default-font-family: var(--font-geist-sans); font-family: var(--font-geist-sans); }
+html[data-font="inter"]  { --default-font-family: var(--font-inter); font-family: var(--font-inter); }
+html[data-font="lora"]   { --default-font-family: var(--font-lora); font-family: var(--font-lora); }
+html[data-font="merriweather"] { --default-font-family: var(--font-merriweather); font-family: var(--font-merriweather); }
+html[data-font="jetbrains"]   { --default-font-family: var(--font-jetbrains); font-family: var(--font-jetbrains); }
+
+html[data-font-size="sm"]  { font-size: 0.9rem; }
+html[data-font-size="base"] { font-size: 1rem; }
+html[data-font-size="lg"]  { font-size: 1.125rem; }
+html[data-font-size="xl"]  { font-size: 1.25rem; }
 
 :root {
   --rust: oklch(0.65 0.17 45);
