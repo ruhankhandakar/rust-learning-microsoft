@@ -1,10 +1,11 @@
 {
   "name": "rust-learn",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/sync-sw-version.js && next build",
+    "postversion": "node scripts/sync-sw-version.js",
     "start": "next start",
     "lint": "eslint"
   },
@@ -35,9 +36,5 @@
     "tailwindcss": "^4",
     "typescript": "^5"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
-  }
+  "pnpm": {}
 }
