@@ -10,6 +10,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SearchTrigger } from "@/components/search-dialog";
 import { HomeButton } from "@/components/home-button";
+import { AuthButton } from "@/components/auth-button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 export function generateStaticParams() {
@@ -72,6 +73,7 @@ export default async function ChapterPage({
           <div className="flex items-center gap-2 shrink-0">
             <SearchTrigger />
             <ThemeToggle />
+            <AuthButton />
           </div>
         </div>
       </header>

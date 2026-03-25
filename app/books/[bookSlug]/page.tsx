@@ -16,6 +16,7 @@ import { BookProgressBar } from "@/components/book-progress";
 import { ChapterCheckmark } from "@/components/chapter-checkmark";
 import { BookCacheTrigger } from "@/components/book-cache-trigger";
 import { APP_VERSION } from "@/lib/version";
+import { AuthButton } from "@/components/auth-button";
 
 const LEVEL_STYLES: Record<string, string> = {
   green:
@@ -57,6 +58,7 @@ export default async function BookPage({
           <div className="flex items-center gap-2">
             <SearchTrigger />
             <ThemeToggle />
+            <AuthButton />
           </div>
         </div>
       </nav>

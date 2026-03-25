@@ -14,6 +14,7 @@ import { SearchTrigger } from "@/components/search-dialog";
 import { BookProgressBar } from "@/components/book-progress";
 import { LevelTooltip } from "@/components/level-tooltip";
 import { APP_VERSION } from "@/lib/version";
+import { AuthButton } from "@/components/auth-button";
 
 export default function HomePage() {
   const booksWithCounts = BOOKS.map((book) => {
@@ -39,6 +40,7 @@ export default function HomePage() {
             <div className="flex items-center gap-2">
               <SearchTrigger />
               <ThemeToggle />
+              <AuthButton />
             </div>
           </div>
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
