@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BOOKS, getBookBySlug } from "@/lib/books";
-import { getBookStructure, getChapterContent } from "@/lib/content";
+import { getBookStructure, getChapterMarkdown } from "@/lib/content";
 import { ChapterSidebar } from "@/components/chapter-sidebar";
 import { MobileNav } from "@/components/mobile-nav";
 import { ChapterReadMarker } from "@/components/chapter-read-marker";
+import { MarkdownRenderer } from "@/components/markdown-renderer";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SearchTrigger } from "@/components/search-dialog";
 import {
@@ -43,13 +45,12 @@ export default async function ChapterPage({
   const prev = currentIndex > 0 ? flat[currentIndex - 1] : null;
   const next = currentIndex < flat.length - 1 ? flat[currentIndex + 1] : null;
 
-  const html = await getChapterContent(book.dirName, chapterSlug);
+  const markdown = getChapterMarkdown(book.dirName, chapterSlug);
 
   return (
     <div className="min-h-screen flex flex-col">
       <ChapterReadMarker bookSlug={bookSlug} chapterSlug={chapterSlug} />
 
-      {/* Top bar */}
       <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
         <div className="flex items-center gap-3 px-4 h-14">
           <MobileNav
@@ -79,7 +80,6 @@ export default async function ChapterPage({
       </header>
 
       <div className="flex flex-1">
-        {/* Sidebar — desktop only */}
         <aside className="hidden lg:flex w-72 shrink-0 border-r border-border">
           <div className="sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto p-4 w-full">
             <ChapterSidebar
@@ -90,16 +90,13 @@ export default async function ChapterPage({
           </div>
         </aside>
 
-        {/* Main content */}
         <main className="flex-1 min-w-0">
           <article className="mx-auto max-w-3xl px-6 md:px-10 py-10">
-            <div
-              className="prose"
-              dangerouslySetInnerHTML={{ __html: html }}
-            />
+            <ErrorBoundary>
+              <MarkdownRenderer content={markdown} />
+            </ErrorBoundary>
           </article>
 
-          {/* Prev / Next navigation */}
           <nav className="border-t border-border">
             <div className="mx-auto max-w-3xl px-6 md:px-10 py-6 flex items-stretch gap-4">
               {prev ? (

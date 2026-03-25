@@ -1,11 +1,5 @@
 import fs from "fs";
 import path from "path";
-import { unified } from "unified";
-import remarkParse from "remark-parse";
-import remarkGfm from "remark-gfm";
-import remarkRehype from "remark-rehype";
-import rehypeStringify from "rehype-stringify";
-import rehypeHighlight from "rehype-highlight";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
 
@@ -41,7 +35,6 @@ export function parseSummary(summaryContent: string): BookStructure {
   for (const line of lines) {
     const trimmed = line.trimEnd();
 
-    // Part heading: # Part I — Foundations  or  # Appendices
     if (/^#\s+(?!Summary)/.test(trimmed) && !trimmed.startsWith("# Summary")) {
       const partTitle = trimmed.replace(/^#+\s*/, "");
       currentPart = { title: partTitle, chapters: [] };
@@ -50,7 +43,6 @@ export function parseSummary(summaryContent: string): BookStructure {
       continue;
     }
 
-    // Standalone link (introduction): [Introduction](ch00-introduction.md)
     const standaloneMatch = trimmed.match(/^\[([^\]]+)\]\(([^)]+\.md)\)/);
     if (standaloneMatch) {
       const entry: ChapterEntry = {
@@ -68,7 +60,6 @@ export function parseSummary(summaryContent: string): BookStructure {
       continue;
     }
 
-    // Top-level chapter: - [Title](file.md)
     const topMatch = trimmed.match(/^- \[([^\]]+)\]\(([^)]+\.md)\)/);
     if (topMatch) {
       const entry: ChapterEntry = {
@@ -89,7 +80,6 @@ export function parseSummary(summaryContent: string): BookStructure {
       continue;
     }
 
-    // Sub-chapter:   - [Title](file.md)
     const subMatch = trimmed.match(/^\s+- \[([^\]]+)\]\(([^)]+\.md)\)/);
     if (subMatch && lastTopChapter) {
       lastTopChapter.children.push({
@@ -121,31 +111,18 @@ export function getBookStructure(bookDir: string): BookStructure {
   return parseSummary(content);
 }
 
-const processor = unified()
-  .use(remarkParse)
-  .use(remarkGfm)
-  .use(remarkRehype, { allowDangerousHtml: true })
-  .use(rehypeHighlight, { detect: true, ignoreMissing: true })
-  .use(rehypeStringify, { allowDangerousHtml: true });
-
-export async function getChapterContent(
-  bookDir: string,
-  chapterSlug: string
-): Promise<string> {
-  const filePath = path.join(CONTENT_DIR, bookDir, `${chapterSlug}.md`);
-  if (!fs.existsSync(filePath)) {
-    return "<p>Chapter content not found.</p>";
-  }
-  const raw = fs.readFileSync(filePath, "utf-8");
-  const result = await processor.process(raw);
-  return String(result);
-}
-
-export function getChapterRawContent(
+export function getChapterMarkdown(
   bookDir: string,
   chapterSlug: string
 ): string {
   const filePath = path.join(CONTENT_DIR, bookDir, `${chapterSlug}.md`);
   if (!fs.existsSync(filePath)) return "";
   return fs.readFileSync(filePath, "utf-8");
+}
+
+export function getChapterRawContent(
+  bookDir: string,
+  chapterSlug: string
+): string {
+  return getChapterMarkdown(bookDir, chapterSlug);
 }

@@ -10,7 +10,6 @@ import {
 import {
   getReadChapters,
   markChapterRead as dbMark,
-  type ChapterProgress,
 } from "@/lib/progress-db";
 
 interface ProgressContextValue {
@@ -33,19 +32,23 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
   const [readSet, setReadSet] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    getReadChapters().then((records) => {
-      setReadSet(new Set(records.map((r) => r.id)));
-    });
+    getReadChapters()
+      .then((records) => setReadSet(new Set(records.map((r) => r.id))))
+      .catch(() => {
+        // IndexedDB unavailable — progress won't persist but app still works
+      });
   }, []);
 
   const markRead = useCallback(
     (bookSlug: string, chapterSlug: string) => {
       const key = `${bookSlug}/${chapterSlug}`;
-      if (readSet.has(key)) return;
-      dbMark(bookSlug, chapterSlug);
-      setReadSet((prev) => new Set(prev).add(key));
+      setReadSet((prev) => {
+        if (prev.has(key)) return prev;
+        dbMark(bookSlug, chapterSlug);
+        return new Set(prev).add(key);
+      });
     },
-    [readSet]
+    []
   );
 
   const getBookProgress = useCallback(

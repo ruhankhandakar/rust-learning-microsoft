@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Search, BookOpen, ArrowRight, X, Loader2 } from "lucide-react";
+import { Index as FlexIndex } from "flexsearch";
 
 interface SearchEntry {
   bookSlug: string;
@@ -50,11 +51,30 @@ function SearchDialog({ onClose }: { onClose: () => void }) {
   const [query, setQuery] = useState("");
   const [entries, setEntries] = useState<SearchEntry[] | null>(null);
   const [selectedIdx, setSelectedIdx] = useState(0);
+  const flexRef = useRef<FlexIndex | null>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch("/api/search")
       .then((r) => r.json())
-      .then(setEntries);
+      .then((data: SearchEntry[]) => {
+        setEntries(data);
+        const index = new FlexIndex({
+          tokenize: "forward",
+          resolution: 9,
+        });
+        data.forEach((entry, i) => {
+          index.add(
+            i,
+            `${entry.chapterTitle} ${entry.bookTitle} ${entry.preview}`
+          );
+        });
+        flexRef.current = index;
+      })
+      .catch(() => {
+        // Search unavailable — degrade gracefully
+        setEntries([]);
+      });
   }, []);
 
   useEffect(() => {
@@ -63,30 +83,26 @@ function SearchDialog({ onClose }: { onClose: () => void }) {
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        onClose();
-      }
+      if (e.key === "Escape") onClose();
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [onClose]);
 
-  const filtered = entries
-    ? query.length < 2
-      ? []
-      : entries.filter((e) => {
-          const q = query.toLowerCase();
-          return (
-            e.chapterTitle.toLowerCase().includes(q) ||
-            e.preview.toLowerCase().includes(q) ||
-            e.bookTitle.toLowerCase().includes(q)
-          );
-        })
-    : [];
+  const filtered = useMemo(() => {
+    if (!entries || !flexRef.current || query.length < 2) return [];
+    const ids = flexRef.current.search(query, { limit: 30 }) as number[];
+    return ids.map((id) => entries[id]);
+  }, [entries, query]);
 
   useEffect(() => {
     setSelectedIdx(0);
   }, [query]);
+
+  useEffect(() => {
+    const active = resultsRef.current?.querySelector("[data-selected='true']");
+    active?.scrollIntoView({ block: "nearest" });
+  }, [selectedIdx]);
 
   const navigate = useCallback(
     (entry: SearchEntry) => {
@@ -110,9 +126,11 @@ function SearchDialog({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh]">
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
       <div className="relative w-full max-w-xl mx-4 bg-card border border-border rounded-xl shadow-2xl overflow-hidden">
-        {/* Input */}
         <div className="flex items-center gap-3 px-4 border-b border-border">
           <Search className="h-4 w-4 text-muted-foreground shrink-0" />
           <input
@@ -124,14 +142,16 @@ function SearchDialog({ onClose }: { onClose: () => void }) {
             className="flex-1 h-12 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
           />
           {query && (
-            <button onClick={() => setQuery("")} className="text-muted-foreground hover:text-foreground">
+            <button
+              onClick={() => setQuery("")}
+              className="text-muted-foreground hover:text-foreground"
+            >
               <X className="h-4 w-4" />
             </button>
           )}
         </div>
 
-        {/* Results */}
-        <div className="max-h-80 overflow-y-auto p-2">
+        <div ref={resultsRef} className="max-h-80 overflow-y-auto p-2">
           {!entries && (
             <div className="flex items-center justify-center py-8 text-muted-foreground">
               <Loader2 className="h-5 w-5 animate-spin mr-2" />
@@ -151,9 +171,10 @@ function SearchDialog({ onClose }: { onClose: () => void }) {
             </div>
           )}
 
-          {filtered.slice(0, 20).map((entry, i) => (
+          {filtered.map((entry, i) => (
             <button
               key={`${entry.bookSlug}/${entry.chapterSlug}`}
+              data-selected={i === selectedIdx}
               onClick={() => navigate(entry)}
               onMouseEnter={() => setSelectedIdx(i)}
               className={`w-full flex items-start gap-3 px-3 py-2.5 rounded-lg text-left transition-colors ${
@@ -177,26 +198,25 @@ function SearchDialog({ onClose }: { onClose: () => void }) {
               )}
             </button>
           ))}
-
-          {filtered.length > 20 && (
-            <p className="text-center text-xs text-muted-foreground py-2">
-              +{filtered.length - 20} more results
-            </p>
-          )}
         </div>
 
-        {/* Footer */}
         <div className="flex items-center gap-4 px-4 py-2 border-t border-border text-[11px] text-muted-foreground">
           <span className="flex items-center gap-1">
-            <kbd className="px-1 rounded border border-border bg-muted font-mono">↑↓</kbd>
+            <kbd className="px-1 rounded border border-border bg-muted font-mono">
+              ↑↓
+            </kbd>
             navigate
           </span>
           <span className="flex items-center gap-1">
-            <kbd className="px-1 rounded border border-border bg-muted font-mono">↵</kbd>
+            <kbd className="px-1 rounded border border-border bg-muted font-mono">
+              ↵
+            </kbd>
             open
           </span>
           <span className="flex items-center gap-1">
-            <kbd className="px-1 rounded border border-border bg-muted font-mono">esc</kbd>
+            <kbd className="px-1 rounded border border-border bg-muted font-mono">
+              esc
+            </kbd>
             close
           </span>
         </div>

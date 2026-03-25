@@ -246,6 +246,7 @@
 }
 
 .prose pre {
+  position: relative;
   background: oklch(0.16 0.01 45) !important;
   color: oklch(0.90 0.01 55);
   padding: 1.25rem;
@@ -255,6 +256,33 @@
   border: 1px solid oklch(0.25 0.02 45);
   font-size: 0.875rem;
   line-height: 1.7;
+}
+
+.prose pre .copy-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2rem;
+  width: 2rem;
+  border-radius: var(--radius-md);
+  border: 1px solid oklch(0.30 0.02 45);
+  background: oklch(0.20 0.01 45);
+  color: oklch(0.65 0.02 50);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s, color 0.15s;
+}
+
+.prose pre:hover .copy-btn {
+  opacity: 1;
+}
+
+.prose pre .copy-btn:hover {
+  background: oklch(0.28 0.02 45);
+  color: oklch(0.90 0.01 55);
 }
 
 .prose pre code {
