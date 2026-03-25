@@ -1,0 +1,206 @@
+"use client";
+
+import { useEffect, useState, useRef, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { Search, BookOpen, ArrowRight, X, Loader2 } from "lucide-react";
+
+interface SearchEntry {
+  bookSlug: string;
+  bookTitle: string;
+  bookIcon: string;
+  chapterSlug: string;
+  chapterTitle: string;
+  preview: string;
+}
+
+export function SearchTrigger({ className }: { className?: string }) {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setOpen(true);
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  return (
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        className={`inline-flex items-center gap-2 h-9 px-3 rounded-lg border border-border bg-card hover:bg-accent transition-colors text-sm text-muted-foreground ${className ?? ""}`}
+      >
+        <Search className="h-4 w-4" />
+        <span className="hidden sm:inline">Search...</span>
+        <kbd className="hidden sm:inline-flex h-5 items-center gap-0.5 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+          <span className="text-xs">⌘</span>K
+        </kbd>
+      </button>
+      {open && <SearchDialog onClose={() => setOpen(false)} />}
+    </>
+  );
+}
+
+function SearchDialog({ onClose }: { onClose: () => void }) {
+  const router = useRouter();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [query, setQuery] = useState("");
+  const [entries, setEntries] = useState<SearchEntry[] | null>(null);
+  const [selectedIdx, setSelectedIdx] = useState(0);
+
+  useEffect(() => {
+    fetch("/api/search")
+      .then((r) => r.json())
+      .then(setEntries);
+  }, []);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose]);
+
+  const filtered = entries
+    ? query.length < 2
+      ? []
+      : entries.filter((e) => {
+          const q = query.toLowerCase();
+          return (
+            e.chapterTitle.toLowerCase().includes(q) ||
+            e.preview.toLowerCase().includes(q) ||
+            e.bookTitle.toLowerCase().includes(q)
+          );
+        })
+    : [];
+
+  useEffect(() => {
+    setSelectedIdx(0);
+  }, [query]);
+
+  const navigate = useCallback(
+    (entry: SearchEntry) => {
+      router.push(`/books/${entry.bookSlug}/${entry.chapterSlug}`);
+      onClose();
+    },
+    [router, onClose]
+  );
+
+  function onKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setSelectedIdx((i) => Math.min(i + 1, filtered.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSelectedIdx((i) => Math.max(i - 1, 0));
+    } else if (e.key === "Enter" && filtered[selectedIdx]) {
+      navigate(filtered[selectedIdx]);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh]">
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-xl mx-4 bg-card border border-border rounded-xl shadow-2xl overflow-hidden">
+        {/* Input */}
+        <div className="flex items-center gap-3 px-4 border-b border-border">
+          <Search className="h-4 w-4 text-muted-foreground shrink-0" />
+          <input
+            ref={inputRef}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={onKeyDown}
+            placeholder="Search all books..."
+            className="flex-1 h-12 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+          />
+          {query && (
+            <button onClick={() => setQuery("")} className="text-muted-foreground hover:text-foreground">
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+
+        {/* Results */}
+        <div className="max-h-80 overflow-y-auto p-2">
+          {!entries && (
+            <div className="flex items-center justify-center py-8 text-muted-foreground">
+              <Loader2 className="h-5 w-5 animate-spin mr-2" />
+              Loading index...
+            </div>
+          )}
+
+          {entries && query.length < 2 && (
+            <div className="py-8 text-center text-sm text-muted-foreground">
+              Type at least 2 characters to search across all 7 books
+            </div>
+          )}
+
+          {entries && query.length >= 2 && filtered.length === 0 && (
+            <div className="py-8 text-center text-sm text-muted-foreground">
+              No results for &ldquo;{query}&rdquo;
+            </div>
+          )}
+
+          {filtered.slice(0, 20).map((entry, i) => (
+            <button
+              key={`${entry.bookSlug}/${entry.chapterSlug}`}
+              onClick={() => navigate(entry)}
+              onMouseEnter={() => setSelectedIdx(i)}
+              className={`w-full flex items-start gap-3 px-3 py-2.5 rounded-lg text-left transition-colors ${
+                i === selectedIdx
+                  ? "bg-primary/10 text-primary"
+                  : "hover:bg-accent"
+              }`}
+            >
+              <BookOpen className="h-4 w-4 mt-0.5 shrink-0 text-muted-foreground" />
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-medium truncate">
+                  {entry.chapterTitle}
+                </div>
+                <div className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                  <span>{entry.bookIcon}</span>
+                  <span>{entry.bookTitle}</span>
+                </div>
+              </div>
+              {i === selectedIdx && (
+                <ArrowRight className="h-4 w-4 mt-0.5 shrink-0" />
+              )}
+            </button>
+          ))}
+
+          {filtered.length > 20 && (
+            <p className="text-center text-xs text-muted-foreground py-2">
+              +{filtered.length - 20} more results
+            </p>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center gap-4 px-4 py-2 border-t border-border text-[11px] text-muted-foreground">
+          <span className="flex items-center gap-1">
+            <kbd className="px-1 rounded border border-border bg-muted font-mono">↑↓</kbd>
+            navigate
+          </span>
+          <span className="flex items-center gap-1">
+            <kbd className="px-1 rounded border border-border bg-muted font-mono">↵</kbd>
+            open
+          </span>
+          <span className="flex items-center gap-1">
+            <kbd className="px-1 rounded border border-border bg-muted font-mono">esc</kbd>
+            close
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
