@@ -32,7 +32,7 @@ function openDB(): Promise<IDBDatabase> {
   });
 }
 
-export interface ChapterProgress {
+interface ChapterProgress {
   id: string;
   bookSlug: string;
   chapterSlug: string;

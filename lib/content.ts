@@ -25,7 +25,7 @@ function fileToSlug(file: string): string {
   return file.replace(/\.md$/, "");
 }
 
-export function parseSummary(summaryContent: string): BookStructure {
+function parseSummary(summaryContent: string): BookStructure {
   const lines = summaryContent.split("\n");
   const parts: Part[] = [];
   let introduction: ChapterEntry | null = null;

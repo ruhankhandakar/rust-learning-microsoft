@@ -30,24 +30,3 @@ export function BookProgressBar({
     </div>
   );
 }
-
-export function BookProgressInline({
-  bookSlug,
-  totalChapters,
-}: {
-  bookSlug: string;
-  totalChapters: number;
-}) {
-  const { getBookProgress } = useProgress();
-  const read = getBookProgress(bookSlug, totalChapters);
-
-  if (read === 0) return null;
-
-  const pct = Math.round((read / totalChapters) * 100);
-
-  return (
-    <span className="flex items-center gap-1.5 text-xs text-primary font-medium">
-      {pct}% complete
-    </span>
-  );
-}

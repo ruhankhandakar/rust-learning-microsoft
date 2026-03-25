@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { BOOKS } from "@/lib/books";
 import { getBookStructure } from "@/lib/content";
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardHeader,
@@ -14,18 +13,6 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { SearchTrigger } from "@/components/search-dialog";
 import { BookProgressBar } from "@/components/book-progress";
 import { LevelTooltip } from "@/components/level-tooltip";
-
-const LEVEL_STYLES: Record<string, string> = {
-  green:
-    "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
-  blue: "bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-300",
-  yellow:
-    "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
-  purple:
-    "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300",
-  brown:
-    "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300",
-};
 
 export default function HomePage() {
   const booksWithCounts = BOOKS.map((book) => {

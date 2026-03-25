@@ -4,7 +4,7 @@ import { getBookStructure, getChapterRawContent } from "@/lib/content";
 
 export const dynamic = "force-static";
 
-export interface SearchEntry {
+interface SearchEntry {
   bookSlug: string;
   bookTitle: string;
   bookIcon: string;
