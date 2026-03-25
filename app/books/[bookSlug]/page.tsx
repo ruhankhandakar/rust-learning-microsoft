@@ -14,6 +14,7 @@ import { SearchTrigger } from "@/components/search-dialog";
 import { HomeButton } from "@/components/home-button";
 import { BookProgressBar } from "@/components/book-progress";
 import { ChapterCheckmark } from "@/components/chapter-checkmark";
+import { BookCacheTrigger } from "@/components/book-cache-trigger";
 
 const LEVEL_STYLES: Record<string, string> = {
   green:
@@ -43,8 +44,11 @@ export default async function BookPage({
   const structure = getBookStructure(book.dirName);
   const firstChapter = structure.flatChapters[0];
 
+  const allChapterSlugs = structure.flatChapters.map((ch) => ch.slug);
+
   return (
     <div className="min-h-screen flex flex-col">
+      <BookCacheTrigger bookSlug={bookSlug} chapterSlugs={allChapterSlugs} />
       {/* Top nav */}
       <nav className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
         <div className="mx-auto max-w-5xl px-6 flex items-center justify-between h-14">

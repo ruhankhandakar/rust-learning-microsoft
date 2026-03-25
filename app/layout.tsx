@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next"
+
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ProgressProvider } from "@/components/progress-provider";
+import { OfflineIndicator } from "@/components/offline-indicator";
+import { ServiceWorkerRegister } from "@/components/sw-register";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,6 +22,12 @@ export const metadata: Metadata = {
   title: "Rust Training — Microsoft",
   description:
     "A collection of free Rust training books for developers from every background.",
+  applicationName: "Rust Training",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Rust Training",
+  },
 };
 
 export default function RootLayout({
@@ -40,7 +50,12 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
-          <ProgressProvider>{children}</ProgressProvider>
+          <ProgressProvider>
+            {children}
+            <Analytics />
+            <OfflineIndicator />
+            <ServiceWorkerRegister />
+          </ProgressProvider>
         </ThemeProvider>
       </body>
     </html>
