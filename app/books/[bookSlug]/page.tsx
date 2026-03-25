@@ -6,12 +6,12 @@ import { Badge } from "@/components/ui/badge";
 import {
   BookOpen,
   ChevronRight,
-  ArrowLeft,
   Layers,
   FileText,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SearchTrigger } from "@/components/search-dialog";
+import { HomeButton } from "@/components/home-button";
 import { BookProgressBar } from "@/components/book-progress";
 import { ChapterCheckmark } from "@/components/chapter-checkmark";
 
@@ -48,13 +48,7 @@ export default async function BookPage({
       {/* Top nav */}
       <nav className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
         <div className="mx-auto max-w-5xl px-6 flex items-center justify-between h-14">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            All Books
-          </Link>
+          <HomeButton />
           <div className="flex items-center gap-2">
             <SearchTrigger />
             <ThemeToggle />

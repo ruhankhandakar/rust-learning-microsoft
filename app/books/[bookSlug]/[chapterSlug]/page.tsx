@@ -9,12 +9,8 @@ import { MarkdownRenderer } from "@/components/markdown-renderer";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SearchTrigger } from "@/components/search-dialog";
-import {
-  ArrowLeft,
-  ArrowRight,
-  ChevronLeft,
-  BookOpen,
-} from "lucide-react";
+import { HomeButton } from "@/components/home-button";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 export function generateStaticParams() {
   const params: { bookSlug: string; chapterSlug: string }[] = [];
@@ -58,17 +54,18 @@ export default async function ChapterPage({
             structure={structure}
             currentSlug={chapterSlug}
           />
+          <HomeButton />
+          <span className="text-muted-foreground">/</span>
           <Link
             href={`/books/${bookSlug}`}
             className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors shrink-0"
           >
-            <ChevronLeft className="h-4 w-4" />
-            <BookOpen className="h-4 w-4" />
             <span className="hidden sm:inline font-medium">
               {book.shortTitle}
             </span>
+            <span className="sm:hidden font-medium">{book.icon}</span>
           </Link>
-          <span className="text-border">/</span>
+          <span className="text-muted-foreground">/</span>
           <span className="text-sm font-medium truncate flex-1">
             {current.title}
           </span>
