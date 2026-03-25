@@ -19,7 +19,7 @@ function CopyablePre({ children }: { children?: ReactNode }) {
   }, []);
 
   return (
-    <pre ref={preRef}>
+    <div className="pre-wrapper">
       <button
         onClick={handleCopy}
         className="copy-btn"
@@ -28,8 +28,8 @@ function CopyablePre({ children }: { children?: ReactNode }) {
       >
         {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
       </button>
-      {children}
-    </pre>
+      <pre ref={preRef}>{children}</pre>
+    </div>
   );
 }
 

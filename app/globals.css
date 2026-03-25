@@ -245,23 +245,31 @@
   font-weight: 500;
 }
 
-.prose pre {
+.prose .pre-wrapper {
   position: relative;
-  background: oklch(0.155 0.005 260) !important;
+  margin: 1.5rem 0;
+  background: oklch(0.155 0.005 260);
+  border-radius: var(--radius-lg);
+  border: 1px solid oklch(0.24 0.006 260);
+}
+
+.prose .pre-wrapper pre {
+  background: transparent !important;
   color: oklch(0.82 0.008 260);
   padding: 1.25rem;
-  border-radius: var(--radius-lg);
+  border-radius: inherit;
   overflow-x: auto;
-  margin: 1.5rem 0;
-  border: 1px solid oklch(0.24 0.006 260);
+  margin: 0;
+  border: none;
   font-size: 0.875rem;
   line-height: 1.7;
 }
 
-.prose pre .copy-btn {
+.prose .pre-wrapper .copy-btn {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -276,13 +284,25 @@
   transition: opacity 0.15s, background 0.15s, color 0.15s;
 }
 
-.prose pre:hover .copy-btn {
+.prose .pre-wrapper:hover .copy-btn {
   opacity: 1;
 }
 
-.prose pre .copy-btn:hover {
+.prose .pre-wrapper .copy-btn:hover {
   background: oklch(0.26 0.006 260);
   color: oklch(0.82 0.008 260);
+}
+
+.prose pre {
+  background: oklch(0.155 0.005 260) !important;
+  color: oklch(0.82 0.008 260);
+  padding: 1.25rem;
+  border-radius: var(--radius-lg);
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border: 1px solid oklch(0.24 0.006 260);
+  font-size: 0.875rem;
+  line-height: 1.7;
 }
 
 .prose pre code {
