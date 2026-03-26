@@ -5,7 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "node scripts/sync-sw-version.js && next build",
-    "postversion": "node scripts/sync-sw-version.js",
+    "version": "node scripts/sync-sw-version.js && git add public/sw.js",
+    "version:patch": "pnpm version patch",
+    "version:minor": "pnpm version minor",
+    "version:major": "pnpm version major",
     "start": "next start",
     "lint": "eslint",
     "db:migrate": "npx auth@latest migrate --yes && tsx --env-file=.env.local db/migrate.ts"
