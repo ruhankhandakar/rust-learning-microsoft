@@ -1,6 +1,6 @@
 "use client";
 
-import { Settings, Sun, Moon, Check, Minus, Plus, LogOut } from "lucide-react";
+import { Settings, Sun, Moon, Check, Minus, Plus, LogOut, ChevronDown } from "lucide-react";
 import { BookmarksPanel } from "./bookmarks-panel";
 import { useTheme } from "./theme-provider";
 import {
@@ -38,7 +38,7 @@ export function SettingsDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        className="inline-flex items-center justify-center gap-2 h-9 rounded-lg border border-border bg-card hover:bg-accent transition-colors px-2 outline-none"
+        className="inline-flex items-center justify-center gap-1 h-9 rounded-lg border border-border bg-card hover:bg-accent transition-colors px-2 outline-none"
         aria-label="Settings"
       >
         {session?.user?.image ? (
@@ -46,6 +46,7 @@ export function SettingsDropdown() {
         ) : (
           <Settings className="h-4 w-4" />
         )}
+        <ChevronDown className="h-3 w-3 text-muted-foreground" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-72 p-0">
