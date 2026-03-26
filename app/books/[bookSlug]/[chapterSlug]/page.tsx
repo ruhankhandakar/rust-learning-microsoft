@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BOOKS, getBookBySlug } from "@/lib/books";
@@ -11,6 +12,44 @@ import { SearchTrigger } from "@/components/search-dialog";
 import { HomeButton } from "@/components/home-button";
 import { SettingsDropdown } from "@/components/settings-dropdown";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+
+const BASE_URL = "https://rust.learningz.xyz";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ bookSlug: string; chapterSlug: string }>;
+}): Promise<Metadata> {
+  const { bookSlug, chapterSlug } = await params;
+  const book = getBookBySlug(bookSlug);
+  if (!book) return {};
+
+  const structure = getBookStructure(book.dirName);
+  const chapter = structure.flatChapters.find((ch) => ch.slug === chapterSlug);
+  if (!chapter) return {};
+
+  const title = `${chapter.title} — ${book.shortTitle}`;
+  const description = `Read "${chapter.title}" from ${book.title}. Free Rust training by Ruhan Khandakar.`;
+  const url = `${BASE_URL}/books/${bookSlug}/${chapterSlug}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      type: "article",
+      title,
+      description,
+      url,
+      siteName: "Rust Training by Ruhan Khandakar",
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
+    alternates: { canonical: url },
+  };
+}
 
 export function generateStaticParams() {
   const params: { bookSlug: string; chapterSlug: string }[] = [];
@@ -43,8 +82,29 @@ export default async function ChapterPage({
 
   const markdown = getChapterMarkdown(book.dirName, chapterSlug);
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: current.title,
+    description: `Read "${current.title}" from ${book.title}. Free Rust training curated by Ruhan Khandakar.`,
+    url: `${BASE_URL}/books/${bookSlug}/${chapterSlug}`,
+    author: { "@type": "Person", name: "Ruhan Khandakar" },
+    publisher: { "@type": "Person", name: "Ruhan Khandakar" },
+    isPartOf: {
+      "@type": "Book",
+      name: book.title,
+      author: { "@type": "Organization", name: "Microsoft" },
+    },
+    inLanguage: "en",
+    isAccessibleForFree: true,
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <ChapterReadMarker bookSlug={bookSlug} chapterSlug={chapterSlug} />
 
       <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">

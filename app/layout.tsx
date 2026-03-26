@@ -43,10 +43,54 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Rust Training — Microsoft",
+  metadataBase: new URL("https://rust.learningz.xyz"),
+  title: {
+    default: "Rust Training by Ruhan Khandakar — Learn Rust Programming",
+    template: "%s | Rust Training by Ruhan Khandakar",
+  },
   description:
-    "A collection of free Rust training books for developers from every background.",
+    "A curated collection of free Rust programming books and tutorials, built by Ruhan Khandakar. Learn Rust from beginner to advanced with interactive reading, progress tracking, and bookmarks.",
   applicationName: "Rust Training",
+  authors: [{ name: "Ruhan Khandakar" }],
+  creator: "Ruhan Khandakar",
+  publisher: "Ruhan Khandakar",
+  keywords: [
+    "Rust",
+    "Rust programming",
+    "learn Rust",
+    "Rust tutorial",
+    "Rust book",
+    "Ruhan Khandakar",
+    "systems programming",
+    "Rust beginner",
+    "Rust training",
+  ],
+  openGraph: {
+    type: "website",
+    title: "Rust Training by Ruhan Khandakar — Learn Rust Programming",
+    description:
+      "A curated collection of free Rust programming books and tutorials. Learn Rust from beginner to advanced with progress tracking and bookmarks.",
+    siteName: "Rust Training by Ruhan Khandakar",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Rust Training by Ruhan Khandakar",
+    description:
+      "Free Rust programming books and tutorials. Learn Rust from beginner to advanced.",
+    creator: "ruhankhandakar",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -67,6 +111,29 @@ export default function RootLayout({
     >
       <head>
         <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "Rust Training by Ruhan Khandakar",
+              description:
+                "A curated collection of free Rust programming books and tutorials. Learn Rust from beginner to advanced.",
+              url: "https://rust.learningz.xyz",
+              author: {
+                "@type": "Person",
+                name: "Ruhan Khandakar",
+                url: "https://x.com/KhandakarRuhan",
+              },
+              publisher: {
+                "@type": "Person",
+                name: "Ruhan Khandakar",
+              },
+              inLanguage: "en-US",
+            }),
+          }}
+        />
+        <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem("theme");if(t!=="light"){document.documentElement.classList.add("dark")}var f=localStorage.getItem("reading-font");if(f)document.documentElement.setAttribute("data-font",f);var s=localStorage.getItem("reading-font-size");if(s)document.documentElement.setAttribute("data-font-size",s)}catch(e){}})()`,
           }}
@@ -75,15 +142,15 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
           <FontProvider>
-          <ProgressProvider>
-          <BookmarkProvider>
-            {children}
-            <SpeedInsights />
-            <Analytics />
-            <OfflineIndicator />
-            <ServiceWorkerRegister />
-          </BookmarkProvider>
-          </ProgressProvider>
+            <ProgressProvider>
+              <BookmarkProvider>
+                {children}
+                <SpeedInsights />
+                <Analytics />
+                <OfflineIndicator />
+                <ServiceWorkerRegister />
+              </BookmarkProvider>
+            </ProgressProvider>
           </FontProvider>
         </ThemeProvider>
       </body>

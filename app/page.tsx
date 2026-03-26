@@ -21,8 +21,40 @@ export default function HomePage() {
     return { ...book, chapterCount: structure.flatChapters.length };
   });
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Rust Training by Ruhan Khandakar",
+    description:
+      "A curated collection of free Rust programming books and tutorials. Learn Rust from beginner to advanced.",
+    url: "https://rust.learningz.xyz",
+    author: { "@type": "Person", name: "Ruhan Khandakar" },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: booksWithCounts.length,
+      itemListElement: booksWithCounts.map((book, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        item: {
+          "@type": "Book",
+          name: book.title,
+          description: book.description,
+          url: `https://rust.learningz.xyz/books/${book.slug}`,
+          author: { "@type": "Organization", name: "Microsoft" },
+          numberOfPages: book.chapterCount,
+          inLanguage: "en",
+          isAccessibleForFree: true,
+        },
+      })),
+    },
+  };
+
   return (
     <div className="min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Hero */}
       <header className="relative overflow-hidden border-b border-border">
         <div className="absolute inset-0 bg-gradient-to-br from-rust/5 via-transparent to-rust/10" />
