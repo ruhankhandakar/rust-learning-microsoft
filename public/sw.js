@@ -1,4 +1,4 @@
-const CACHE_NAME = "rust-training-4.2.2";
+const CACHE_NAME = "rust-training-4.2.3";
 const CONTENT_HASH_URL = "/content-hash.json";
 
 const PRECACHE_URLS = ["/", "/~offline", "/manifest.webmanifest", "/icon.svg"];
