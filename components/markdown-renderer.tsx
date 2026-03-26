@@ -131,6 +131,11 @@ export function MarkdownRenderer({
         ]}
         components={{
           pre: CopyablePre,
+          table: ({ children }) => (
+            <div className="table-wrapper">
+              <table>{children}</table>
+            </div>
+          ),
           h1: headingComponent(1),
           h2: headingComponent(2),
           h3: headingComponent(3),

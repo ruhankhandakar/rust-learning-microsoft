@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Geist, Geist_Mono, Inter, Lora, Merriweather, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
@@ -10,6 +11,7 @@ import { OfflineIndicator } from "@/components/offline-indicator";
 import { ServiceWorkerRegister } from "@/components/sw-register";
 import { FontProvider } from "@/components/font-provider";
 import { BookmarkProvider } from "@/components/bookmark-provider";
+import { StarPrompt } from "@/components/star-prompt";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -109,7 +111,14 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${lora.variable} ${merriweather.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <head>
+      <body className="min-h-full flex flex-col">
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("theme");if(t!=="light"){document.documentElement.classList.add("dark")}var f=localStorage.getItem("reading-font");if(f)document.documentElement.setAttribute("data-font",f);var s=localStorage.getItem("reading-font-size");if(s)document.documentElement.setAttribute("data-font-size",s)}catch(e){}})()`,
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -133,13 +142,6 @@ export default function RootLayout({
             }),
           }}
         />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem("theme");if(t!=="light"){document.documentElement.classList.add("dark")}var f=localStorage.getItem("reading-font");if(f)document.documentElement.setAttribute("data-font",f);var s=localStorage.getItem("reading-font-size");if(s)document.documentElement.setAttribute("data-font-size",s)}catch(e){}})()`,
-          }}
-        />
-      </head>
-      <body className="min-h-full flex flex-col">
         <ThemeProvider>
           <FontProvider>
             <ProgressProvider>
@@ -148,8 +150,9 @@ export default function RootLayout({
                 <SpeedInsights />
                 <Analytics />
                 <OfflineIndicator />
-                <ServiceWorkerRegister />
-              </BookmarkProvider>
+            <ServiceWorkerRegister />
+            <StarPrompt />
+          </BookmarkProvider>
             </ProgressProvider>
           </FontProvider>
         </ThemeProvider>
