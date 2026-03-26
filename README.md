@@ -2,7 +2,7 @@
 
 A modern web reader for [Microsoft's Rust Training](https://github.com/microsoft/RustTraining) books. Seven free books that meet you where you are — from C++, C#, Python bridges to async deep dives and type-driven design.
 
-**Live site →** [rust-training.vercel.app](https://rust.learningz.xyz/)
+**Live site →** [https://rust.learningz.xyz/](https://rust.learningz.xyz/)
 
 ## Features
 
