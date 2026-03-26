@@ -9,8 +9,8 @@ import {
   Layers,
   FileText,
 } from "lucide-react";
-import { SearchTrigger } from "@/components/search-dialog";
-import { SettingsDropdown } from "@/components/settings-dropdown";
+import { SearchTrigger } from "@/components/search-trigger";
+import { SettingsDropdownLazy as SettingsDropdown } from "@/components/settings-dropdown-lazy";
 import { HomeButton } from "@/components/home-button";
 import { BookProgressBar } from "@/components/book-progress";
 import { ChapterCheckmark } from "@/components/chapter-checkmark";

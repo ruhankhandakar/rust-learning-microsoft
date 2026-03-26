@@ -7,7 +7,7 @@ import {
   useState,
   useCallback,
 } from "react";
-import { useSession } from "@/lib/auth-client";
+import { useSessionLite } from "./session-provider";
 import {
   getAllBookmarks,
   addBookmark as localAdd,
@@ -75,8 +75,8 @@ function makeKey(b: string, c: string, h: string) {
 
 export function BookmarkProvider({ children }: { children: React.ReactNode }) {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
-  const { data: session } = useSession();
-  const isLoggedIn = !!session?.user;
+  const { user } = useSessionLite();
+  const isLoggedIn = !!user;
 
   useEffect(() => {
     let cancelled = false;

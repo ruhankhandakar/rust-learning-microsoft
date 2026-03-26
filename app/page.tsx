@@ -9,8 +9,8 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { BookOpen, ChevronRight } from "lucide-react";
-import { SearchTrigger } from "@/components/search-dialog";
-import { SettingsDropdown } from "@/components/settings-dropdown";
+import { SearchTrigger } from "@/components/search-trigger";
+import { SettingsDropdownLazy as SettingsDropdown } from "@/components/settings-dropdown-lazy";
 import { BookProgressBar } from "@/components/book-progress";
 import { LevelTooltip } from "@/components/level-tooltip";
 import { APP_VERSION, CONTENT_LAST_UPDATED } from "@/lib/version";

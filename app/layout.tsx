@@ -11,6 +11,7 @@ import { OfflineIndicator } from "@/components/offline-indicator";
 import { ServiceWorkerRegister } from "@/components/sw-register";
 import { FontProvider } from "@/components/font-provider";
 import { BookmarkProvider } from "@/components/bookmark-provider";
+import { SessionProvider } from "@/components/session-provider";
 import { StarPrompt } from "@/components/star-prompt";
 
 const geistSans = Geist({
@@ -142,20 +143,22 @@ export default function RootLayout({
             }),
           }}
         />
-        <ThemeProvider>
-          <FontProvider>
-            <ProgressProvider>
-              <BookmarkProvider>
-                {children}
-                <SpeedInsights />
-                <Analytics />
-                <OfflineIndicator />
-            <ServiceWorkerRegister />
-            <StarPrompt />
-          </BookmarkProvider>
-            </ProgressProvider>
-          </FontProvider>
-        </ThemeProvider>
+        <SessionProvider>
+          <ThemeProvider>
+            <FontProvider>
+              <ProgressProvider>
+                <BookmarkProvider>
+                  {children}
+                  <SpeedInsights />
+                  <Analytics />
+                  <OfflineIndicator />
+                  <ServiceWorkerRegister />
+                  <StarPrompt />
+                </BookmarkProvider>
+              </ProgressProvider>
+            </FontProvider>
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );

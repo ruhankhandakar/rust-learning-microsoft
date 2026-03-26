@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { useSession } from "@/lib/auth-client";
+import { useSessionLite } from "./session-provider";
 import { pullPreferences, pushPreferences } from "@/lib/preferences";
 
 export type FontFamily = "geist" | "inter" | "lora" | "merriweather" | "jetbrains";
@@ -51,8 +51,8 @@ export function useFont() {
 export function FontProvider({ children }: { children: React.ReactNode }) {
   const [fontFamily, setFontFamilyState] = useState<FontFamily>("geist");
   const [fontSize, setFontSizeState] = useState<FontSize>("base");
-  const { data: session } = useSession();
-  const isLoggedIn = !!session?.user;
+  const { user } = useSessionLite();
+  const isLoggedIn = !!user;
 
   // Load from localStorage on mount
   useEffect(() => {

@@ -8,9 +8,9 @@ import { ChapterSidebar } from "@/components/chapter-sidebar";
 import { MobileNav } from "@/components/mobile-nav";
 import { ChapterReadMarker } from "@/components/chapter-read-marker";
 import { ErrorBoundary } from "@/components/error-boundary";
-import { SearchTrigger } from "@/components/search-dialog";
+import { SearchTrigger } from "@/components/search-trigger";
 import { HomeButton } from "@/components/home-button";
-import { SettingsDropdown } from "@/components/settings-dropdown";
+import { SettingsDropdownLazy as SettingsDropdown } from "@/components/settings-dropdown-lazy";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 const MarkdownRenderer = dynamic(

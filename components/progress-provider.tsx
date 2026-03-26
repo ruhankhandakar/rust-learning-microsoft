@@ -11,7 +11,7 @@ import {
   getReadChapters,
   markChapterRead as dbMark,
 } from "@/lib/progress-db";
-import { useSession } from "@/lib/auth-client";
+import { useSessionLite } from "./session-provider";
 
 interface ProgressContextValue {
   readSet: Set<string>;
@@ -57,8 +57,8 @@ async function pushToCloud(
 
 export function ProgressProvider({ children }: { children: React.ReactNode }) {
   const [readSet, setReadSet] = useState<Set<string>>(new Set());
-  const { data: session } = useSession();
-  const isLoggedIn = !!session?.user;
+  const { user } = useSessionLite();
+  const isLoggedIn = !!user;
 
   useEffect(() => {
     let cancelled = false;

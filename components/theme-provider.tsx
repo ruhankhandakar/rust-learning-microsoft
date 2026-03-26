@@ -7,7 +7,7 @@ import {
   useState,
   useCallback,
 } from "react";
-import { useSession } from "@/lib/auth-client";
+import { useSessionLite } from "./session-provider";
 import { pullPreferences, pushPreferences } from "@/lib/preferences";
 
 type Theme = "light" | "dark";
@@ -29,8 +29,8 @@ export function useTheme() {
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("dark");
   const [mounted, setMounted] = useState(false);
-  const { data: session } = useSession();
-  const isLoggedIn = !!session?.user;
+  const { user } = useSessionLite();
+  const isLoggedIn = !!user;
 
   // Load from localStorage on mount
   useEffect(() => {
