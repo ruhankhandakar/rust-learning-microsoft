@@ -104,6 +104,75 @@ export default function HomePage() {
         </div>
       </main>
 
+      {/* FAQ */}
+      <section className="mx-auto max-w-6xl px-6 py-16">
+        <h2 className="text-2xl font-bold mb-2">Frequently Asked Questions</h2>
+        <p className="text-muted-foreground mb-8">
+          Everything you need to know about using this site.
+        </p>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="rounded-lg border border-border p-5">
+            <h3 className="font-semibold mb-1.5">Does it work offline?</h3>
+            <p className="text-sm text-muted-foreground">
+              Yes. The site is a PWA — once you visit a book, its chapters are
+              cached automatically. You can install it on your device and read
+              without an internet connection.
+            </p>
+          </div>
+
+          <div className="rounded-lg border border-border p-5">
+            <h3 className="font-semibold mb-1.5">Can I change the font?</h3>
+            <p className="text-sm text-muted-foreground">
+              Open the settings menu (gear icon) to choose from five fonts and
+              four size options. Your choice is saved and applies across all pages.
+            </p>
+          </div>
+
+          <div className="rounded-lg border border-border p-5">
+            <h3 className="font-semibold mb-1.5">How do bookmarks work?</h3>
+            <p className="text-sm text-muted-foreground">
+              Hover over any heading inside a chapter and click the bookmark icon.
+              All your bookmarks are accessible from the settings menu. They work
+              offline via your browser&apos;s local storage.
+            </p>
+          </div>
+
+          <div className="rounded-lg border border-border p-5">
+            <h3 className="font-semibold mb-1.5">Why sign in with GitHub?</h3>
+            <p className="text-sm text-muted-foreground">
+              Signing in syncs your reading progress, bookmarks, and preferences
+              to the cloud — so they follow you across devices. Without signing
+              in, everything is stored locally on your current browser.
+            </p>
+          </div>
+
+          <div className="rounded-lg border border-border p-5">
+            <h3 className="font-semibold mb-1.5">Is my reading progress tracked?</h3>
+            <p className="text-sm text-muted-foreground">
+              Chapters are automatically marked as read when you visit them. A
+              progress bar on each book card shows how far you&apos;ve gone.
+            </p>
+          </div>
+
+          <div className="rounded-lg border border-border p-5">
+            <h3 className="font-semibold mb-1.5">Is this free &amp; open source?</h3>
+            <p className="text-sm text-muted-foreground">
+              The training content is from Microsoft&apos;s{" "}
+              <a
+                href="https://github.com/microsoft/RustTraining"
+                className="text-primary hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                RustTraining
+              </a>{" "}
+              repo (MIT &amp; CC BY 4.0). This website is also open source.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="border-t border-border mt-auto">
         <div className="mx-auto max-w-6xl px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">

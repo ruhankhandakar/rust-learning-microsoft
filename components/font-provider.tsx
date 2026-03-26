@@ -1,6 +1,8 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { useSession } from "@/lib/auth-client";
+import { pullPreferences, pushPreferences } from "@/lib/preferences";
 
 export type FontFamily = "geist" | "inter" | "lora" | "merriweather" | "jetbrains";
 export type FontSize = "sm" | "base" | "lg" | "xl";
@@ -49,7 +51,10 @@ export function useFont() {
 export function FontProvider({ children }: { children: React.ReactNode }) {
   const [fontFamily, setFontFamilyState] = useState<FontFamily>("geist");
   const [fontSize, setFontSizeState] = useState<FontSize>("base");
+  const { data: session } = useSession();
+  const isLoggedIn = !!session?.user;
 
+  // Load from localStorage on mount
   useEffect(() => {
     try {
       const saved = localStorage.getItem("reading-font");
@@ -59,6 +64,34 @@ export function FontProvider({ children }: { children: React.ReactNode }) {
     } catch {}
   }, []);
 
+  // Sync from cloud on login / coming back online
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    let cancelled = false;
+
+    async function sync() {
+      const prefs = await pullPreferences();
+      if (cancelled || !prefs) return;
+
+      if (prefs.font_family) {
+        setFontFamilyState(prefs.font_family as FontFamily);
+        try { localStorage.setItem("reading-font", prefs.font_family); } catch {}
+      }
+      if (prefs.font_size) {
+        setFontSizeState(prefs.font_size as FontSize);
+        try { localStorage.setItem("reading-font-size", prefs.font_size); } catch {}
+      }
+    }
+
+    sync();
+    window.addEventListener("online", sync);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("online", sync);
+    };
+  }, [isLoggedIn]);
+
+  // Apply data attributes
   useEffect(() => {
     document.documentElement.setAttribute("data-font", fontFamily);
   }, [fontFamily]);
@@ -70,12 +103,14 @@ export function FontProvider({ children }: { children: React.ReactNode }) {
   const setFontFamily = useCallback((f: FontFamily) => {
     setFontFamilyState(f);
     try { localStorage.setItem("reading-font", f); } catch {}
-  }, []);
+    if (isLoggedIn) pushPreferences({ font_family: f });
+  }, [isLoggedIn]);
 
   const setFontSize = useCallback((s: FontSize) => {
     setFontSizeState(s);
     try { localStorage.setItem("reading-font-size", s); } catch {}
-  }, []);
+    if (isLoggedIn) pushPreferences({ font_size: s });
+  }, [isLoggedIn]);
 
   return (
     <FontContext.Provider

@@ -1,6 +1,7 @@
 "use client";
 
 import { Settings, Sun, Moon, Check, Minus, Plus, LogOut } from "lucide-react";
+import { BookmarksPanel } from "./bookmarks-panel";
 import { useTheme } from "./theme-provider";
 import {
   useFont,
@@ -87,6 +88,13 @@ export function SettingsDropdown() {
               <span className="ml-auto text-[10px] text-muted-foreground">sync progress</span>
             </button>
           )}
+        </div>
+
+        <DropdownMenuSeparator />
+
+        {/* Bookmarks */}
+        <div className="px-1 py-1">
+          <BookmarksPanel />
         </div>
 
         <DropdownMenuSeparator />

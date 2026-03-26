@@ -90,7 +90,7 @@ export default async function ChapterPage({
         <main className="flex-1 min-w-0">
           <article className="mx-auto max-w-3xl px-6 md:px-10 py-10">
               <ErrorBoundary>
-                <MarkdownRenderer content={markdown} />
+                <MarkdownRenderer content={markdown} bookSlug={bookSlug} chapterSlug={chapterSlug} />
               </ErrorBoundary>
           </article>
 

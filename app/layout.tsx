@@ -9,6 +9,7 @@ import { ProgressProvider } from "@/components/progress-provider";
 import { OfflineIndicator } from "@/components/offline-indicator";
 import { ServiceWorkerRegister } from "@/components/sw-register";
 import { FontProvider } from "@/components/font-provider";
+import { BookmarkProvider } from "@/components/bookmark-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -75,11 +76,13 @@ export default function RootLayout({
         <ThemeProvider>
           <FontProvider>
           <ProgressProvider>
+          <BookmarkProvider>
             {children}
             <SpeedInsights />
             <Analytics />
             <OfflineIndicator />
             <ServiceWorkerRegister />
+          </BookmarkProvider>
           </ProgressProvider>
           </FontProvider>
         </ThemeProvider>
