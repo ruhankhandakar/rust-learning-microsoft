@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 import rehypeHighlight from "rehype-highlight";
 import { Check, Copy, Bookmark as BookmarkIcon } from "lucide-react";
 import { useBookmarks } from "./bookmark-provider";
@@ -127,6 +128,7 @@ export function MarkdownRenderer({
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[
+          rehypeRaw,
           [rehypeHighlight, { detect: true, ignoreMissing: true }],
         ]}
         components={{
