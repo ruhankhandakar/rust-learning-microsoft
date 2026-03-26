@@ -32,6 +32,7 @@ export function SearchTrigger({ className }: { className?: string }) {
     <>
       <button
         onClick={() => setOpen(true)}
+        aria-label="Search"
         className={`inline-flex items-center gap-2 h-9 px-3 rounded-lg border border-border bg-card hover:bg-accent transition-colors text-sm text-muted-foreground ${className ?? ""}`}
       >
         <Search className="h-4 w-4" />

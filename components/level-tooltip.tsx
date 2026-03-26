@@ -47,10 +47,10 @@ export function LevelTooltip({
         }}
         onMouseEnter={() => setShow(true)}
         onMouseLeave={() => setShow(false)}
-        className="text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+        className="text-muted-foreground/60 hover:text-muted-foreground transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center -m-2.5"
         aria-label={`What does ${level} mean?`}
       >
-        <Info className="h-3.5 w-3.5" />
+        <Info className="h-4 w-4" />
       </button>
       {show && (
         <span className="absolute right-0 top-full mt-1.5 z-50 w-52 rounded-lg border border-border bg-popover px-3 py-2 text-xs text-popover-foreground shadow-lg">

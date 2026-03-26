@@ -193,7 +193,7 @@ export default function HomePage() {
               The training content is from Microsoft&apos;s{" "}
               <a
                 href="https://github.com/microsoft/RustTraining"
-                className="text-primary hover:underline"
+                className="text-primary underline underline-offset-2 decoration-primary/40 hover:decoration-primary"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -202,7 +202,7 @@ export default function HomePage() {
               repo (MIT &amp; CC BY 4.0). This website is also{" "}
               <a
                 href="https://github.com/ruhankhandakar/rust-learning-microsoft"
-                className="text-primary hover:underline"
+                className="text-primary underline underline-offset-2 decoration-primary/40 hover:decoration-primary"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -220,7 +220,7 @@ export default function HomePage() {
             Content from{" "}
             <a
               href="https://github.com/microsoft/RustTraining"
-              className="font-medium text-foreground hover:text-primary"
+              className="font-medium text-foreground underline underline-offset-2 decoration-foreground/30 hover:text-primary hover:decoration-primary"
               target="_blank"
               rel="noopener noreferrer"
             >
