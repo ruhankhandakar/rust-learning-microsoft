@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BOOKS, getBookBySlug } from "@/lib/books";
@@ -6,12 +7,26 @@ import { getBookStructure, getChapterMarkdown } from "@/lib/content";
 import { ChapterSidebar } from "@/components/chapter-sidebar";
 import { MobileNav } from "@/components/mobile-nav";
 import { ChapterReadMarker } from "@/components/chapter-read-marker";
-import { MarkdownRenderer } from "@/components/markdown-renderer";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { SearchTrigger } from "@/components/search-dialog";
 import { HomeButton } from "@/components/home-button";
 import { SettingsDropdown } from "@/components/settings-dropdown";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+
+const MarkdownRenderer = dynamic(
+  () => import("@/components/markdown-renderer").then((m) => m.MarkdownRenderer),
+  {
+    loading: () => (
+      <div className="animate-pulse space-y-4">
+        <div className="h-8 bg-muted rounded w-3/4" />
+        <div className="h-4 bg-muted rounded w-full" />
+        <div className="h-4 bg-muted rounded w-5/6" />
+        <div className="h-4 bg-muted rounded w-full" />
+        <div className="h-4 bg-muted rounded w-2/3" />
+      </div>
+    ),
+  }
+);
 
 const BASE_URL = "https://rust.learningz.xyz";
 
