@@ -45,6 +45,8 @@ fn main() {
 }
 ```
 
+> **Note:** `.unwrap()` on `.send()` is used for brevity. It panics if the receiver has been dropped. Production code should handle `SendError` gracefully.
+
 **Key properties**:
 - **Unbounded** by default (can fill memory if consumer is slow)
 - `mpsc::sync_channel(N)` creates a **bounded** channel with backpressure
@@ -62,6 +64,8 @@ thread::spawn(move || {
     }
 });
 ```
+
+> **Note:** `.unwrap()` is used for brevity. In production, handle `SendError` (receiver dropped) instead of panicking.
 
 ### crossbeam-channel — The Production Workhorse
 

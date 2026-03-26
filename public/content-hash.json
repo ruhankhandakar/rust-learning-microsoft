@@ -1,0 +1,12 @@
+{
+  "version": "04b958c35ef2",
+  "books": {
+    "async-book": "38397497f552",
+    "c-cpp-book": "09aaf518402e",
+    "csharp-book": "4c36d99c41aa",
+    "engineering-book": "5d4936b2445e",
+    "python-book": "c847cb098cbf",
+    "rust-patterns-book": "8e3da584c345",
+    "type-driven-correctness-book": "edf2a48054e0"
+  }
+}

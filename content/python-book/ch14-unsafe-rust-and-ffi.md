@@ -51,6 +51,7 @@ extern "C" {
 }
 
 fn main() {
+    // SAFETY: abs() is a well-defined C standard library function.
     let result = unsafe { abs(-42) };  // Safe Rust can't verify C code
     println!("{result}");               // 42
 }
@@ -484,6 +485,8 @@ fn split_at_mid(slice: &mut [i32]) -> (&mut [i32], &mut [i32]) {
 
     assert!(mid <= len); // Safety check before unsafe
 
+    // SAFETY: mid <= len (asserted above), and ptr comes from a valid &mut slice,
+    // so both sub-slices are within bounds and non-overlapping.
     unsafe {
         (
             std::slice::from_raw_parts_mut(ptr, mid),

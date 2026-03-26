@@ -10,7 +10,7 @@ fn main() {
 - The above syntax should be similar to anyone familiar with C-style languages
     - All functions in Rust begin with the ```fn``` keyword
     - The default entry point for executables is ```main()```
-    - The ```println!``` looks like a function, but is actually a **macro**. Macros in Rust are very different from C/C++ preprocessor macros \u2014 they are hygienic, type-safe, and operate on the syntax tree rather than text substitution
+    - The ```println!``` looks like a function, but is actually a **macro**. Macros in Rust are very different from C/C++ preprocessor macros — they are hygienic, type-safe, and operate on the syntax tree rather than text substitution
 - Two great ways to quickly try out Rust snippets:
     - **Online**: [Rust Playground](https://play.rust-lang.org/) — paste code, hit Run, share results. No install needed
     - **Local REPL**: Install [`evcxr_repl`](https://github.com/evcxr/evcxr) for an interactive Rust REPL (like Python's REPL, but for Rust):

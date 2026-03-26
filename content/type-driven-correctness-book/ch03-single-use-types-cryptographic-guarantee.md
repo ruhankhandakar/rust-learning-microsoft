@@ -62,6 +62,7 @@ Attempting to reuse it:
 
 ```rust,ignore
 fn bad_encrypt(key: &SealingKey, data1: &mut Vec<u8>, data2: &mut Vec<u8>) {
+    // .unwrap() is safe — a 12-byte array is always a valid nonce.
     let nonce = Nonce::try_assume_unique_for_key(&[0u8; 12]).unwrap();
     seal_in_place(key, nonce, data1).unwrap();  // ✅ nonce moved here
     // seal_in_place(key, nonce, data2).unwrap();

@@ -259,6 +259,8 @@ impl ComputerSystemBuilder<HasField, HasField, HasField, HasField> {
             "@odata.id": format!("/redfish/v1/Systems/{id}"),
             "@odata.type": "#ComputerSystem.v1_13_0.ComputerSystem",
             "Id": id,
+            // Type-state guarantees these are Some — .unwrap() is safe here.
+            // In production, prefer .expect("guaranteed by type state").
             "Name": self.name.unwrap(),
             "UUID": self.uuid.unwrap(),
             "PowerState": self.power_state.unwrap(),
@@ -278,6 +280,8 @@ impl ComputerSystemBuilder<HasField, HasField, HasField, HasField> {
         if let Some(v) = self.bios_version {
             obj["BiosVersion"] = serde_json::json!(v);
         }
+        // NOTE: .unwrap() on to_value() is used for brevity.
+        // Production code should propagate serialization errors with `?`.
         if let Some(ps) = self.processor_summary {
             obj["ProcessorSummary"] = serde_json::to_value(ps).unwrap();
         }
@@ -1173,6 +1177,7 @@ fn main() {
         Some("2.10.1".into()),
     );
 
+    // NOTE: .unwrap() is used for brevity — handle errors in production.
     println!("{}", serde_json::to_string_pretty(&response).unwrap());
 }
 ```

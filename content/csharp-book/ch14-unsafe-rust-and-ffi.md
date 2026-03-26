@@ -14,6 +14,7 @@ Unsafe Rust allows you to perform operations that the borrow checker cannot veri
 // 1. Dereferencing raw pointers
 let mut value = 42;
 let ptr = &mut value as *mut i32;
+// SAFETY: ptr points to a valid, live local variable.
 unsafe {
     *ptr = 100; // Must be in unsafe block
 }
@@ -23,12 +24,14 @@ unsafe fn dangerous() {
     // Internal implementation that requires caller to maintain invariants
 }
 
+// SAFETY: no invariants to uphold for this example function.
 unsafe {
     dangerous(); // Caller takes responsibility
 }
 
 // 3. Accessing mutable static variables
 static mut COUNTER: u32 = 0;
+// SAFETY: single-threaded context; no concurrent access to COUNTER.
 unsafe {
     COUNTER += 1; // Not thread-safe — caller must ensure synchronization
 }
@@ -124,6 +127,7 @@ pub extern "C" fn add_numbers(a: i32, b: i32) -> i32 {
 
 #[no_mangle]
 pub extern "C" fn process_string(input: *const std::os::raw::c_char) -> i32 {
+    // SAFETY: input is non-null (checked inside) and assumed null-terminated by caller.
     let c_str = unsafe {
         if input.is_null() {
             return -1;
@@ -230,6 +234,7 @@ pub extern "C" fn processor_new(width: u32, height: u32) -> *mut ImageProcessor 
 /// Apply a grayscale filter. Returns 0 on success, -1 on null pointer.
 #[no_mangle]
 pub extern "C" fn processor_grayscale(ptr: *mut ImageProcessor) -> i32 {
+    // SAFETY: ptr was created by Box::into_raw (non-null), still valid.
     let proc = match unsafe { ptr.as_mut() } {
         Some(p) => p,
         None => return -1,
@@ -337,6 +342,7 @@ struct SafeBuffer {
 
 impl SafeBuffer {
     fn new(size: usize) -> Option<Self> {
+        // SAFETY: lib_create_buffer returns a valid pointer or null (checked below).
         let ptr = unsafe { lib_create_buffer(size) };
         if ptr.is_null() {
             None

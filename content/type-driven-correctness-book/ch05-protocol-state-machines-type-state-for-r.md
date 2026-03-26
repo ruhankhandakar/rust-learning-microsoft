@@ -114,6 +114,7 @@ impl IpmiSession<Idle> {
 // Transition: Authenticated → Active
 impl IpmiSession<Authenticated> {
     pub fn activate(self) -> Result<IpmiSession<Active>, String> {
+        // session_id is guaranteed Some by the type-state transition path.
         println!("Activating session {}", self.session_id.unwrap());
         Ok(IpmiSession {
             transport: self.transport,
@@ -126,11 +127,13 @@ impl IpmiSession<Authenticated> {
 // Operations available ONLY in Active state
 impl IpmiSession<Active> {
     pub fn send_command(&mut self, netfn: u8, cmd: u8, data: &[u8]) -> Vec<u8> {
+        // session_id is guaranteed Some in Active state.
         println!("Sending cmd 0x{cmd:02X} on session {}", self.session_id.unwrap());
         vec![0x00] // stub: completion code OK
     }
 
     pub fn close(self) -> IpmiSession<Closed> {
+        // session_id is guaranteed Some in Active state.
         println!("Closing session {}", self.session_id.unwrap());
         IpmiSession {
             transport: self.transport,

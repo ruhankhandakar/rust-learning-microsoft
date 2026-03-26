@@ -28,6 +28,8 @@ async fn main_server() {
     println!("Shutdown signal received, finishing in-flight requests...");
 
     // Notify all tasks to shut down
+    // NOTE: .unwrap() is used for brevity. Production code should handle
+    // the case where all receivers have been dropped.
     shutdown_tx.send(true).unwrap();
 
     // Wait for server to finish (with timeout)
@@ -448,6 +450,7 @@ async fn main() {
     }
 
     // On Ctrl+C: signal shutdown, wait for workers
+    // NOTE: .unwrap() is used for brevity — handle errors in production.
     tokio::signal::ctrl_c().await.unwrap();
     shutdown_tx.send(true).unwrap();
     for h in handles { let _ = h.await; }

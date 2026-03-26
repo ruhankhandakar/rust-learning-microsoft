@@ -47,6 +47,7 @@ fn block_on<F: Future>(mut future: F) -> F::Output {
         RawWaker::new(std::ptr::null(), vtable)
     }
 
+    // SAFETY: noop_raw_waker() returns a valid RawWaker with a correct vtable.
     let waker = unsafe { Waker::from_raw(noop_raw_waker()) };
     let mut cx = Context::from_waker(&waker);
 

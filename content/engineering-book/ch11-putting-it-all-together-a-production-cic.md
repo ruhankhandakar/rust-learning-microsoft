@@ -47,6 +47,12 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2  # Cache dependencies
 
+      - name: Check Cargo.lock
+        run: cargo fetch --locked
+
+      - name: Check doc
+        run: RUSTDOCFLAGS='-Dwarnings' cargo doc --workspace --all-features --no-deps
+
       - name: Check compilation
         run: cargo check --workspace --all-targets --all-features
 
@@ -192,7 +198,7 @@ jobs:
        │ (2×) │  │ (2×) │ │        │ │      │ │(PR)  │
        └──────┘  └──────┘ └────────┘ └──────┘ └──────┘
          3 min    8 min     8 min     12 min    5 min
-                                                        
+
 Total wall-clock: ~14 min (parallel after check gate)
 ```
 
@@ -541,29 +547,29 @@ flowchart LR
     subgraph "Stage 1 — Fast Feedback < 2 min"
         CHECK["cargo check\ncargo clippy\ncargo fmt"]
     end
-    
+
     subgraph "Stage 2 — Tests < 5 min"
         TEST["cargo nextest\ncargo test --doc"]
     end
-    
+
     subgraph "Stage 3 — Coverage"
         COV["cargo llvm-cov\nfail-under 80%"]
     end
-    
+
     subgraph "Stage 4 — Security"
         SEC["cargo audit\ncargo deny check"]
     end
-    
+
     subgraph "Stage 5 — Cross-Build"
         CROSS["musl static\naarch64 + x86_64"]
     end
-    
+
     subgraph "Stage 6 — Release (tag only)"
         REL["cargo dist\nGitHub Release"]
     end
-    
+
     CHECK --> TEST --> COV --> SEC --> CROSS --> REL
-    
+
     style CHECK fill:#91e5a3,color:#000
     style TEST fill:#91e5a3,color:#000
     style COV fill:#e3f2fd,color:#000
@@ -581,4 +587,3 @@ flowchart LR
 - `cargo-dist` automates cross-platform release builds — stop writing platform matrix YAML by hand
 
 ---
-

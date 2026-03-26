@@ -4,6 +4,8 @@ A modern web reader for [Microsoft's Rust Training](https://github.com/microsoft
 
 **Live site →** [https://rust.learningz.xyz/](https://rust.learningz.xyz/)
 
+Built by [Ruhan Khandakar](https://x.com/KhandakarRuhan).
+
 ## Features
 
 - **7 Rust books** with chapter-by-chapter navigation and syntax highlighting
@@ -122,18 +124,61 @@ lib/
 
 public/
 ├── sw.js                             # Service worker
+├── content-hash.json                 # Auto-generated content hash for cache busting
 └── icons/                            # PWA icons
+
+scripts/
+├── sync-content.sh                   # Pull latest markdown from upstream repo
+├── generate-content-hash.js          # Hash content for SW cache invalidation
+└── sync-sw-version.js                # Sync package.json version → SW cache name
+
+.github/workflows/
+└── sync-content.yml                  # Weekly automated content sync (PR-based)
 ```
 
-## Versioning
+## Content Sync
 
-`package.json` is the single source of truth for the app version. The build script auto-syncs it to the service worker cache name.
+Book content is sourced from [microsoft/RustTraining](https://github.com/microsoft/RustTraining). A GitHub Actions workflow syncs it automatically every Monday and opens a PR for review.
+
+### How it works
+
+1. `scripts/sync-content.sh` shallow-clones the upstream repo and rsyncs `.md` files from each book's `src/` into `content/<book>/`
+2. If anything changed, the workflow bumps the patch version, regenerates the content hash and SW cache name, then opens a PR
+3. You review and merge — Vercel deploys, the new SW activates and invalidates the old cache
+
+### Manual sync
+
+```bash
+pnpm sync-content          # Pull latest from upstream
+node scripts/generate-content-hash.js  # Regenerate content hash
+```
+
+### Triggering the workflow manually
+
+Go to **Actions → Sync upstream content → Run workflow** in the GitHub repo.
+
+## Versioning & Service Worker
+
+`package.json` is the single source of truth for the app version. The build script auto-syncs it to the service worker cache name and generates a `content-hash.json` for fine-grained cache invalidation.
 
 ```bash
 pnpm version:patch   # 1.0.0 → 1.0.1
 pnpm version:minor   # 1.0.0 → 1.1.0
 pnpm version:major   # 1.0.0 → 2.0.0
 ```
+
+The SW uses a **network-first** strategy for pages and a **cache-first** strategy for static assets. On deploy, a new version-stamped cache replaces the old one. The `CHECK_CONTENT_UPDATE` message lets the app detect content changes and notify users without a full SW update.
+
+## Contributing
+
+Contributions are welcome! If you find a bug or want to add a feature:
+
+1. Fork the repo
+2. Create a feature branch (`git checkout -b feat/my-feature`)
+3. Commit your changes
+4. Open a PR
+
+For content issues, please file them on [microsoft/RustTraining](https://github.com/microsoft/RustTraining/issues) directly.
 
 ## License
 

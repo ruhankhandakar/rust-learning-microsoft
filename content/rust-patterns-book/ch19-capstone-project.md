@@ -254,6 +254,7 @@ fn main() {
                 }
             },
         );
+        // NOTE: .unwrap() is used for brevity — handle SendError in production.
         scheduler.submit(item).unwrap();
     }
 

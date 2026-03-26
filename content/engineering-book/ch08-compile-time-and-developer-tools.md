@@ -55,11 +55,18 @@ sudo apt install mold  # Ubuntu 22.04+
 # The macOS linker (ld64) is already quite fast; if you need faster:
 # brew install sold     # sold = mold for Mach-O (experimental, less mature)
 # In practice, macOS link times are rarely a bottleneck.
+```
 
+```toml
 # Use mold for linking
 # .cargo/config.toml
 [target.x86_64-unknown-linux-gnu]
 rustflags = ["-C", "link-arg=-fuse-ld=mold"]
+```
+
+```bash
+# See https://github.com/rui314/mold/blob/main/docs/mold.md#environment-variables
+export MOLD_JOBS=1
 
 # Verify mold is being used
 cargo build -v 2>&1 | grep mold
@@ -136,6 +143,12 @@ cargo expand --lib --tests
 
 Invaluable for debugging `#[derive]` macro output, `macro_rules!` expansions,
 and understanding what `serde` generates for your types.
+
+In addition to `cargo-expand`, you can also use rust-analyzer to expand macros:
+
+1. Move cursor to the macro you want to check.
+2. Open command palette (e.g. `F1` on VSCode).
+3. Search for `rust-analyzer: Expand macro recursively at caret`.
 
 **`cargo-geiger`** — count `unsafe` usage across your dependency tree:
 
@@ -404,16 +417,16 @@ pub fn get_battery_status() -> Option<u8> {
 ```mermaid
 flowchart TD
     START["Compile too slow?"] --> WHERE{"Where's the time?"}
-    
+
     WHERE -->|"Recompiling\nunchanged crates"| SCCACHE["sccache\nShared compilation cache"]
     WHERE -->|"Linking phase"| MOLD["mold linker\n3-10× faster linking"]
     WHERE -->|"Running tests"| NEXTEST["cargo-nextest\nParallel test runner"]
     WHERE -->|"Everything"| COMBO["All of the above +\ncargo-udeps to trim deps"]
-    
+
     SCCACHE --> CI_CACHE{"CI or local?"}
     CI_CACHE -->|"CI"| S3["S3/GCS shared cache"]
     CI_CACHE -->|"Local"| LOCAL["Local disk cache\nauto-configured"]
-    
+
     style SCCACHE fill:#91e5a3,color:#000
     style MOLD fill:#e3f2fd,color:#000
     style NEXTEST fill:#ffd43b,color:#000
@@ -490,4 +503,3 @@ cargo nextest run --workspace --retries 2
 - `[workspace.lints]` centralizes Clippy and rustc lint configuration across a multi-crate workspace
 
 ---
-

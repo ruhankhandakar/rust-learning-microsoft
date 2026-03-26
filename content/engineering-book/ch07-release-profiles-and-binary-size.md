@@ -4,7 +4,7 @@
 > - Release profile anatomy: LTO, codegen-units, panic strategy, strip, opt-level
 > - Thin vs Fat vs Cross-Language LTO trade-offs
 > - Binary size analysis with `cargo-bloat`
-> - Dependency trimming with `cargo-udeps` and `cargo-machete`
+> - Dependency trimming with `cargo-udeps`, `cargo-machete` and `cargo-shear`
 >
 > **Cross-references:** [Compile-Time Tools](ch08-compile-time-and-developer-tools.md) — the other half of optimization · [Benchmarking](ch03-benchmarking-measuring-what-matters.md) — measure runtime before you optimize · [Dependencies](ch06-dependency-management-and-supply-chain-s.md) — trimming deps reduces both size and compile time
 
@@ -220,7 +220,7 @@ cargo +nightly udeps --workspace
 # `diag_tool v0.1.0`
 # └── "tempfile" (dev-dependency)
 #
-# `accel_diag v0.1.0`  
+# `accel_diag v0.1.0`
 # └── "once_cell"    ← was needed before LazyLock, now dead
 ```
 
@@ -238,6 +238,15 @@ cargo machete
 # Faster but may have false positives (heuristic, not compilation-based)
 ```
 
+**Alternative: `cargo-shear`** — sweet spot between `cargo-udeps` and `cargo-machete`:
+
+```bash
+cargo install cargo-shear
+cargo shear --fix
+# Slower than cargo-machete but much faster than cargo-udeps
+# Much less false positives than cargo-machete
+```
+
 ### Size Optimization Decision Tree
 
 ```mermaid
@@ -252,7 +261,7 @@ flowchart TD
     BIG_DEP -->|"No"| UDEPS["cargo-udeps\nRemove unused deps"]
     UDEPS --> OPT_LEVEL{"Need smaller?"}
     OPT_LEVEL -->|"Yes"| SIZE_OPT["opt-level = 's' or 'z'"]
-    
+
     style DO_STRIP fill:#91e5a3,color:#000
     style DO_LTO fill:#e3f2fd,color:#000
     style REPLACE fill:#ffd43b,color:#000
@@ -318,7 +327,7 @@ cargo bloat --release --crates  # Compare after changes
 - `lto = true` + `codegen-units = 1` + `strip = true` + `panic = "abort"` is the production release profile
 - Thin LTO (`lto = "thin"`) gives 80% of Fat LTO's benefit at a fraction of the compile cost
 - `cargo-bloat --crates` tells you exactly which dependencies are eating binary space
-- `cargo-udeps` and `cargo-machete` find dead dependencies that waste compile time and binary size
+- `cargo-udeps`, `cargo-machete` and `cargo-shear` find dead dependencies that waste compile time and binary size
 - Per-crate profile overrides let you optimize hot crates without slowing the whole build
 
 ---

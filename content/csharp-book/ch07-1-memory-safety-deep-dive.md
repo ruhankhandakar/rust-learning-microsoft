@@ -160,6 +160,8 @@ impl Buffer {
     }
     
     // Or explicitly unsafe if you know what you're doing:
+    /// # Safety
+    /// `index` must be less than `array.len()`.
     unsafe fn get_value_unchecked(array: &[i32], index: usize) -> i32 {
         *array.get_unchecked(index)  // Fast but must prove bounds manually
     }

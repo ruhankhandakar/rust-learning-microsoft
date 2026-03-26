@@ -58,12 +58,11 @@ This material works both as an instructor-led course and for self-study. If you'
 - [How does Rust address these issues?](ch01-introduction-and-motivation.md#how-does-rust-address-these-issues)
 - [Other Rust USPs and features](ch01-introduction-and-motivation.md#other-rust-usps-and-features)
 - [Quick Reference: Rust vs C/C++](ch01-introduction-and-motivation.md#quick-reference-rust-vs-cc)
-- [Why C Developers Need Rust](ch01-1-why-c-developers-need-rust.md)
-  - [Common C vulnerabilities](ch01-1-why-c-developers-need-rust.md#a-brief-peek-at-some-common-c-vulnerabilities)
-  - [Illustration of C vulnerabilities](ch01-1-why-c-developers-need-rust.md#illustration-of-c-vulnerabilities)
-- [Why C++ Developers Need Rust](ch01-2-why-cpp-developers-need-rust.md)
-  - [C++ challenges that Rust addresses](ch01-2-why-cpp-developers-need-rust.md#c-challenges-that-rust-addresses)
-  - [C++ memory safety issues (even with modern C++)](ch01-2-why-cpp-developers-need-rust.md#c-memory-safety-issues-even-with-modern-c)
+- [Why C/C++ Developers Need Rust](ch01-1-why-c-cpp-developers-need-rust.md)
+  - [What Rust Eliminates — The Complete List](ch01-1-why-c-cpp-developers-need-rust.md#what-rust-eliminates--the-complete-list)
+  - [The Problems Shared by C and C++](ch01-1-why-c-cpp-developers-need-rust.md#the-problems-shared-by-c-and-c)
+  - [C++ Adds More Problems on Top](ch01-1-why-c-cpp-developers-need-rust.md#c-adds-more-problems-on-top)
+  - [How Rust Addresses All of This](ch01-1-why-c-cpp-developers-need-rust.md#how-rust-addresses-all-of-this)
 
 ### 2. Getting Started
 - [Enough talk already: Show me some code](ch02-getting-started.md#enough-talk-already-show-me-some-code)

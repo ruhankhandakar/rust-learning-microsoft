@@ -1,0 +1,72 @@
+name: Sync upstream content
+
+on:
+  schedule:
+    # Every Monday at 08:00 UTC
+    - cron: "0 8 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Sync content from Microsoft/RustTraining
+        run: |
+          chmod +x scripts/sync-content.sh
+          bash scripts/sync-content.sh
+
+      - name: Check for changes
+        id: check
+        run: |
+          if git diff --quiet -- content/; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Bump patch version & generate content hash
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          npm version patch --no-git-tag-version
+          node scripts/generate-content-hash.js
+          node scripts/sync-sw-version.js
+
+      - name: Create Pull Request
+        if: steps.check.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: chore/sync-upstream-content
+          delete-branch: true
+          commit-message: "chore: sync content from Microsoft/RustTraining"
+          title: "chore: sync content from Microsoft/RustTraining"
+          body: |
+            Automated content sync from [microsoft/RustTraining](https://github.com/microsoft/RustTraining).
+
+            - Pulled latest markdown from upstream `src/` directories
+            - Bumped patch version
+            - Regenerated content hash & SW cache name
+
+            Review the diff and merge when ready.
+          labels: |
+            content
+            automated

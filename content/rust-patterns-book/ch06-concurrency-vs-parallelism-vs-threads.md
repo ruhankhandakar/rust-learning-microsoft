@@ -162,6 +162,11 @@ fn expensive_computation(x: u64) -> u64 {
 
 When threads need shared mutable state, Rust provides safe abstractions:
 
+> **Note:** `.unwrap()` on `.lock()`, `.read()`, and `.write()` is used for brevity
+> throughout these examples. These calls fail only if another thread panicked while
+> holding the lock ("poisoning"). Production code should decide whether to recover
+> from poisoned locks or propagate the error.
+
 ```rust
 use std::sync::{Arc, Mutex, RwLock};
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -407,6 +412,8 @@ impl<T: Copy> SeqLock<T> {
         // side is technically unnecessary for a single writer but
         // harmless and consistent.
         self.seq.fetch_add(1, Ordering::AcqRel);
+        // SAFETY: Single-writer invariant upheld by caller (see doc above).
+        // UnsafeCell allows interior mutation; seq counter protects readers.
         unsafe { *self.data.get() = val; }
         // Increment to even (signals write complete).
         // Release: ensure the data write is visible before readers see the even seq.

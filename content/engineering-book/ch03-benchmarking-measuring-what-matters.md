@@ -262,10 +262,11 @@ cargo build --release
 # debug = true          # Add this temporarily for profiling
 
 # Step 2: Record with perf
-perf record -g --call-graph=dwarf ./target/release/diag_tool --run-diagnostics
+perf record --call-graph=dwarf ./target/release/diag_tool --run-diagnostics
 
 # Step 3: Generate a flamegraph
 # Install: cargo install flamegraph
+# Install: cargo install addr2line --features=bin (optional, speedup cargo-flamegraph)
 cargo flamegraph --root -- --run-diagnostics
 # Opens an interactive SVG flamegraph
 
@@ -438,15 +439,15 @@ criterion_main!(benches);
 ```mermaid
 flowchart TD
     START["Want to measure performance?"] --> WHAT{"What level?"}
-    
+
     WHAT -->|"Single function"| CRITERION["Criterion.rs\nStatistical, regression detection"]
     WHAT -->|"Quick function check"| DIVAN["Divan\nLighter, attribute macros"]
     WHAT -->|"Whole binary"| HYPERFINE["hyperfine\nEnd-to-end, wall-clock"]
     WHAT -->|"Find hot spots"| PERF["perf + flamegraph\nCPU sampling profiler"]
-    
+
     CRITERION --> CI_BENCH["Continuous benchmarking\nin GitHub Actions"]
     PERF --> OPTIMIZE["Profile-Guided\nOptimization (PGO)"]
-    
+
     style CRITERION fill:#91e5a3,color:#000
     style DIVAN fill:#91e5a3,color:#000
     style HYPERFINE fill:#e3f2fd,color:#000
@@ -487,7 +488,7 @@ fn generate_data(n: usize) -> Vec<u64> {
 
 fn bench_sort(c: &mut Criterion) {
     let mut group = c.benchmark_group("sort-10k");
-    
+
     group.bench_function("stable", |b| {
         b.iter_batched(
             || generate_data(10_000),
@@ -495,7 +496,7 @@ fn bench_sort(c: &mut Criterion) {
             criterion::BatchSize::SmallInput,
         )
     });
-    
+
     group.bench_function("unstable", |b| {
         b.iter_batched(
             || generate_data(10_000),
@@ -503,7 +504,7 @@ fn bench_sort(c: &mut Criterion) {
             criterion::BatchSize::SmallInput,
         )
     });
-    
+
     group.finish();
 }
 
@@ -547,4 +548,3 @@ cargo flamegraph --release -- <your-args>
 - Continuous benchmarking in CI catches performance regressions before they ship
 
 ---
-

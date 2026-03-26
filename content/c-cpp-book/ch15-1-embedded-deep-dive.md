@@ -28,6 +28,7 @@ const GPIO_ODR: *mut u32 = (GPIO_BASE + 0x14) as *mut u32;
 /// # Safety
 /// Caller must ensure GPIO_BASE is a valid mapped peripheral address.
 unsafe fn toggle_led() {
+    // SAFETY: GPIO_ODR is a valid memory-mapped register address.
     let current = unsafe { ptr::read_volatile(GPIO_ODR) };
     unsafe { ptr::write_volatile(GPIO_ODR, current ^ (1 << 5)) };
 }
@@ -55,6 +56,7 @@ fn configure_gpio(dp: stm32f401::Peripherals) {
 
     // Toggle pin 5 — type-checked field access
     dp.GPIOA.odr.modify(|r, w| {
+        // SAFETY: toggling a single bit in a valid register field.
         unsafe { w.bits(r.bits() ^ (1 << 5)) }
     });
 }
@@ -185,7 +187,7 @@ fn panic(info: &PanicInfo) -> ! {
     cortex_m::interrupt::disable();
 
     // 2. Write panic info to a reserved RAM region (survives reset)
-    // Safety: PANIC_LOG is a reserved memory region defined in linker script
+    // SAFETY: PANIC_LOG is a reserved memory region defined in linker script.
     unsafe {
         let log = 0x2000_0000 as *mut [u8; 256];
         // Write truncated panic message
@@ -336,7 +338,7 @@ fn main() -> ! {
     {
         const HEAP_SIZE: usize = 4096;
         static mut HEAP_MEM: [u8; HEAP_SIZE] = [0; HEAP_SIZE];
-        // Safety: HEAP_MEM is only accessed here during init, before any allocation
+        // SAFETY: HEAP_MEM is only accessed here during init, before any allocation.
         unsafe { HEAP.init(HEAP_MEM.as_ptr() as usize, HEAP_SIZE) }
     }
 

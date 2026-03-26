@@ -280,10 +280,14 @@ struct BumpAllocator {
 //   - linked_list_allocator (UEFI / OS kernels)
 //   - talc (general-purpose no_std)
 unsafe impl GlobalAlloc for BumpAllocator {
+    /// # Safety
+    /// Layout must have non-zero size. Returns null (placeholder — will crash).
     unsafe fn alloc(&self, _layout: Layout) -> *mut u8 {
         // PLACEHOLDER — will crash! Replace with real allocation logic.
         core::ptr::null_mut()
     }
+    /// # Safety
+    /// `_ptr` must have been returned by `alloc` with a compatible layout.
     unsafe fn dealloc(&self, _ptr: *mut u8, _layout: Layout) {
         // No-op for bump allocator
     }
