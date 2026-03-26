@@ -25,7 +25,9 @@
     "flexsearch": "^0.8.212",
     "kysely": "^0.28.14",
     "kysely-libsql": "^0.7.1",
+    "lowlight": "^3.3.0",
     "lucide-react": "^1.7.0",
+    "mermaid": "^11.13.0",
     "next": "16.2.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
@@ -39,6 +41,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/hast": "^3.0.4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

@@ -1,14 +1,47 @@
 "use client";
 
 import { useState, useRef, useCallback, type ReactNode } from "react";
+import dynamic from "next/dynamic";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
-import rehypeHighlight from "rehype-highlight";
+import rehypeHighlightSafe from "@/lib/rehype-highlight-safe";
 import { Check, Copy, Bookmark as BookmarkIcon } from "lucide-react";
 import { useBookmarks } from "./bookmark-provider";
 
-function CopyablePre({ children }: { children?: ReactNode }) {
+const MermaidDiagram = dynamic(
+  () => import("./mermaid-diagram").then((m) => m.MermaidDiagram),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center py-12 text-muted-foreground text-sm">
+        Loading diagram...
+      </div>
+    ),
+  }
+);
+
+function isMermaidBlock(children: ReactNode): string | null {
+  if (!children || typeof children !== "object") return null;
+  const child = Array.isArray(children) ? children[0] : children;
+  if (
+    child &&
+    typeof child === "object" &&
+    "props" in child
+  ) {
+    const props = (child as React.ReactElement<{ className?: string; children?: string }>).props;
+    if (
+      typeof props.className === "string" &&
+      props.className.includes("language-mermaid") &&
+      typeof props.children === "string"
+    ) {
+      return props.children.trim();
+    }
+  }
+  return null;
+}
+
+function CodePre({ children }: { children?: ReactNode }) {
   const [copied, setCopied] = useState(false);
   const preRef = useRef<HTMLPreElement>(null);
 
@@ -33,6 +66,14 @@ function CopyablePre({ children }: { children?: ReactNode }) {
       <pre ref={preRef}>{children}</pre>
     </div>
   );
+}
+
+function CopyablePre({ children }: { children?: ReactNode }) {
+  const mermaidCode = isMermaidBlock(children);
+  if (mermaidCode) {
+    return <MermaidDiagram chart={mermaidCode} />;
+  }
+  return <CodePre>{children}</CodePre>;
 }
 
 function slugify(text: string) {
@@ -61,11 +102,15 @@ function BookmarkableHeading({
   const Tag = `h${level}` as keyof React.JSX.IntrinsicElements;
   const active = isBookmarked(bookSlug, chapterSlug, id);
 
+  const hasLink = containsLink(children);
+
   return (
     <Tag id={id} className="group/heading relative">
-      <a href={`#${id}`} className="no-underline">
-        {children}
-      </a>
+      {hasLink ? children : (
+        <a href={`#${id}`} className="no-underline">
+          {children}
+        </a>
+      )}
       <button
         onClick={() =>
           toggleBookmark({
@@ -102,6 +147,17 @@ function extractText(node: ReactNode): string {
   return "";
 }
 
+function containsLink(node: ReactNode): boolean {
+  if (!node) return false;
+  if (Array.isArray(node)) return node.some(containsLink);
+  if (typeof node === "object" && "type" in node) {
+    const el = node as React.ReactElement<{ children?: ReactNode }>;
+    if (el.type === "a") return true;
+    return containsLink(el.props?.children);
+  }
+  return false;
+}
+
 export function MarkdownRenderer({
   content,
   bookSlug,
@@ -129,7 +185,7 @@ export function MarkdownRenderer({
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[
           rehypeRaw,
-          [rehypeHighlight, { detect: true, ignoreMissing: true }],
+          rehypeHighlightSafe,
         ]}
         components={{
           pre: CopyablePre,

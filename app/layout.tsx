@@ -126,7 +126,7 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebSite",
-              name: "Rust Training by Ruhan Khandakar",
+              name: "Rust Training by Microsoft | Ruhan Khandakar",
               description:
                 "A curated collection of free Rust programming books and tutorials. Learn Rust from beginner to advanced.",
               url: "https://rust.learningz.xyz",

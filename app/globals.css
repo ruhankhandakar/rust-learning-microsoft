@@ -408,3 +408,17 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
 .hljs-symbol {
   color: oklch(0.70 0.09 45);
 }
+
+.mermaid-diagram svg {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-lg);
+  background: oklch(0.155 0.005 260);
+  padding: 1.5rem;
+  border: 1px solid oklch(0.24 0.006 260);
+}
+
+:root:not(.dark) .mermaid-diagram svg {
+  background: oklch(0.97 0.002 60);
+  border-color: oklch(0.90 0.01 55);
+}
