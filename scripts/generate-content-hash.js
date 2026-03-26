@@ -43,7 +43,11 @@ const globalHash = crypto
   .digest("hex")
   .slice(0, 12);
 
-const result = { version: globalHash, books: hashes };
+const result = {
+  version: globalHash,
+  lastUpdated: new Date().toISOString(),
+  books: hashes,
+};
 
 fs.writeFileSync(OUTPUT, JSON.stringify(result, null, 2) + "\n");
 console.log(`content-hash.json generated (${globalHash})`);
