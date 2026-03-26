@@ -44,7 +44,7 @@ export async function generateMetadata({
   if (!chapter) return {};
 
   const title = `${chapter.title} — ${book.shortTitle}`;
-  const description = `Read "${chapter.title}" from ${book.title}. Free Rust training by Ruhan Khandakar.`;
+  const description = `Read "${chapter.title}" from ${book.title}. Free Rust training by Microsoft.`;
   const url = `${BASE_URL}/books/${bookSlug}/${chapterSlug}`;
 
   return {
@@ -55,7 +55,7 @@ export async function generateMetadata({
       title,
       description,
       url,
-      siteName: "Rust Training by Ruhan Khandakar",
+      siteName: "Rust Training by Microsoft | Ruhan Khandakar",
     },
     twitter: {
       card: "summary",
@@ -101,7 +101,7 @@ export default async function ChapterPage({
     "@context": "https://schema.org",
     "@type": "Article",
     headline: current.title,
-    description: `Read "${current.title}" from ${book.title}. Free Rust training curated by Ruhan Khandakar.`,
+    description: `Read "${current.title}" from ${book.title}. Free Rust training curated by Microsoft | Ruhan Khandakar.`,
     url: `${BASE_URL}/books/${bookSlug}/${chapterSlug}`,
     author: { "@type": "Person", name: "Ruhan Khandakar" },
     publisher: { "@type": "Person", name: "Ruhan Khandakar" },
@@ -164,9 +164,9 @@ export default async function ChapterPage({
 
         <main className="flex-1 min-w-0">
           <article className="mx-auto max-w-3xl px-6 md:px-10 py-10">
-              <ErrorBoundary>
-                <MarkdownRenderer content={markdown} bookSlug={bookSlug} chapterSlug={chapterSlug} />
-              </ErrorBoundary>
+            <ErrorBoundary>
+              <MarkdownRenderer content={markdown} bookSlug={bookSlug} chapterSlug={chapterSlug} />
+            </ErrorBoundary>
           </article>
 
           <nav className="border-t border-border">

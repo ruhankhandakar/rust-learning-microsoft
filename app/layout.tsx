@@ -48,11 +48,11 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://rust.learningz.xyz"),
   title: {
-    default: "Rust Training by Ruhan Khandakar — Learn Rust Programming",
-    template: "%s | Rust Training by Ruhan Khandakar",
+    default: "Rust Training by Microsoft — Learn Rust Programming",
+    template: "%s | Rust Training by Microsoft",
   },
   description:
-    "A curated collection of free Rust programming books and tutorials, built by Ruhan Khandakar. Learn Rust from beginner to advanced with interactive reading, progress tracking, and bookmarks.",
+    "A curated collection of free Rust programming books and tutorials from Microsoft, built by Ruhan Khandakar. Learn Rust from beginner to advanced with interactive reading, progress tracking, and bookmarks.",
   applicationName: "Rust Training",
   authors: [{ name: "Ruhan Khandakar" }],
   creator: "Ruhan Khandakar",
@@ -70,15 +70,15 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     type: "website",
-    title: "Rust Training by Ruhan Khandakar — Learn Rust Programming",
+    title: "Rust Training by Microsoft — Learn Rust Programming",
     description:
       "A curated collection of free Rust programming books and tutorials. Learn Rust from beginner to advanced with progress tracking and bookmarks.",
-    siteName: "Rust Training by Ruhan Khandakar",
+    siteName: "Rust Training by Microsoft",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rust Training by Ruhan Khandakar",
+    title: "Rust Training by Microsoft",
     description:
       "Free Rust programming books and tutorials. Learn Rust from beginner to advanced.",
     creator: "ruhankhandakar",
