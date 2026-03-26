@@ -77,7 +77,7 @@ function BookmarkableHeading({
         className={`inline-flex items-center justify-center ml-2 align-middle rounded-md transition-all ${
           active
             ? "text-primary opacity-100"
-            : "text-muted-foreground opacity-0 group-hover/heading:opacity-100"
+            : "text-muted-foreground opacity-0 group-hover/heading:opacity-100 max-lg:opacity-100"
         }`}
         aria-label={active ? "Remove bookmark" : "Bookmark this section"}
         title={active ? "Remove bookmark" : "Bookmark this section"}

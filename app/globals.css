@@ -299,6 +299,12 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
   opacity: 1;
 }
 
+@media (hover: none), (max-width: 1024px) {
+  .prose .pre-wrapper .copy-btn {
+    opacity: 1;
+  }
+}
+
 .prose .pre-wrapper .copy-btn:hover {
   background: oklch(0.26 0.006 260);
   color: oklch(0.82 0.008 260);
