@@ -12,6 +12,7 @@ import { SearchTrigger } from "@/components/search-trigger";
 import { HomeButton } from "@/components/home-button";
 import { SettingsDropdownLazy as SettingsDropdown } from "@/components/settings-dropdown-lazy";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ChapterKeyboardNav } from "@/components/chapter-keyboard-nav";
 
 const MarkdownRenderer = dynamic(
   () => import("@/components/markdown-renderer").then((m) => m.MarkdownRenderer),
@@ -121,6 +122,10 @@ export default async function ChapterPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <ChapterReadMarker bookSlug={bookSlug} chapterSlug={chapterSlug} />
+      <ChapterKeyboardNav
+        prevHref={prev ? `/books/${bookSlug}/${prev.slug}` : null}
+        nextHref={next ? `/books/${bookSlug}/${next.slug}` : null}
+      />
 
       <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
         <div className="flex items-center gap-3 px-4 h-14">
@@ -170,6 +175,14 @@ export default async function ChapterPage({
           </article>
 
           <nav className="border-t border-border">
+            <p className="mx-auto max-w-3xl px-6 md:px-10 pt-6 text-[11px] text-muted-foreground/50 text-center hidden sm:block">
+              <kbd className="px-1 py-0.5 rounded border border-border text-[10px]">⌘</kbd>{" / "}
+              <kbd className="px-1 py-0.5 rounded border border-border text-[10px]">Alt</kbd>
+              {" + "}
+              <kbd className="px-1 py-0.5 rounded border border-border text-[10px]">←</kbd>
+              <kbd className="px-1 py-0.5 rounded border border-border text-[10px]">→</kbd>
+              {" to navigate chapters"}
+            </p>
             <div className="mx-auto max-w-3xl px-6 md:px-10 py-6 flex items-stretch gap-4">
               {prev ? (
                 <Link
