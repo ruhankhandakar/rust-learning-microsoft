@@ -18,14 +18,14 @@ There is no built-in runtime, no thread pool, no event loop. The `async` keyword
 
 ```mermaid
 graph LR
-    subgraph "Other Languages"
+    subgraph "C# / JS / Go"
         EAGER["Eager Execution<br/>Task starts immediately"]
         BUILTIN["Built-in Runtime<br/>Thread pool included"]
         GC["GC-Managed<br/>No lifetime concerns"]
     end
 
-    subgraph "Rust"
-        LAZY["Lazy Execution<br/>Nothing happens until polled"]
+    subgraph "Rust (and Python*)"
+        LAZY["Lazy Execution<br/>Nothing happens until polled/awaited"]
         BYOB["Bring Your Own Runtime<br/>You choose the executor"]
         OWNED["Ownership Applies<br/>Lifetimes, Send, Sync matter"]
     end
@@ -41,6 +41,8 @@ graph LR
     style BUILTIN fill:#e3f2fd,color:#000
     style GC fill:#e3f2fd,color:#000
 ```
+
+> \* Python coroutines are lazy like Rust futures — they don't execute until awaited or scheduled. However, Python still uses GC and has no ownership/lifetime concerns.
 
 ### No Built-In Runtime
 
@@ -71,13 +73,13 @@ var result = await task; // Just waits for completion
 
 This is the single most important mental shift:
 
-| | C# / JavaScript / Python | Go | Rust |
-|---|---|---|---|
-| **Creation** | `Task` starts executing immediately | Goroutine starts immediately | `Future` does nothing until polled |
-| **Dropping** | Detached task continues running | Goroutine runs until return | Dropping a Future cancels it |
-| **Runtime** | Built into the language/VM | Built into the binary (M:N scheduler) | You choose (tokio, smol, etc.) |
-| **Scheduling** | Automatic (thread pool) | Automatic (GMP scheduler) | Explicit (`spawn`, `block_on`) |
-| **Cancellation** | `CancellationToken` (cooperative) | `context.Context` (cooperative) | Drop the future (immediate) |
+| | C# / JavaScript | Python | Go | Rust |
+|---|---|---|---|---|
+| **Creation** | `Task` starts executing immediately | Coroutine is **lazy** — returns an object, doesn't run until awaited or scheduled | Goroutine starts immediately | `Future` does nothing until polled |
+| **Dropping** | Detached task continues running | Unawaited coroutine is garbage-collected (with a warning) | Goroutine runs until return | Dropping a Future cancels it |
+| **Runtime** | Built into the language/VM | `asyncio` event loop (must be explicitly started) | Built into the binary (M:N scheduler) | You choose (tokio, smol, etc.) |
+| **Scheduling** | Automatic (thread pool) | Event loop + `await` or `create_task()` | Automatic (GMP scheduler) | Explicit (`spawn`, `block_on`) |
+| **Cancellation** | `CancellationToken` (cooperative) | `Task.cancel()` (cooperative, raises `CancelledError`) | `context.Context` (cooperative) | Drop the future (immediate) |
 
 ```rust
 // To actually RUN a future, you need an executor:

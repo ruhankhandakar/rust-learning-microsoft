@@ -11,7 +11,7 @@
     }
     
     fn main() {
-        // Initializes an array of 10 elements and sets all to 42
+        // Initializes an array of 3 elements and sets all to 42
         let a : [u8; 3] = [42; 3];
         // Alternative syntax
         // let a = [42u8, 42u8, 42u8];
@@ -63,7 +63,7 @@ fn main() {
 ### Rust references
 - References in Rust are roughly equivalent to pointers in C with some key differences
     - It is legal to have any number of read-only (immutable) references to a variable at any point of time. A reference cannot outlive the variable scope (this is a key concept called **lifetime**; discussed in detail later)
-    - Only a single writable (mutable) reference to a mutable variable is permitted and it must no overlap with any other reference.
+    - Only a single writable (mutable) reference to a mutable variable is permitted and it must not overlap with any other reference.
 ```rust
 fn main() {
     let mut a = 42;
@@ -81,7 +81,7 @@ fn main() {
 
 ----
 # Rust slices
-- Rust references can be used create subsets of arrays
+- Rust references can be used to create subsets of arrays
     - Unlike arrays, which have a static fixed length determined at compile time, slices can be of arbitrary size. Internally, slices are implemented as a "fat-pointer" that contains the length of the slice and a pointer to the starting element in the original array
 ```rust
 fn main() {
