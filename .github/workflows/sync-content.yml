@@ -56,18 +56,18 @@ jobs:
         if: steps.check.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
           branch: chore/sync-upstream-content
           delete-branch: true
           commit-message: "chore: sync content from Microsoft/RustTraining"
           title: "chore: sync content from Microsoft/RustTraining"
           body: |
             Automated content sync from [microsoft/RustTraining](https://github.com/microsoft/RustTraining).
-
+            
             - Pulled latest markdown from upstream `src/` directories
             - Bumped patch version
             - Regenerated content hash & SW cache name
-
+            
             Review the diff and merge when ready.
           labels: |
             content
