@@ -335,13 +335,13 @@ A `&dyn Trait` (or `Box<dyn Trait>`) is a **fat pointer** — two machine words:
 │  ↓           │  ↓                                │
 │  ┌─────────┐ │  ┌──────────────────────────────┐ │
 │  │ Circle  │ │  │ vtable for <Circle as        │ │
-│  │ {       │ │  │           Drawable>           │ │
+│  │ {       │ │  │           Drawable>          │ │
 │  │  r: 5.0 │ │  │                              │ │
 │  │ }       │ │  │  drop_in_place: 0x7f...a0    │ │
-│  └─────────┘ │  │  size:           8            │ │
-│              │  │  align:          8            │ │
-│              │  │  draw:          0x7f...b4     │ │
-│              │  │  bounding_box:  0x7f...c8     │ │
+│  └─────────┘ │  │  size:           8           │ │
+│              │  │  align:          8           │ │
+│              │  │  draw:          0x7f...b4    │ │
+│              │  │  bounding_box:  0x7f...c8    │ │
 │              │  └──────────────────────────────┘ │
 └──────────────┴───────────────────────────────────┘
 ```
@@ -391,9 +391,9 @@ fn main() {
     }
 
     // Size comparison:
-    println!("size_of::<&Circle>()        = {}", std::mem::size_of::<&Circle>());
+    println!("size_of::<&Circle>()        = {}", size_of::<&Circle>());
     // → 8 bytes (one pointer — the compiler knows the type)
-    println!("size_of::<&dyn Drawable>()  = {}", std::mem::size_of::<&dyn Drawable>());
+    println!("size_of::<&dyn Drawable>()  = {}", size_of::<&dyn Drawable>());
     // → 16 bytes (data_ptr + vtable_ptr)
 }
 ```
