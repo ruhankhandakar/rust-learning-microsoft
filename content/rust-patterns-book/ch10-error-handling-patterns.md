@@ -1,4 +1,4 @@
-# 9. Error Handling Patterns 🟢
+# 10. Error Handling Patterns 🟢
 
 > **What you'll learn:**
 > - When to use `thiserror` (libraries) vs `anyhow` (applications)

@@ -1,4 +1,4 @@
-# 12. Macros — Code That Writes Code 🟡
+# 13. Macros — Code That Writes Code 🟡
 
 > **What you'll learn:**
 > - Declarative macros (`macro_rules!`) with pattern matching and repetition

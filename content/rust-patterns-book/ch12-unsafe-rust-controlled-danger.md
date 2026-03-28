@@ -1,4 +1,4 @@
-# 11. Unsafe Rust — Controlled Danger 🔴
+# 12. Unsafe Rust — Controlled Danger 🔴
 
 > **What you'll learn:**
 > - The five unsafe superpowers and when each is needed

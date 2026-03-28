@@ -1,4 +1,4 @@
-# 14. Crate Architecture and API Design 🟡
+# 15. Crate Architecture and API Design 🟡
 
 > **What you'll learn:**
 > - Module layout conventions and re-export strategies
