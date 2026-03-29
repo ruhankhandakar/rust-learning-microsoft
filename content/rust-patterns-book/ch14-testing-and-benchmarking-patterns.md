@@ -1,4 +1,4 @@
-# 13. Testing and Benchmarking Patterns 🟢
+# 14. Testing and Benchmarking Patterns 🟢
 
 > **What you'll learn:**
 > - Rust's three test tiers: unit, integration, and doc tests

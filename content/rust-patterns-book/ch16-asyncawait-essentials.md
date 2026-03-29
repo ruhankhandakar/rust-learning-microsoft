@@ -1,4 +1,4 @@
-# 15. Async/Await Essentials 🔴
+# 16. Async/Await Essentials 🔴
 
 > **What you'll learn:**
 > - How Rust's `Future` trait differs from Go's goroutines and Python's asyncio

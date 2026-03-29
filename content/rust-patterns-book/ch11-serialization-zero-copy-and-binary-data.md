@@ -1,4 +1,4 @@
-# 10. Serialization, Zero-Copy, and Binary Data 🟡
+# 11. Serialization, Zero-Copy, and Binary Data 🟡
 
 > **What you'll learn:**
 > - serde fundamentals: derive macros, attributes, and enum representations
