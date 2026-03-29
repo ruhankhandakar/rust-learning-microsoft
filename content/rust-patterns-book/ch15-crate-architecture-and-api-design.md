@@ -128,7 +128,6 @@ fn connect(host: impl Into<String>, port: u16) -> Connection {
 }
 connect("localhost", 5432);     // &str — zero friction
 connect(hostname, 5432);        // String — moved, no clone
-connect(arc_str, 5432);         // Arc<str> if From is implemented
 ```
 
 This works because Rust's `From`/`Into` trait pair provides blanket conversions.
@@ -870,7 +869,7 @@ cargo test        # Runs unit + integration + doc tests
 
 ### Benchmarking with Criterion
 
-> **Full coverage**: See the [Benchmarking with criterion](ch13-testing-and-benchmarking-patterns.md#benchmarking-with-criterion)
+> **Full coverage**: See the [Benchmarking with criterion](ch14-testing-and-benchmarking-patterns.md#benchmarking-with-criterion)
 > section in Chapter 13 (Testing and Benchmarking Patterns) for complete
 > `criterion` setup, API examples, and a comparison table vs `cargo bench`.
 > Below is a quick-reference for architecture-specific usage.
@@ -891,7 +890,7 @@ cargo bench -- parse_config  # Run specific benchmark
 > - `#[non_exhaustive]` on public enums prevents breaking changes when adding variants
 > - `#[must_use]` catches silent discards of important values
 
-> **See also:** [Ch 9 — Error Handling](ch09-error-handling-patterns.md) for error type design in public APIs. [Ch 13 — Testing](ch13-testing-and-benchmarking-patterns.md) for testing your crate's public API.
+> **See also:** [Ch 9 — Error Handling](ch10-error-handling-patterns.md) for error type design in public APIs. [Ch 13 — Testing](ch14-testing-and-benchmarking-patterns.md) for testing your crate's public API.
 
 ---
 

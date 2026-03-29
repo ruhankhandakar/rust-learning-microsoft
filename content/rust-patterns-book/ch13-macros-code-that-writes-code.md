@@ -358,7 +358,7 @@ inspect/transform → `quote!` (generate tokens) → `TokenStream` (back to comp
 > - Prefer generics/traits over macros when possible — macros are harder to debug and maintain
 > - `$crate` ensures hygiene; `tt` munching enables recursive pattern matching
 
-> **See also:** [Ch 2 — Traits](ch02-traits-in-depth.md) for when traits/generics beat macros. [Ch 13 — Testing](ch13-testing-and-benchmarking-patterns.md) for testing macro-generated code.
+> **See also:** [Ch 2 — Traits](ch02-traits-in-depth.md) for when traits/generics beat macros. [Ch 13 — Testing](ch14-testing-and-benchmarking-patterns.md) for testing macro-generated code.
 
 ```mermaid
 flowchart LR

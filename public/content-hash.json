@@ -1,13 +1,13 @@
 {
-  "version": "84772d9e75a7",
-  "lastUpdated": "2026-03-28T08:36:29.988Z",
+  "version": "34cd0565f53b",
+  "lastUpdated": "2026-03-29T08:37:17.616Z",
   "books": {
-    "async-book": "d16ac9e7dbcf",
+    "async-book": "e7a4173cd06a",
     "c-cpp-book": "61d29e7dec0f",
-    "csharp-book": "3235dd8cbdcb",
+    "csharp-book": "de22708725d5",
     "engineering-book": "4d6d0f3aaa8e",
-    "python-book": "ca9ea302ce6f",
-    "rust-patterns-book": "df1e02e375bb",
-    "type-driven-correctness-book": "4ca09ccc66f9"
+    "python-book": "ddcb89a9ae70",
+    "rust-patterns-book": "9f6442825b95",
+    "type-driven-correctness-book": "b7feee87a9b9"
   }
 }

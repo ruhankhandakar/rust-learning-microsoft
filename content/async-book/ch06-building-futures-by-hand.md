@@ -105,6 +105,12 @@ enum MaybeDone<F: Future> {
     Taken, // Output has been taken
 }
 
+// MaybeDone<F> stores F::Output, which the compiler can't prove
+// is Unpin even when F: Unpin. Since we only use Join with Unpin
+// futures and never pin-project into fields, implementing Unpin
+// by hand is safe and lets us call self.get_mut() in poll().
+impl<A: Future + Unpin, B: Future + Unpin> Unpin for Join<A, B> {}
+
 impl<A, B> Join<A, B>
 where
     A: Future,
@@ -125,30 +131,32 @@ where
 {
     type Output = (A::Output, B::Output);
 
-    fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+    fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+        let this = self.get_mut();
+
         // Poll A if not done
-        if let MaybeDone::Pending(ref mut fut) = self.a {
+        if let MaybeDone::Pending(ref mut fut) = this.a {
             if let Poll::Ready(val) = Pin::new(fut).poll(cx) {
-                self.a = MaybeDone::Done(val);
+                this.a = MaybeDone::Done(val);
             }
         }
 
         // Poll B if not done
-        if let MaybeDone::Pending(ref mut fut) = self.b {
+        if let MaybeDone::Pending(ref mut fut) = this.b {
             if let Poll::Ready(val) = Pin::new(fut).poll(cx) {
-                self.b = MaybeDone::Done(val);
+                this.b = MaybeDone::Done(val);
             }
         }
 
         // Both done?
-        match (&self.a, &self.b) {
+        match (&this.a, &this.b) {
             (MaybeDone::Done(_), MaybeDone::Done(_)) => {
                 // Take both outputs
-                let a_val = match std::mem::replace(&mut self.a, MaybeDone::Taken) {
+                let a_val = match std::mem::replace(&mut this.a, MaybeDone::Taken) {
                     MaybeDone::Done(v) => v,
                     _ => unreachable!(),
                 };
-                let b_val = match std::mem::replace(&mut self.b, MaybeDone::Taken) {
+                let b_val = match std::mem::replace(&mut this.b, MaybeDone::Taken) {
                     MaybeDone::Done(v) => v,
                     _ => unreachable!(),
                 };
@@ -159,10 +167,10 @@ where
     }
 }
 
-// Usage:
+// Usage (async blocks are !Unpin, so wrap them with Box::pin):
 // let (page1, page2) = Join::new(
-//     http_get("https://example.com/a"),
-//     http_get("https://example.com/b"),
+//     Box::pin(http_get("https://example.com/a")),
+//     Box::pin(http_get("https://example.com/b")),
 // ).await;
 // Both requests run concurrently!
 ```
