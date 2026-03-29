@@ -276,11 +276,11 @@ const SENSOR_THRESHOLDS: [u16; 4] = {
 - Calling other `const fn`s
 - References (`&`, `&mut` — within the const context)
 - `panic!()` (becomes a compile error if reached at compile time)
+- Basic floating-point arithmetic (`+`, `-`, `*`, `/`; complex ops like `sqrt`/`sin` are not const-eligible)
 
 **What you CANNOT do** (yet):
 - Heap allocation (`Box`, `Vec`, `String`)
 - Trait method calls (only inherent methods)
-- Floating-point in some contexts (stabilized for basic ops)
 - I/O or side effects
 
 ```rust

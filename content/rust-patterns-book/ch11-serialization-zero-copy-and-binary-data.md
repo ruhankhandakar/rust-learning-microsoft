@@ -473,7 +473,7 @@ fn main() {
 > - Zero-copy deserialization (`&'a str` in structs) avoids allocation for read-heavy workloads
 > - `repr(C)` + `zerocopy`/`bytemuck` for hardware register layouts; `bytes::Bytes` for reference-counted buffers
 
-> **See also:** [Ch 9 — Error Handling](ch09-error-handling-patterns.md) for combining serde errors with `thiserror`. [Ch 11 — Unsafe](ch11-unsafe-rust-controlled-danger.md) for `repr(C)` and FFI data layouts.
+> **See also:** [Ch 9 — Error Handling](ch10-error-handling-patterns.md) for combining serde errors with `thiserror`. [Ch 11 — Unsafe](ch12-unsafe-rust-controlled-danger.md) for `repr(C)` and FFI data layouts.
 
 ```mermaid
 flowchart LR
