@@ -560,8 +560,6 @@ system guarantees they're valid.
 ### Feature Flags and Conditional Compilation
 
 ```toml
-```
-
 # Cargo.toml
 [features]
 default = ["json"]          # Enabled by default
@@ -573,6 +571,7 @@ full = ["json", "xml"]      # Meta-feature: enables all
 serde = "1"
 serde_json = { version = "1", optional = true }
 quick-xml = { version = "0.31", optional = true }
+```
 
 ```rust
 // Conditional compilation based on features:
@@ -601,8 +600,6 @@ compile_error!("At least one format feature (json, xml) must be enabled");
 For large projects, use a Cargo workspace to share dependencies and build artifacts:
 
 ```toml
-```
-
 # Root Cargo.toml
 [workspace]
 members = [
@@ -622,11 +619,9 @@ tracing = "0.1"
 # In each member's Cargo.toml:
 # [dependencies]
 # serde = { workspace = true }
-
-```rust
+```
 
 **Benefits**:
-```
 
 - Single `Cargo.lock` — all crates use the same dependency versions
 - `cargo test --workspace` runs all tests
@@ -639,8 +634,6 @@ The `.cargo/config.toml` file (at the workspace root or in `$HOME/.cargo/`)
 customizes Cargo behavior without modifying `Cargo.toml`:
 
 ```toml
-```
-
 # .cargo/config.toml
 
 # Default target for this workspace
@@ -665,12 +658,9 @@ IPMI_LIB_PATH = "/usr/lib/bmc"
 # Use a custom registry (for internal packages)
 # [registries.internal]
 # index = "https://gitlab.internal/crates/index"
-
-```rust
+```
 
 Common configuration patterns:
-
-```
 
 | Setting | Purpose | Example |
 |---------|---------|---------|
@@ -763,8 +753,6 @@ extern "C" fn platform_ioctl(fd: i32, request: u64) -> i32;
 ### `cargo deny` and `cargo audit`: Supply-Chain Security
 
 ```bash
-```
-
 # Install security audit tools
 cargo install cargo-deny
 cargo install cargo-audit
@@ -774,16 +762,11 @@ cargo audit
 
 # Comprehensive checks: licenses, bans, advisories, sources
 cargo deny check
-
-```rust
+```
 
 Configure `cargo deny` with a `deny.toml` at the workspace root:
 
-```
-
 ```toml
-```
-
 # deny.toml
 [advisories]
 vulnerability = "deny"      # Fail on known vulnerabilities
@@ -796,8 +779,6 @@ deny = ["GPL-3.0"]          # Reject copyleft licenses
 [bans]
 multiple-versions = "warn"  # Warn if multiple versions of same crate
 deny = [
-
-```rust
     { name = "openssl" },   # Force use of rustls instead
 ]
 

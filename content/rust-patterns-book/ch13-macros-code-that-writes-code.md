@@ -271,8 +271,6 @@ Derive macros live in a separate crate (`proc-macro = true`) and transform
 a token stream using `syn` (parse Rust) and `quote` (generate Rust):
 
 ```toml
-```
-
 # my_derive/Cargo.toml
 [lib]
 proc-macro = true
@@ -281,6 +279,7 @@ proc-macro = true
 syn = { version = "2", features = ["full"] }
 quote = "1"
 proc-macro2 = "1"
+```
 
 ```rust
 // my_derive/src/lib.rs
