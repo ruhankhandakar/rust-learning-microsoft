@@ -1,9 +1,9 @@
 {
-  "version": "34cd0565f53b",
-  "lastUpdated": "2026-03-29T08:37:17.616Z",
+  "version": "0de1e8532d0d",
+  "lastUpdated": "2026-03-30T09:09:24.078Z",
   "books": {
-    "async-book": "e7a4173cd06a",
-    "c-cpp-book": "61d29e7dec0f",
+    "async-book": "32394fc70edb",
+    "c-cpp-book": "b13280c476d7",
     "csharp-book": "de22708725d5",
     "engineering-book": "4d6d0f3aaa8e",
     "python-book": "ddcb89a9ae70",
