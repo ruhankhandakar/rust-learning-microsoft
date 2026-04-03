@@ -106,7 +106,7 @@ fn main() {
     // let g : u32 = f;    // Will not compile
     let g = f as u32;      // Ok, but not preferred. Subject to rules around narrowing
     let g : u32 = f.into(); // Most preferred form; infallible and checked by the compiler
-    //let k : u8 = f.into();  // Fails to compile; narrowing can result in loss of data
+    // let k : u8 = g.into();  // Fails to compile; narrowing can result in loss of data
     
     // Attempting a narrowing operation requires use of try_into
     if let Ok(k) = TryInto::<u8>::try_into(g) {
