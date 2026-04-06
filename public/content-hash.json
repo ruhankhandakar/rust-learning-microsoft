@@ -1,8 +1,8 @@
 {
-  "version": "816e078e8e8c",
-  "lastUpdated": "2026-04-05T08:40:13.692Z",
+  "version": "c254df30f74e",
+  "lastUpdated": "2026-04-06T09:06:23.840Z",
   "books": {
-    "async-book": "32394fc70edb",
+    "async-book": "21ca7e470557",
     "c-cpp-book": "242d59442822",
     "csharp-book": "de22708725d5",
     "engineering-book": "4d6d0f3aaa8e",
