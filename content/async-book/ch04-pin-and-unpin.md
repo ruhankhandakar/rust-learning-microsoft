@@ -130,7 +130,7 @@ impl Unpin for MySimpleFuture {} // "I'm safe to move, trust me"
 | What | When | How |
 |------|------|-----|
 | Pin a future on the heap | Storing in a collection, returning from function | `Box::pin(future)` |
-| Pin a future on the stack | Local use in `select!` or manual polling | `tokio::pin!(future)` or `pin_mut!` from `pin-utils` |
+| Pin a future on the stack | Local use in `select!` or manual polling | `std::pin::pin!(future)` or `tokio::pin!(future)` |
 | Pin in function signature | Accepting pinned futures | `future: Pin<&mut F>` |
 | Require Unpin | When you need to move a future after creation | `F: Future + Unpin` |
 
