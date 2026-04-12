@@ -13,7 +13,7 @@ Python never gives you direct memory access.
 flowchart TB
     subgraph Safe ["Safe Rust (99% of code)"]
         S1["Your application logic"]
-        S2["pub fn safe_api\(&self\) -> Result"]
+        S2["pub fn safe_api(&self) -> Result"]
     end
     subgraph Unsafe ["unsafe block (minimal, audited)"]
         U1["Raw pointer dereference"]

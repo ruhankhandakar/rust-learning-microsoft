@@ -30,22 +30,34 @@ That's it. A `Future` is anything that can be *polled* — asked "are you done y
 ```mermaid
 sequenceDiagram
     participant E as Executor
-    participant F as Future
-    participant R as Resource (I/O)
+    participant F as Future (Task)
+    participant OS as Operating System<br/>(e.g., epoll/kqueue)
+    participant R as Reactor (Runtime)
 
-    E->>F: poll(cx)
-    F->>R: Check: is data ready?
-    R-->>F: Not yet
-    F->>R: Register waker from cx
-    F-->>E: Poll::Pending
+    E->>F: Calls poll(cx)
+    Note right of F: Future attempts operation
+    F->>OS: Syscall (e.g., read TCP socket)
+    OS-->>F: Returns Error: Not Ready
+    
+    F->>R: Registers: (Waker)
+    F-->>E: Returns Poll::Pending
+    Note left of E: Task is moved out<br/>of run queue
 
-    Note over R: ... time passes, data arrives ...
+    E->>E: (Executor runs other tasks OR sleeps)
+    R->>OS: epoll_wait() / Polls OS for events
 
-    R->>E: waker.wake() — "I'm ready!"
-    E->>F: poll(cx) — try again
-    F->>R: Check: is data ready?
-    R-->>F: Yes! Here's the data
-    F-->>E: Poll::Ready(data)
+    Note right of OS: (Sometime Later) New data arrives
+    OS-->>R: Wakes Reactor: data is NOW READY
+    
+    R->>R: Reactor finds Waker
+    R->>E: Calls Waker::wake()
+    Note right of E: Task is pushed back<br/>to Executor's run queue
+
+    E->>F: Calls poll(cx) again
+    Note right of F: Future attempts operation again
+    F->>OS: Syscall (e.g., read TCP socket)
+    OS-->>F: Success: Returns Data Buffer
+    F-->>E: Returns Poll::Ready(Data)
 ```
 
 Let's break down each piece:
@@ -108,12 +120,12 @@ impl Future for Delay {
     type Output = ();
 
     fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<()> {
-        // Check if already completed
+        // Check if already completed before storing waker
         if *self.completed.lock().unwrap() {
             return Poll::Ready(());
         }
 
-        // Store the waker so the background thread can wake us
+        // Store the waker - executor may pass a new one on each poll
         *self.waker_stored.lock().unwrap() = Some(cx.waker().clone());
 
         // Start the background timer on first poll
@@ -132,6 +144,11 @@ impl Future for Delay {
                     w.wake(); // "Hey executor, I'm ready — poll me again!"
                 }
             });
+        }
+
+        // Double-check completion after storing waker (handles race condition)
+        if *self.completed.lock().unwrap() {
+            return Poll::Ready(());
         }
 
         Poll::Pending // Not done yet

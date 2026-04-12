@@ -173,10 +173,10 @@ flat = [item for sublist in nested for item in sublist]
 
 ```mermaid
 flowchart LR
-    A["Source<br/>[1,2,3,4,5]"] -->|.iter\(\)| B["Iterator"]
-    B -->|.filter\(\|x\| x%2==0\)| C["[2, 4]"]
-    C -->|.map\(\|x\| x*x\)| D["[4, 16]"]
-    D -->|.collect\(\)| E["Vec&lt;i32&gt;<br/>[4, 16]"]
+    A["Source<br/>[1,2,3,4,5]"] -->|".iter()"| B["Iterator"]
+    B -->|".filter(x: x%2==0)"| C["[2, 4]"]
+    C -->|".map(x: x*x)"| D["[4, 16]"]
+    D -->|".collect()"| E["Vec&lt;i32&gt;<br/>[4, 16]"]
     style A fill:#ffeeba
     style E fill:#d4edda
 ```
@@ -306,8 +306,10 @@ struct Point {
 // Declarative macro (like a template)
 macro_rules! log_call {
     ($func_name:expr, $body:expr) => {
-        println!("Calling {}", $func_name);
-        $body
+        {
+            println!("Calling {}", $func_name);
+            $body
+        }
     };
 }
 

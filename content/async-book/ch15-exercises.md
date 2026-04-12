@@ -196,7 +196,7 @@ async fn main() {
 
 Implement an async-aware mutex using channels (without using `tokio::sync::Mutex`).
 
-*Hint*: Use a `tokio::sync::mpsc` channel with capacity 1 as a semaphore.
+*Hint*: Use a `tokio::sync::Semaphore` with 1 permit to serialize access.
 
 <details>
 <summary>🔑 Solution</summary>
