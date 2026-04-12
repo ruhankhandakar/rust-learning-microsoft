@@ -74,9 +74,9 @@ fn main() {
         
         let d = &mut a;
         
-        /* 
-         * Uncommenting the line below would be cause the 
-         * program to not compile, because `b` is used 
+        /*
+         * Uncommenting the line below would cause the
+         * program to not compile, because `b` is used
          * while the mutable reference `d` is live in the current scope
          * 
          * You cannot have a mutable and immutable reference in use in the same scope

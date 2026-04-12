@@ -191,7 +191,7 @@ graph LR
     - User defined data types can optionally opt into ```copy``` semantics using the ```derive``` macro with to automatically implement the ```Copy``` trait
     - The compiler will allocate space for the copy following a new assignment
 ```rust
-// Try commenting this out to see the change in let p1 = p; belw
+// Try commenting this out to see the change in let p1 = p; below
 #[derive(Copy, Clone, Debug)]   // We'll discuss this more later
 struct Point{x: u32, y:u32}
 fn main() {

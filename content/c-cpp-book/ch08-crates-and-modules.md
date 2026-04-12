@@ -97,7 +97,7 @@ cargo new --lib hellolib
 ```
 
 ## Exercise: Using workspaces and package dependencies
-- Take a look at the generated Cargo.toml in ```hello``` and ```hellolib```. Notice that both of them have been to the upper level ```Cargo.toml```
+- Take a look at the generated Cargo.toml in ```hello``` and ```hellolib```. Notice that both of them have been added to the upper level ```Cargo.toml```
 - The presence of ```lib.rs``` in ```hellolib``` implies a library package (see https://doc.rust-lang.org/cargo/reference/cargo-targets.html for customization options)
 - Adding a dependency on ```hellolib``` in ```Cargo.toml``` for ```hello```
 ```toml

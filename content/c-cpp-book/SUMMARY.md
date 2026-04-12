@@ -35,7 +35,7 @@
 - [15. no_std — Rust Without the Standard Library](ch15-no_std-rust-without-the-standard-library.md)
     - [Embedded Deep Dive](ch15-1-embedded-deep-dive.md)
 - [16. Case Studies: Real-World C++ to Rust](ch16-case-studies.md)
-    - [Case Study — Lifetime Borrowing](ch16-1-case-study-lifetime-borrowing.md)
+    - [Case Studies 3–5: Lifetimes, Composability, Trait Objects](ch16-cases-3-5-lifetime-borrowing.md)
 
 ---
 
