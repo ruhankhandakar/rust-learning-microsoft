@@ -1,6 +1,6 @@
 # 🦀 Rust Training — Microsoft
 
-A modern web reader for [Microsoft's Rust Training](https://github.com/microsoft/RustTraining) books. Seven free books that meet you where you are — from C++, C#, Python bridges to async deep dives and type-driven design.
+A modern web reader for [Microsoft's Rust Training](https://github.com/microsoft/RustTraining) books, plus **[100 Rust Projects](https://github.com/emmaglorypraise/100rustprojects)** by [Glory Praise Emmanuel](https://github.com/emmaglorypraise). Eight library entries — seven Microsoft books and one hands-on project collection covering CLI through async, web, and databases.
 
 **Live site →** [https://rust.learningz.xyz/](https://rust.learningz.xyz/)
 
@@ -8,7 +8,7 @@ Built by [Ruhan Khandakar](https://x.com/KhandakarRuhan).
 
 ## Features
 
-- **7 Rust books** with chapter-by-chapter navigation and syntax highlighting
+- **8 library entries** (7 Microsoft books + **100 Rust Projects**) with chapter-by-chapter navigation and syntax highlighting
 - **Offline support** — PWA with automatic chapter caching
 - **Reading progress** — auto-tracked per chapter with visual progress bars
 - **Bookmarks** — bookmark any heading in any chapter for quick access

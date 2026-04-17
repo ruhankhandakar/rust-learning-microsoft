@@ -34,6 +34,12 @@ jobs:
           chmod +x scripts/sync-content.sh
           bash scripts/sync-content.sh
 
+      - name: Sync 100 Rust Projects (emmaglorypraise/100rustprojects)
+        run: |
+          chmod +x scripts/sync-100-rust-projects.sh
+          bash scripts/sync-100-rust-projects.sh
+          node scripts/build-100-projects-manifest.js
+
       - name: Check for changes
         id: check
         run: |
@@ -59,15 +65,15 @@ jobs:
           token: ${{ secrets.PAT_TOKEN }}
           branch: chore/sync-upstream-content
           delete-branch: true
-          commit-message: "chore: sync content from Microsoft/RustTraining"
-          title: "chore: sync content from Microsoft/RustTraining"
+          commit-message: "chore: sync upstream book content"
+          title: "chore: sync upstream book content"
           body: |
-            Automated content sync from [microsoft/RustTraining](https://github.com/microsoft/RustTraining).
-            
-            - Pulled latest markdown from upstream `src/` directories
-            - Bumped patch version
-            - Regenerated content hash & SW cache name
-            
+            Automated content sync from:
+            - [microsoft/RustTraining](https://github.com/microsoft/RustTraining) (`src/` markdown)
+            - [emmaglorypraise/100rustprojects](https://github.com/emmaglorypraise/100rustprojects) (notes + progress manifest)
+
+            Also bumps patch version and regenerates content hash & service worker cache name when `content/` changes.
+
             Review the diff and merge when ready.
           labels: |
             content

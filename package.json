@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "node scripts/sync-sw-version.js && node scripts/generate-content-hash.js && next build",
     "sync-content": "bash scripts/sync-content.sh",
+    "sync-100-rust-projects": "bash scripts/sync-100-rust-projects.sh && node scripts/build-100-projects-manifest.js",
     "version": "node scripts/sync-sw-version.js && git add public/sw.js",
     "version:patch": "pnpm version patch",
     "version:minor": "pnpm version minor",
