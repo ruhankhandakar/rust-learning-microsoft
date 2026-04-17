@@ -45,3 +45,26 @@ export async function POST(request: Request) {
 
   return NextResponse.json({ ok: true });
 }
+
+export async function DELETE(request: Request) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const body = await request.json();
+  const bookSlug = body?.bookSlug as string | undefined;
+  const chapterSlug = body?.chapterSlug as string | undefined;
+  if (!bookSlug || !chapterSlug) {
+    return NextResponse.json({ error: "Invalid body" }, { status: 400 });
+  }
+
+  await db
+    .deleteFrom("reading_progress")
+    .where("user_id", "=", session.user.id)
+    .where("book_slug", "=", bookSlug)
+    .where("chapter_slug", "=", chapterSlug)
+    .execute();
+
+  return NextResponse.json({ ok: true });
+}
