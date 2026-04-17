@@ -10,18 +10,21 @@ import {
 import {
   getReadChapters,
   markChapterRead as dbMark,
+  unmarkChapterRead as dbUnmark,
 } from "@/lib/progress-db";
 import { useSessionLite } from "./session-provider";
 
 interface ProgressContextValue {
   readSet: Set<string>;
   markRead: (bookSlug: string, chapterSlug: string) => void;
+  toggleRead: (bookSlug: string, chapterSlug: string) => void;
   getBookProgress: (bookSlug: string, total: number) => number;
 }
 
 const ProgressContext = createContext<ProgressContextValue>({
   readSet: new Set(),
   markRead: () => {},
+  toggleRead: () => {},
   getBookProgress: () => 0,
 });
 
@@ -52,6 +55,18 @@ async function pushToCloud(
     });
   } catch {
     // Offline or error — will sync next time
+  }
+}
+
+async function deleteFromCloud(bookSlug: string, chapterSlug: string) {
+  try {
+    await fetch("/api/progress", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ bookSlug, chapterSlug }),
+    });
+  } catch {
+    // offline
   }
 }
 
@@ -132,6 +147,26 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
     [isLoggedIn]
   );
 
+  const toggleRead = useCallback(
+    (bookSlug: string, chapterSlug: string) => {
+      const key = `${bookSlug}/${chapterSlug}`;
+      setReadSet((prev) => {
+        const next = new Set(prev);
+        if (next.has(key)) {
+          next.delete(key);
+          void dbUnmark(bookSlug, chapterSlug);
+          if (isLoggedIn) void deleteFromCloud(bookSlug, chapterSlug);
+        } else {
+          next.add(key);
+          void dbMark(bookSlug, chapterSlug);
+          if (isLoggedIn) void pushToCloud([{ bookSlug, chapterSlug }]);
+        }
+        return next;
+      });
+    },
+    [isLoggedIn]
+  );
+
   const getBookProgress = useCallback(
     (bookSlug: string, total: number) => {
       if (total === 0) return 0;
@@ -145,7 +180,9 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <ProgressContext.Provider value={{ readSet, markRead, getBookProgress }}>
+    <ProgressContext.Provider
+      value={{ readSet, markRead, toggleRead, getBookProgress }}
+    >
       {children}
     </ProgressContext.Provider>
   );

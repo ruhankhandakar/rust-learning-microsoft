@@ -15,8 +15,16 @@ import { BookProgressBar } from "@/components/book-progress";
 import { LevelTooltip } from "@/components/level-tooltip";
 import { APP_VERSION, CONTENT_LAST_UPDATED } from "@/lib/version";
 import { LocalTime } from "@/components/local-time";
+import { cn } from "@/lib/utils";
+
+// Refresh hourly so temporary homepage highlights expire automatically.
+export const revalidate = 3600;
+
+const FEATURED_BOOK_SLUG = "100-rust-projects";
+const FEATURED_UNTIL_ISO = "2026-04-25T23:59:59Z";
 
 export default function HomePage() {
+  const highlightActive = Date.now() < Date.parse(FEATURED_UNTIL_ISO);
   const booksWithCounts = BOOKS.map((book) => {
     const structure = getBookStructure(book.dirName);
     return { ...book, chapterCount: structure.flatChapters.length };
@@ -44,10 +52,10 @@ export default function HomePage() {
           author:
             book.slug === "100-rust-projects"
               ? {
-                  "@type": "Person",
-                  name: "Glory Praise Emmanuel",
-                  url: "https://github.com/emmaglorypraise",
-                }
+                "@type": "Person",
+                name: "Glory Praise Emmanuel",
+                url: "https://github.com/emmaglorypraise",
+              }
               : { "@type": "Organization", name: "Microsoft" },
           numberOfPages: book.chapterCount,
           inLanguage: "en",
@@ -108,43 +116,60 @@ export default function HomePage() {
         </p>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {booksWithCounts.map((book) => (
-            <Link key={book.slug} href={`/books/${book.slug}`}>
-              <Card className="group h-full transition-all hover:shadow-lg hover:shadow-rust/5 hover:border-primary/30 cursor-pointer">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between mb-2">
-                    <span className="text-3xl">{book.icon}</span>
-                    <LevelTooltip level={book.level} color={book.levelColor} />
-                  </div>
-                  <CardTitle className="text-lg leading-tight group-hover:text-primary transition-colors">
-                    {book.title}
-                  </CardTitle>
-                  <CardDescription className="text-xs">
-                    For {book.audience}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {book.description}
-                  </p>
-                  <BookProgressBar
-                    bookSlug={book.slug}
-                    totalChapters={book.chapterCount}
-                  />
-                  <div className="flex items-center justify-between text-xs text-muted-foreground mt-3">
-                    <span className="flex items-center gap-1">
-                      <BookOpen className="h-3.5 w-3.5" />
-                      {book.chapterCount} chapters
-                    </span>
-                    <span className="flex items-center gap-1 text-primary font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                      Start reading
-                      <ChevronRight className="h-3.5 w-3.5" />
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+          {booksWithCounts.map((book) => {
+            const isFeatured =
+              highlightActive && book.slug === FEATURED_BOOK_SLUG;
+            return (
+              <Link key={book.slug} href={`/books/${book.slug}`}>
+                <Card
+                  className={cn(
+                    "group h-full transition-all hover:shadow-lg hover:shadow-rust/5 hover:border-primary/30 cursor-pointer",
+                    isFeatured &&
+                    "border-primary/50 shadow-lg shadow-rust/10 ring-1 ring-primary/30 bg-gradient-to-br from-primary/5 to-transparent"
+                  )}
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between mb-2">
+                      <span className="text-3xl">{book.icon}</span>
+                      <div className="flex items-center gap-2">
+                        {isFeatured && (
+                          <span className="inline-flex items-center rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
+                            Featured
+                          </span>
+                        )}
+                        <LevelTooltip level={book.level} color={book.levelColor} />
+                      </div>
+                    </div>
+                    <CardTitle className="text-lg leading-tight group-hover:text-primary transition-colors">
+                      {book.title}
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      For {book.audience}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {book.description}
+                    </p>
+                    <BookProgressBar
+                      bookSlug={book.slug}
+                      totalChapters={book.chapterCount}
+                    />
+                    <div className="flex items-center justify-between text-xs text-muted-foreground mt-3">
+                      <span className="flex items-center gap-1">
+                        <BookOpen className="h-3.5 w-3.5" />
+                        {book.chapterCount} chapters
+                      </span>
+                      <span className="flex items-center gap-1 text-primary font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                        Start reading
+                        <ChevronRight className="h-3.5 w-3.5" />
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            )
+          })}
         </div>
       </main>
 

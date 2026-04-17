@@ -16,6 +16,8 @@ import { BookProgressBar } from "@/components/book-progress";
 import { ChapterCheckmark } from "@/components/chapter-checkmark";
 import { BookCacheTrigger } from "@/components/book-cache-trigger";
 import { APP_VERSION } from "@/lib/version";
+import { loadRust100Manifest } from "@/lib/rust-100-projects";
+import { Rust100ProjectsHub } from "@/components/rust-100-projects-hub";
 
 const LEVEL_STYLES: Record<string, string> = {
   green:
@@ -46,6 +48,18 @@ export default async function BookPage({
   const firstChapter = structure.flatChapters[0];
 
   const allChapterSlugs = structure.flatChapters.map((ch) => ch.slug);
+
+  if (bookSlug === "100-rust-projects") {
+    const manifest = loadRust100Manifest();
+    return (
+      <Rust100ProjectsHub
+        book={book}
+        projects={manifest.projects}
+        totalChapters={structure.flatChapters.length}
+        allChapterSlugs={allChapterSlugs}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">

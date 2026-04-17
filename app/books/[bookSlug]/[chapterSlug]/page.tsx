@@ -13,6 +13,16 @@ import { HomeButton } from "@/components/home-button";
 import { SettingsDropdownLazy as SettingsDropdown } from "@/components/settings-dropdown-lazy";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { ChapterKeyboardNav } from "@/components/chapter-keyboard-nav";
+import { loadRust100Manifest, getRust100ProjectByChapterSlug } from "@/lib/rust-100-projects";
+import {
+  listProjectSourceDir,
+  resolveProjectSourcePath,
+} from "@/lib/rust-100-project-source";
+import {
+  Rust100ProjectGlossaryToolbar,
+  Rust100ProjectSourcePanel,
+} from "@/components/rust-100-project-source-panel";
+import { Rust100ProjectSourceMobile } from "@/components/rust-100-project-source-mobile";
 
 const MarkdownRenderer = dynamic(
   () => import("@/components/markdown-renderer").then((m) => m.MarkdownRenderer),
@@ -45,7 +55,10 @@ export async function generateMetadata({
   if (!chapter) return {};
 
   const title = `${chapter.title} — ${book.shortTitle}`;
-  const description = `Read "${chapter.title}" from ${book.title}. Free Rust training by Microsoft.`;
+  const description =
+    bookSlug === "100-rust-projects"
+      ? `Read "${chapter.title}" from ${book.title}. Notes from emmaglorypraise/100rustprojects.`
+      : `Read "${chapter.title}" from ${book.title}. Free Rust training by Microsoft.`;
   const url = `${BASE_URL}/books/${bookSlug}/${chapterSlug}`;
 
   return {
@@ -56,7 +69,10 @@ export async function generateMetadata({
       title,
       description,
       url,
-      siteName: "Rust Training by Microsoft | Ruhan Khandakar",
+      siteName:
+      bookSlug === "100-rust-projects"
+        ? "100 Rust Projects | Ruhan Khandakar"
+        : "Rust Training by Microsoft | Ruhan Khandakar",
     },
     twitter: {
       card: "summary",
@@ -98,18 +114,46 @@ export default async function ChapterPage({
 
   const markdown = getChapterMarkdown(book.dirName, chapterSlug);
 
+  const rust100 =
+    bookSlug === "100-rust-projects" ? loadRust100Manifest() : null;
+  const rust100Project = rust100
+    ? getRust100ProjectByChapterSlug(rust100, chapterSlug)
+    : undefined;
+  const rustProjectDir = rust100Project?.projectDir ?? null;
+  const useRustSourceSplit =
+    bookSlug === "100-rust-projects" &&
+    chapterSlug !== "glossary" &&
+    rustProjectDir !== null;
+  const rustSourceEntries =
+    useRustSourceSplit && rustProjectDir
+      ? (() => {
+          const root = resolveProjectSourcePath(rustProjectDir, []);
+          return root ? listProjectSourceDir(root.absolute) : [];
+        })()
+      : [];
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: current.title,
-    description: `Read "${current.title}" from ${book.title}. Free Rust training curated by Microsoft | Ruhan Khandakar.`,
+    description:
+      bookSlug === "100-rust-projects"
+        ? `Project notes from ${book.title} (emmaglorypraise/100rustprojects).`
+        : `Read "${current.title}" from ${book.title}. Free Rust training curated by Microsoft | Ruhan Khandakar.`,
     url: `${BASE_URL}/books/${bookSlug}/${chapterSlug}`,
     author: { "@type": "Person", name: "Ruhan Khandakar" },
     publisher: { "@type": "Person", name: "Ruhan Khandakar" },
     isPartOf: {
       "@type": "Book",
       name: book.title,
-      author: { "@type": "Organization", name: "Microsoft" },
+      author:
+        bookSlug === "100-rust-projects"
+          ? {
+              "@type": "Person",
+              name: "Glory Praise Emmanuel",
+              url: "https://github.com/emmaglorypraise",
+            }
+          : { "@type": "Organization", name: "Microsoft" },
     },
     inLanguage: "en",
     isAccessibleForFree: true,
@@ -121,7 +165,9 @@ export default async function ChapterPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <ChapterReadMarker bookSlug={bookSlug} chapterSlug={chapterSlug} />
+      {bookSlug !== "100-rust-projects" && (
+        <ChapterReadMarker bookSlug={bookSlug} chapterSlug={chapterSlug} />
+      )}
       <ChapterKeyboardNav
         prevHref={prev ? `/books/${bookSlug}/${prev.slug}` : null}
         nextHref={next ? `/books/${bookSlug}/${next.slug}` : null}
@@ -168,14 +214,57 @@ export default async function ChapterPage({
         </aside>
 
         <main className="flex-1 min-w-0">
-          <article className="mx-auto max-w-3xl px-6 md:px-10 py-10">
-            <ErrorBoundary>
-              <MarkdownRenderer content={markdown} bookSlug={bookSlug} chapterSlug={chapterSlug} />
-            </ErrorBoundary>
-          </article>
+          {useRustSourceSplit && rustProjectDir ? (
+            <>
+              <div
+                className="w-full px-4 md:px-6 xl:px-8 pt-10 pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] lg:pb-10"
+              >
+                <div className="flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-10 xl:gap-12">
+                  <article className="min-w-0 flex-1">
+                    <ErrorBoundary>
+                      <MarkdownRenderer
+                        content={markdown}
+                        bookSlug={bookSlug}
+                        chapterSlug={chapterSlug}
+                      />
+                    </ErrorBoundary>
+                  </article>
+                  <aside className="hidden lg:block w-full lg:w-[min(42rem,48%)] shrink-0 lg:sticky lg:top-[4.5rem] lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto">
+                    <Rust100ProjectSourcePanel
+                      chapterSlug={chapterSlug}
+                      projectDir={rustProjectDir}
+                      initialEntries={rustSourceEntries}
+                      showActions={false}
+                    />
+                  </aside>
+                </div>
+              </div>
+              <Rust100ProjectSourceMobile
+                chapterSlug={chapterSlug}
+                projectDir={rustProjectDir}
+                initialEntries={rustSourceEntries}
+              />
+            </>
+          ) : (
+            <article className="mx-auto max-w-3xl px-6 md:px-10 py-10">
+              <ErrorBoundary>
+                {bookSlug === "100-rust-projects" &&
+                  chapterSlug === "glossary" && <Rust100ProjectGlossaryToolbar />}
+                <MarkdownRenderer
+                  content={markdown}
+                  bookSlug={bookSlug}
+                  chapterSlug={chapterSlug}
+                />
+              </ErrorBoundary>
+            </article>
+          )}
 
-          <nav className="border-t border-border">
-            <p className="mx-auto max-w-3xl px-6 md:px-10 pt-6 text-[11px] text-muted-foreground/50 text-center hidden sm:block">
+          <nav
+            className={`border-t border-border ${useRustSourceSplit ? "pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0" : ""}`}
+          >
+            <p
+              className={`${useRustSourceSplit ? "w-full px-4 md:px-6 xl:px-8" : "mx-auto max-w-3xl px-6 md:px-10"} pt-6 text-[11px] text-muted-foreground/50 text-center hidden sm:block`}
+            >
               <kbd className="px-1 py-0.5 rounded border border-border text-[10px]">⌘</kbd>{" / "}
               <kbd className="px-1 py-0.5 rounded border border-border text-[10px]">Alt</kbd>
               {" + "}
@@ -183,7 +272,9 @@ export default async function ChapterPage({
               <kbd className="px-1 py-0.5 rounded border border-border text-[10px]">→</kbd>
               {" to navigate chapters"}
             </p>
-            <div className="mx-auto max-w-3xl px-6 md:px-10 py-6 flex items-stretch gap-4">
+            <div
+              className={`${useRustSourceSplit ? "w-full px-4 md:px-6 xl:px-8" : "mx-auto max-w-3xl px-6 md:px-10"} py-6 flex items-stretch gap-4`}
+            >
               {prev ? (
                 <Link
                   href={`/books/${bookSlug}/${prev.slug}`}
