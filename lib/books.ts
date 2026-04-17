@@ -95,6 +95,18 @@ export const BOOKS: BookMeta[] = [
       "Build scripts, cross-compilation, CI/CD, Miri — production-grade engineering workflows.",
     icon: "🏗️",
   },
+  {
+    slug: "100-rust-projects",
+    dirName: "100-rust-projects",
+    title: "100 Rust Projects",
+    shortTitle: "100 Projects",
+    level: "Projects",
+    levelColor: "yellow",
+    audience: "Hands-on learners",
+    description:
+      "A curated path through 100 small Rust projects — CLI, async, web, databases, and more — with notes and links to upstream source.",
+    icon: "🧰",
+  },
 ];
 
 export function getBookBySlug(slug: string): BookMeta | undefined {

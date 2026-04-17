@@ -63,6 +63,24 @@ export async function markChapterRead(
   }
 }
 
+export async function unmarkChapterRead(
+  bookSlug: string,
+  chapterSlug: string
+): Promise<void> {
+  try {
+    const db = await openDB();
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    const store = tx.objectStore(STORE_NAME);
+    store.delete(`${bookSlug}/${chapterSlug}`);
+    return new Promise((resolve, reject) => {
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch {
+    // non-critical
+  }
+}
+
 export async function getReadChapters(
   bookSlug?: string
 ): Promise<ChapterProgress[]> {
