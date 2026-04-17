@@ -107,7 +107,16 @@ export function Rust100ProjectsHub({
               >
                 emmaglorypraise/100rustprojects
               </a>{" "}
-              by Glory Praise Emmanuel.
+              by{" "}
+              <a
+                href="https://x.com/emmaglorypraise"
+                className="text-primary hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Glory Praise Emmanuel
+              </a>
+              .
             </p>
             <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
               <span className="flex items-center gap-1">
