@@ -1,0 +1,10 @@
+[package]
+name = "encrypted_notes"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+aes = "0.8"
+cbc = "0.1"
+hex = "0.4"
+rand = "0.8"
