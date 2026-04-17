@@ -41,7 +41,14 @@ export default function HomePage() {
           name: book.title,
           description: book.description,
           url: `https://rust.learningz.xyz/books/${book.slug}`,
-          author: { "@type": "Organization", name: "Microsoft" },
+          author:
+            book.slug === "100-rust-projects"
+              ? {
+                  "@type": "Person",
+                  name: "Glory Praise Emmanuel",
+                  url: "https://github.com/emmaglorypraise",
+                }
+              : { "@type": "Organization", name: "Microsoft" },
           numberOfPages: book.chapterCount,
           inLanguage: "en",
           isAccessibleForFree: true,
@@ -81,8 +88,12 @@ export default function HomePage() {
                 <span className="text-primary">Your Way</span>
               </h1>
               <p className="text-sm md:text-base text-muted-foreground max-w-xl">
-                Seven free books that meet you where you are — from C++, C#, Python
-                bridges to async deep dives and type-driven design.
+                Eight library entries — seven Microsoft books plus{" "}
+                <strong className="font-semibold text-foreground/90">
+                  100 Rust Projects
+                </strong>{" "}
+                (community notes and GitHub links). From C++, C#, Python bridges to
+                async, patterns, and hands-on builds.
               </p>
             </div>
           </div>
