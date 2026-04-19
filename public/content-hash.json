@@ -1,7 +1,8 @@
 {
-  "version": "7a65a3d178e5",
-  "lastUpdated": "2026-04-12T08:44:03.844Z",
+  "version": "d4d84555697a",
+  "lastUpdated": "2026-04-18T08:46:09.103Z",
   "books": {
+    "100-rust-projects": "75c3a84749bd",
     "async-book": "2c88c4b790bf",
     "c-cpp-book": "0b79504ac040",
     "csharp-book": "91e9fb9982cb",
