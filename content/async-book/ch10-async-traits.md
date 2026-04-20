@@ -3,7 +3,7 @@
 > **What you'll learn:**
 > - Why async methods in traits took years to stabilize
 > - RPITIT: native async trait methods (Rust 1.75+)
-> - The dyn dispatch challenge and `trait_variant` workaround
+> - The dyn dispatch challenge and `Send` bounds via `trait_variant`
 > - Async closures (Rust 1.85+): `async Fn()` and `async FnOnce()`
 
 ```mermaid
@@ -11,13 +11,13 @@ graph TD
     subgraph "Async Trait Approaches"
         direction TB
         RPITIT["RPITIT (Rust 1.75+)<br/>async fn in trait<br/>Static dispatch only"]
-        VARIANT["trait_variant<br/>Auto-generates Send variant<br/>Enables dyn dispatch"]
+        VARIANT["trait_variant<br/>Auto-generates Send variant<br/>Static dispatch only"]
         BOXED["Box&lt;dyn Future&gt;<br/>Manual boxing<br/>Works everywhere"]
         CLOSURE["Async Closures (1.85+)<br/>async Fn() / async FnOnce()<br/>Callbacks & middleware"]
     end
 
-    RPITIT -->|"Need dyn?"| VARIANT
-    RPITIT -->|"Pre-1.75?"| BOXED
+    RPITIT -->|"Need Send?"| VARIANT
+    RPITIT -->|"Need dyn?"| BOXED
     CLOSURE -->|"Replaces"| BOXED
 
     style RPITIT fill:#d4efdf,stroke:#27ae60,color:#000
@@ -84,8 +84,6 @@ The limitation: you can't use `dyn DataStore` directly because the compiler does
 trait DynDataStore {
     fn get(&self, key: &str) -> Pin<Box<dyn Future<Output = Option<String>> + Send + '_>>;
 }
-
-// Or use the trait_variant macro (see below)
 ```
 
 **The Send problem**: In multi-threaded runtimes, spawned tasks must be `Send`. But async trait methods don't automatically add `Send` bounds:
@@ -133,12 +131,17 @@ trait DataStore {
 // Both have the same methods, implementors implement DataStore
 // and get SendDataStore for free if their futures are Send.
 
-// Use SendDataStore when you need to spawn:
-async fn spawn_lookup(store: Arc<dyn SendDataStore>) {
+// Use SendDataStore when you need to spawn tasks:
+async fn spawn_lookup<S: SendDataStore + 'static>(store: Arc<S>) {
     tokio::spawn(async move {
         store.get("key").await;
     });
 }
+
+// ⚠️ Note: trait_variant does NOT enable dyn dispatch.
+// The generated trait still uses `impl Future`, so `dyn SendDataStore`
+// is not object-safe. For dyn dispatch, you still need manual boxing
+// (see the Box::pin approach above) or the `async-trait` crate.
 ```
 
 ### Quick Reference: Async Traits
@@ -146,14 +149,14 @@ async fn spawn_lookup(store: Arc<dyn SendDataStore>) {
 | Approach | Static Dispatch | Dynamic Dispatch | Send | Syntax Overhead |
 |----------|:---:|:---:|:---:|---|
 | Native `async fn` in trait | ✅ | ❌ | Implicit | None |
-| `trait_variant` | ✅ | ✅ | Explicit | `#[trait_variant::make]` |
+| `trait_variant` | ✅ | ❌ | Explicit | `#[trait_variant::make]` |
 | Manual `Box::pin` | ✅ | ✅ | Explicit | High |
 | `async-trait` crate | ✅ | ✅ | `#[async_trait]` | Medium (proc macro) |
 
-> **Recommendation**: For new code (Rust 1.75+), use native async traits with
-> `trait_variant` when you need `dyn` dispatch. The `async-trait` crate is still
-> widely used but boxes every future — the native approach is zero-cost for
-> static dispatch.
+> **Recommendation**: For new code (Rust 1.75+), use native async traits. Add
+> `trait_variant` when you need `Send` bounds for spawning tasks. For `dyn`
+> dispatch, use manual `Box::pin` or the `async-trait` crate. The native
+> approach is zero-cost for static dispatch.
 
 ### Async Closures (Rust 1.85+)
 
@@ -281,14 +284,14 @@ async fn main() {
 }
 ```
 
-**Key takeaway**: The same generic function works with both implementations through static dispatch. No boxing, no allocation overhead. For dynamic dispatch, add `trait_variant::make(SendCache: Send)`.
+**Key takeaway**: The same generic function works with both implementations through static dispatch. No boxing, no allocation overhead. If you need to spawn these futures on a multi-threaded runtime, add `trait_variant::make(SendCache: Send)` to get `Send` bounds. For dynamic dispatch, use manual `Box::pin` or the `async-trait` crate.
 
 </details>
 </details>
 
 > **Key Takeaways — Async Traits**
 > - Since Rust 1.75, you can write `async fn` directly in traits (no `#[async_trait]` crate needed)
-> - `trait_variant::make` auto-generates a `Send` variant for dynamic dispatch
+> - `trait_variant::make` auto-generates a `Send` variant for spawning tasks (static dispatch only)
 > - Async closures (`async Fn()`) stabilized in 1.85 — use for callbacks and middleware
 > - Prefer static dispatch (`<S: Service>`) over `dyn` for performance-critical code
 
