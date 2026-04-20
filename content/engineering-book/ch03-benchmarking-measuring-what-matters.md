@@ -280,7 +280,13 @@ perf script | inferno-collapse-perf | inferno-flamegraph > flamegraph.svg
 - **Bottom** = entry point, **Top** = leaf functions doing actual work
 - Look for wide plateaus at the top — those are your hot spots
 
-**Profile-guided optimization (PGO):**
+### Profile-Guided Optimization (PGO)
+
+Profile-Guided Optimization (PGO) is a compiler optimization technique for improving performance of CPU-intensive applications. The basic concept of PGO is to collect data about the typical execution of a program (e.g. which branches it is likely to take) and then use this data to inform optimizations such as inlining, machine-code layout, register allocation, etc.
+
+There are different ways of collecting data about a program’s execution. One is to run the program inside a profiler (such as `perf`) and another is to create an instrumented binary, that is, a binary that has data collection built into it, and run that. The latter usually provides more accurate data and it is also what is supported by Rustc.
+
+Below there is an example of instrumentation-based PGO:
 
 ```bash
 # Step 1: Build with instrumentation
@@ -302,8 +308,31 @@ RUSTFLAGS="-Cprofile-use=/tmp/pgo-data/merged.profdata" cargo build --release
 # because the CPU is mostly waiting, not executing hot loops.
 ```
 
+As an alternative to directly using the compiler for PGO, you may choose to go with [cargo-pgo](https://github.com/kobzol/cargo-pgo), which has an intuitive command-line API and saves you the trouble of doing all the manual work.
+
+With `cargo-pgo`, the optimization workflow from above can look like that:
+
+```bash
+# Step 1: Build with instrumentation
+cargo pgo build
+
+# Step 2: Run representative workloads
+cargo pgo run -- --run-full
+
+# Step 3: Rebuild with profiling feedback
+cargo pgo optimize
+```
+
+Sampling PGO or SPGO is a more complicated way to perform PGO in a price of reduced runtime overhead compared to instrumentation-based PGO. For now, the best place to read about it is the Clang PGO [manual](https://clang.llvm.org/docs/UsersManual.html#using-sampling-profilers).
+
 > **Tip**: Before spending time on PGO, ensure your [release profile](ch07-release-profiles-and-binary-size.md)
 > already has LTO enabled — it typically delivers a bigger win for less effort.
+
+Further reading:
+
+* Official Rustc [guide](https://doc.rust-lang.org/rustc/profile-guided-optimization.html) about PGO.
+* [Awesome PGO](https://github.com/zamazan4ik/awesome-pgo) - a collection of PGO benchmarks for real applications, including PGO guides for different compilers (including Sampling PGO)
+* [LLVM BOLT](https://github.com/llvm/llvm-project/blob/main/bolt/README.md) - Post-Link Optimization (PLO) optimization technique. PLO can be used for performing additional optimizations even after applying PGO for getting better performance. `cargo-pgo` supports `llvm-bolt` too.
 
 ### `hyperfine` — Quick End-to-End Timing
 
