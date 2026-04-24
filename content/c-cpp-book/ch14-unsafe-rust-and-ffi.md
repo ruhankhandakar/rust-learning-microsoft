@@ -207,8 +207,8 @@ pub extern "C" fn create_simple_logger(file_name: *const std::os::raw::c_char, o
         return 1;
     }
     let file_name = file_name.unwrap();
-    // Assume some defaults; we'll pass them in in real life
-    let new_logger = SimpleLogger::new(file_name, false, LogLevel::CRITICAL);
+    // Assume some defaults; we'll pass them in real life
+    let new_logger = SimpleLogger::new(file_name, true, LogLevel::CRITICAL);
     // Check that we were able to construct the logger
     if new_logger.is_err() {
         return 1;
