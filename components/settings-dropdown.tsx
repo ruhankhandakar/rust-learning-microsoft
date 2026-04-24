@@ -2,6 +2,7 @@
 
 import { Settings, Sun, Moon, Check, Minus, Plus, LogOut, ChevronDown } from "lucide-react";
 import { BookmarksPanel } from "./bookmarks-panel";
+import { StorageUsage } from "./storage-usage";
 import { useTheme } from "./theme-provider";
 import {
   useFont,
@@ -192,6 +193,11 @@ export function SettingsDropdown() {
             {SIZE_OPTIONS[sizeIdx]?.label}
           </p>
         </div>
+
+        <DropdownMenuSeparator />
+
+        {/* Storage */}
+        <StorageUsage />
       </DropdownMenuContent>
     </DropdownMenu>
   );

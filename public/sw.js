@@ -3,6 +3,15 @@ const CONTENT_HASH_URL = "/content-hash.json";
 
 const PRECACHE_URLS = ["/", "/~offline", "/manifest.webmanifest", "/icon.svg"];
 
+// Paths that must never be cached (heavy / high-churn / too many pages).
+// The entire 100-rust-projects book has 100+ chapters; caching them bloats
+// storage for little benefit (users rarely revisit the same chapter offline).
+const NO_CACHE_PATH_PATTERNS = [/^\/books\/100-rust-projects(\/|$)/];
+
+function shouldBypassCache(pathname) {
+  return NO_CACHE_PATH_PATTERNS.some((re) => re.test(pathname));
+}
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
@@ -34,6 +43,11 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET") return;
   if (url.origin !== self.location.origin) return;
 
+  if (shouldBypassCache(url.pathname)) {
+    event.respondWith(networkOnly(request));
+    return;
+  }
+
   if (request.mode === "navigate") {
     event.respondWith(networkFirstThenCache(request));
     return;
@@ -50,6 +64,18 @@ self.addEventListener("fetch", (event) => {
 
   event.respondWith(networkFirstThenCache(request));
 });
+
+async function networkOnly(request) {
+  try {
+    return await fetch(request);
+  } catch {
+    if (request.mode === "navigate") {
+      const offline = await caches.match("/~offline");
+      if (offline) return offline;
+    }
+    return new Response("Offline", { status: 503 });
+  }
+}
 
 async function networkFirstThenCache(request) {
   try {
@@ -72,7 +98,13 @@ async function networkFirstThenCache(request) {
 
 self.addEventListener("message", (event) => {
   if (event.data?.type === "CACHE_BOOK") {
-    const urls = event.data.urls;
+    const urls = (event.data.urls || []).filter((u) => {
+      try {
+        return !shouldBypassCache(new URL(u, self.location.origin).pathname);
+      } catch {
+        return false;
+      }
+    });
     event.waitUntil(
       caches.open(CACHE_NAME).then(async (cache) => {
         for (const url of urls) {
@@ -81,10 +113,23 @@ self.addEventListener("message", (event) => {
             try {
               const res = await fetch(url);
               if (res.ok) await cache.put(url, res);
-            } catch {}
+            } catch { }
           }
         }
       })
+    );
+  }
+
+  if (event.data?.type === "CLEAR_CACHE") {
+    event.waitUntil(
+      (async () => {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+        const source = event.source;
+        if (source && "postMessage" in source) {
+          source.postMessage({ type: "CACHE_CLEARED" });
+        }
+      })()
     );
   }
 
@@ -106,7 +151,7 @@ self.addEventListener("message", (event) => {
             });
           }
           await cache.put(CONTENT_HASH_URL, new Response(JSON.stringify(remote)));
-        } catch {}
+        } catch { }
       })()
     );
   }
