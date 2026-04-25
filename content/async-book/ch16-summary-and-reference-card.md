@@ -21,7 +21,7 @@
 | Run two futures concurrently | `tokio::join!(a, b)` |
 | Race two futures | `tokio::select! { ... }` |
 | Spawn a background task | `tokio::spawn(async { ... })` |
-| Run blocking code in async | `tokio::task::spawn_blocking(\\|\\| { ... })` |
+| Run blocking code in async | `tokio::task::spawn_blocking(\|\| { ... })` |
 | Limit concurrency | `Semaphore::new(N)` |
 | Collect many task results | `JoinSet` |
 | Share state across tasks | `Arc<Mutex<T>>` or channels |
