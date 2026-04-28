@@ -140,7 +140,7 @@ fn main() {
     // Approach 2: Single pass with partition()
     let (evens, odds): (Vec<i32>, Vec<i32>) = numbers
         .into_iter()
-        .partition(|n| n % 2 == 0);
+        .partition(|n| *n % 2 == 0);
     println!("Evens (partition): {evens:?}");
     println!("Odds  (partition): {odds:?}");
 }
