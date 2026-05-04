@@ -1,14 +1,14 @@
 {
-  "version": "5a0ac26c614c",
-  "lastUpdated": "2026-04-28T03:22:43.253Z",
+  "version": "a970d85fa5c4",
+  "lastUpdated": "2026-05-04T10:11:21.017Z",
   "books": {
     "100-rust-projects": "75c3a84749bd",
     "async-book": "70d7d07fb23d",
     "c-cpp-book": "2d979e5bb734",
-    "csharp-book": "91e9fb9982cb",
+    "csharp-book": "5802cf6e19e9",
     "engineering-book": "ba26e2481fba",
     "python-book": "24b31d30a21b",
-    "rust-patterns-book": "e52fda39edd3",
+    "rust-patterns-book": "186f4071e6f5",
     "type-driven-correctness-book": "c16a8ef33b30"
   }
 }
