@@ -1,40 +1,32 @@
 # Project 021 – CRUD Operations on a Text File
 
-## What I Built
-A CLI-based Rust app that performs Create, Read, Update, and Delete operations on a plain text file. 
+## Code
+Implements file-based database operations, reading lines into memory, letting the user modify or delete specific lines by index, and writing updates back to disk.
 
-## What I Learned
-- I learned how to use std::fs and BufReader to manage file content line-by-line—great for simulating basic text-based databases.
-- While Debug trait (derived with #[derive(Debug)]) is good for developers during debugging, Display is meant for end-users. It provides cleaner, more readable messages.
+---
 
-In Code:
-```
-impl fmt::Display for CrudError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            CrudError::Io(e) => write!(f, "I/O error: {}", e),
-            CrudError::InvalidLineNumber => write!(f, "Invalid line number"),
-            CrudError::FileNotFound => write!(f, "File not found"),
-        }
-    }
-}
-```
+## Problem
+Simple data management applications need file storage without the complexity of SQL servers. They need to handle line-based file modification, index validations, and disk operations safely.
 
-This implementation means:
+---
 
-- When an I/O error occurs, it will show "I/O error: " followed by the specific OS error
+## Goal
+Build a terminal app that performs create, read, update, and delete (CRUD) operations on lines inside a local text file, implementing index validations.
 
-- For invalid line numbers, a simple "Invalid line number" message
+---
 
-- For missing files, "File not found"
+## What I Learn
+- `std::fs::write` to create or overwrite file contents in a single call
+- `std::path::Path::new` and its `exists` method to check file availability
+- `BufReader::new` and `lines().collect()` to read files into a vector of strings
+- Indexing and updating elements in mutable vectors (`Vec<String>`)
+- Deleting items in vectors using index offsets via `remove`
+- Structuring modular datastores (e.g. `TextFileDb` in `main_pro.rs`)
+- Designing custom error enums and converting `std::io::Error` using the `From` trait
 
-When this error handling is used in main():
-```
-match db.read() {
-    Ok(lines) => { /* show content */ },
-    Err(CrudError::FileNotFound) => println!("📭 File not found"),
-    Err(e) => return Err(e),
-}
-```
+---
 
 ## Notes
+- Rewriting files by reading all content to memory, modifying it, and saving it works well for small configurations but does not scale to large datasets.
+- Custom errors mapping standard I/O errors using `From` traits make code cleaner by allowing the `?` operator.
+- Try modifying the database to store comma-separated values (CSV) rather than plain text lines.

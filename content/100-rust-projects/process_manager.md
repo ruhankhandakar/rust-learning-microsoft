@@ -1,29 +1,32 @@
-# Project 048 – Process Manager      
+# Project 048 – Process Manager
 
-## What I Built
-A CLI tool that lists currently running processes, lets you search by name, and optionally terminate a process by PID. 
+## Code
+Queries system processes using the `sysinfo` crate, providing options to list all active processes, search for processes by name, and terminate processes using their PID.
 
-## What I Learned
+---
+
+## Problem
+Managing system processes requires querying active OS tasks, parsing search queries, obtaining process handles, and sending termination signals safely.
+
+---
+
+## Goal
+Build a terminal process manager that lists active processes, searches processes by name, and terminates tasks by PID.
+
+---
+
+## What I Learn
+- Interfacing with OS process tables using `sysinfo` APIs
+- Refreshing processes and system stats periodically via `refresh_all` updates
+- Filtering process maps case-insensitively using name matching
+- Terminating processes using target OS signals like `Signal::Kill`
+- Parsing process IDs using the custom `Pid` wrapper type
+- Formatting process listings with PID, name, and CPU percentage columns
+- Handling invalid PIDs or missing targets during termination prompts
+
+---
 
 ## Notes
-##### Generate a key (32 bytes = 64 hex chars):
-bash
-```
-# On Linux/macOS:
-head -c 32 /dev/urandom | xxd -p -c 32
-# Or with OpenSSL:
-openssl rand -hex 32
-```
-Example key: 5f4dcc3b5aa765d61d8327deb882cf99b6c2e5d8a83c07b0e7f5a7a53c7f5e5a
-
-
-##### Sample Interaction:
-```
-Enter path to file to encrypt: secret.txt
-Enter 32-byte key (hex): 000102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f
-Output file path: secret.enc
-✅ File encrypted to 'secret.enc'
-```
-
-The encrypted file format is: [16-byte IV][encrypted data]
-
+- Terminating processes with `Signal::Kill` forces immediate termination without letting the process clean up resources.
+- Depending on the OS, terminating processes owned by other users or the system requires elevated privileges (e.g. `sudo`).
+- Try searching for your browser process name in the manager list to check its PID and CPU load.

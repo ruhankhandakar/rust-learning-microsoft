@@ -1,41 +1,32 @@
-# Project 065 – (JSON Web Token) JWT Authentication in Actix-Web
+# Project 065 – JWT Authentication in Actix-Web
 
-## What I Built
-A secure JWT-based authentication in Actix-Web. Created login endpoints that return a JSON Web Token, and a protected route that requires a valid token in the request header. This is essential for stateless API security.
+## Code
+Implements JSON Web Token (JWT) authentication, signing tokens on successful logins, verifying headers on protected paths, and decoding payloads.
 
-## What I Learned
-### Key Concepts:
-- `jsonwebtoken` for secure, signed tokens
+---
 
-- `Authorization headers` for bearer tokens
+## Problem
+Securing APIs requires verifying user identities without maintaining server-side session databases. Signed JWT tokens allow stateless authentication.
 
-- `Token claims` include user identity and expiration
+---
+
+## Goal
+Build a token verification server that encodes claims upon credential validation, inspects request headers, decodes JWT signatures, and restricts access.
+
+---
+
+## What I Learn
+- Formatting and signing JWT token payload structures using the `jsonwebtoken` crate
+- Setting expiration rules for token lifecycles using `chrono::Utc` timestamps
+- Retrieving and reading specific request headers using the `HttpRequest` handle
+- Extracting bearer token structures from header values using string prefixes
+- Decoding and validating tokens with signature keys and validation settings
+- Returning `401 Unauthorized` responses for invalid or missing tokens
+- Decoupling user session states from memory databases
+
+---
 
 ## Notes
-
-### Run the App
-cargo run
-
-### Test with curl:
-1. Login and get token:
-```
-curl -X POST -H "Content-Type: application/json" \
--d '{"username":"admin", "password":"password"}' \
-http://127.0.0.1:8080/login
-```
-
-2. Use token to access protected route:
-```
-curl -H "Authorization: Bearer <TOKEN>" \
-http://127.0.0.1:8080/protected
-```
-
-
-
-
-
-
-
-
-
-
+- HS256 algorithm uses symmetric signing, meaning the same secret key is used to both sign new tokens and verify existing tokens.
+- Keep the secret key secure and change it in production environments; weak keys are vulnerable to offline brute-force attacks.
+- Try making a request to the protected route without a token, and then with a signed token generated via login to test security paths.

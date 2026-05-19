@@ -1,53 +1,32 @@
 # Project 092 – Browser Automation with Fantoccini (WebDriver Client in Rust)
 
-## What I Built
-A Rust CLI app that uses fantoccini to automate a browser (headless or visible). Launch a WebDriver session, visit a page, and interact with elements — ideal for web scraping, testing, or automation workflows.
+## Code
+Automates browser actions using the `fantoccini` crate, connecting to a WebDriver server to navigate to target URLs, click page links, and capture screenshots.
 
-## What I Learned
+---
 
+## Problem
+Performing automated website testing or web scraping requires running actual browser engines (like Chrome or Firefox) to execute JavaScript and capture layouts.
+
+---
+
+## Goal
+Build a WebDriver client in Rust that drives browser navigation, queries page titles, clicks element links, and writes screenshot files.
+
+---
+
+## What I Learn
+- Connecting to WebDriver server ports (e.g. Chrome's ChromeDriver) using `ClientBuilder`
+- Directing browser navigations asynchronously using the `goto` method and `.await`
+- Querying active browser page properties like document titles
+- Locating DOM elements matching search criteria using `Locator` parameters
+- Automating clicks on located elements using the WebDriver protocol
+- Capturing raw PNG screenshot buffers and writing files to disk
+- Shutting down browser sessions cleanly using `close`
+
+---
 
 ## Notes
-Before running the app, install and run a WebDriver instance:
-
-###  Chrome:
-# Install ChromeDriver
-```
-brew install chromedriver
- ```
-# Start it
-```
-chromedriver
-Default runs at: http://localhost:9515
-```
-### For Firefox:
-```
-geckodriver
-```
-
-#### Make sure your WebDriver is running before executing the program:
-```
-# For ChromeDriver
-chromedriver --port=9515
-
-# Or for GeckoDriver (Firefox)
-geckodriver --port 9515
-```
-
-### How to Run the Application:
-```
-cargo run
-```
-
-### Key Concepts:
-- `fantoccini` is a WebDriver client in Rust (like Selenium)
-
-- Use `Locator` to find page elements (by text, id, tag, etc.)
-
-- Supports actions: click, type, wait, screenshot, navigate
-
-You’ve now built a browser automation tool in Rust—great for testing, scraping, monitoring, or task automation.
-
-
-
-
-
+- A WebDriver service (like `chromedriver` on port 9515 or `geckodriver` for Firefox) must be running locally for the script to execute successfully.
+- `fantoccini` is an asynchronous high-level WebDriver client designed to interface directly with W3C WebDriver endpoints.
+- Try running ChromeDriver in the background, executing the automation script, and inspecting the generated `screenshot.png`.

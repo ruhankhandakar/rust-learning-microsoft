@@ -1,65 +1,32 @@
-# Project 096 – Resume Builder (TOML to PDF via HTML)
+# Project 096 – Resume Builder (TOML-to-HTML/PDF Builder)
 
-## What I Built
-A Rust CLI tool that reads resume data from a TOML file, renders it into an HTML template, and optionally converts it into a PDF using an external tool like `WeasyPrint`. Practice TOML parsing, template injection, and PDF generation hooks.
+## Code
+Parses resume data from a TOML configuration file into structs using Serde, rendering the profile details into an HTML template and spawning WeasyPrint to build a PDF file.
 
+---
 
-## What I Learned
-- Conflict resolution: patch overwrites base
+## Problem
+Maintaining multiple formats (like HTML, PDF, or text) of a resume is tedious. A single source-of-truth file (like TOML) allows generating other formats programmatically.
+
+---
+
+## Goal
+Build a resume compiler that parses TOML files, maps details to nested structures, builds HTML documents, and runs PDF generators.
+
+---
+
+## What I Learn
+- Deserializing complex TOML file formats into Rust structures using Serde
+- Designing nested structure schemas containing optional fields (`Option<Vec<T>>`)
+- Formatting HTML files using inline CSS variables (`:root { --primary-color: ... }`)
+- Implementing print-specific style parameters inside CSS media queries (`@media print`)
+- Mapping optional collections conditionally to HTML blocks using `if let Some(...)` blocks
+- Spawning external PDF CLI compilation programs using `std::process::Command`
+- Gracefully handling missing dependencies (like WeasyPrint) during runtime
+
+---
 
 ## Notes
-### Sample resume.toml
-```
-name = "Ada Lovelace"
-title = "Mathematician & Programmer"
-email = "ada@analytical.engine"
-phone = "+44 123 4567"
- 
-[[experience]]
-company = "Analytical Engine Research"
-role = "Lead Algorithm Architect"
-year = "1843"
- 
-[[experience]]
-company = "Royal Society"
-role = "Scientific Advisor"
-year = "1850"
-```
-
-### Run the App
-```
-cargo run 
-Optional: Install WeasyPrint for PDF support.
-```
-
-### Output:
-- `resume.html`: A clean, structured HTML resume
-
-- `resume.pdf`: PDF copy (if WeasyPrint is installed)
-
-### Install WeasyPrint:
-```
-# On macOS
-brew install weasyprint
-
-# On Ubuntu/Debian
-sudo apt-get install weasyprint
-
-# On Windows (requires Python)
-pip install weasyprint
-```
-
-### Usage:
-Create your resume.toml file with all your resume data
-
-1. Install WeasyPrint:
-```
-macOS: brew install weasyprint
-
-Ubuntu/Debian: sudo apt-get install weasyprint
-
-Windows: pip install weasyprint
-```
-2. Run the program: cargo run
-
-You'll get both resume.html and resume.pdf files
+- To render PDF files from generated HTML pages, you must have the WeasyPrint package installed (`sudo apt install weasyprint`).
+- The inline CSS layout uses flexible styling (flexbox and grids) to ensure that the generated resume fits on a single page when printed.
+- Try updating `resume.toml` with your credentials, run the builder, and inspect the resulting `resume.pdf` output.

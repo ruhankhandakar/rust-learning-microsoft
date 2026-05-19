@@ -1,11 +1,32 @@
-# Project 024 – CLI Chat Application 
+# Project 024 – Chat Application
 
-## What I Built
-A local CLI-based chat simulator where a user can type messages and get simple AI-like responses.
+## Code
+Implements a rule-based terminal chatbot named "Rusty" that scores pattern matches to select the best response, maintains a timestamped message history, and persists conversations as structured JSON.
 
-## What I Learned
+---
+
+## Problem
+Developing interactive chat interfaces requires matching inputs against dynamic keywords/regex patterns, scoring the match qualities, tracking order of conversations, and persisting session logs.
+
+---
+
+## Goal
+Build a CLI chatbot using nested data structures, dynamic string scoring rules, and JSON file serialization/deserialization to preserve historical records.
+
+---
+
+## What I Learn
+- `lazy_static` macro usage to initialize static variables (like response lookup maps) safely at runtime
+- Custom struct definitions mapped to JSON arrays using Serde traits
+- Text query matching using iterator functions like `split` and checks like `contains`
+- Calculating matching weights using integer scoring metrics (e.g. pattern length + word matches)
+- File serialization writing using `serde_json::to_writer_pretty`
+- Dynamic structures parsed via `serde_json::from_reader` from file streams
+- Appending items to vector entries and modifying structs in-place using `&mut self`
+
+---
 
 ## Notes
-This improved Rust chatbot demonstrates several key advancements in conversational AI design. By implementing a weighted scoring system for response matching, it now intelligently selects the most relevant reply based on multiple factors including phrase length and keyword matches. The bot prioritizes specific responses (like "rust vs python") over general ones (like "about rust"), ensuring users get precise answers to their queries. Additional enhancements include robust error handling, proper timestamp management, and clean separation of concerns through modular architecture—making the code more maintainable while improving response accuracy.
-
-The chatbot's architecture showcases Rust's strengths in building reliable systems. Features like conversation history persistence (with JSON serialization), natural language understanding through flexible pattern matching, and thread-safe operations make this more than just a simple CLI tool—it's a foundation for building production-grade conversational interfaces. The use of modern Rust crates like chrono for time handling and serde for serialization demonstrates how Rust's ecosystem enables building sophisticated applications while maintaining performance and safety guarantees. This implementation could easily be extended to support network operations or integrate with larger AI systems while maintaining its current reliability.
+- `lazy_static` compiles a thread-safe wrapper, meaning static values are initialized only when first accessed.
+- Saving files with `to_writer_pretty` directly streams data to disk, avoiding full memory-buffer allocations.
+- Try extending the response lookup map to support complex regex patterns rather than simple string boundaries.

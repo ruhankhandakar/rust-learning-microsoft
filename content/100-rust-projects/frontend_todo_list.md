@@ -1,53 +1,32 @@
 # Project 072 – Frontend Todo List (Yew + REST API)
 
-## What I Built
-A Yew-based frontend that connects to a Actix-Web backend to fetch and display todos via HTTP. 
+## Code
+Implements a Yew todo list frontend that fetches task data from a local REST API using `gloo-net`, loading tasks asynchronously and rendering them dynamically.
 
-## What I Learned
+---
 
+## Problem
+Single-page web applications need to fetch data from backend servers, parse JSON lists, handle network latency, and update user interfaces once data arrives.
+
+---
+
+## Goal
+Build a Yew task dashboard that triggers asynchronous GET requests, processes JSON arrays into structs, and displays records.
+
+---
+
+## What I Learn
+- Fetching JSON lists from external server routes using `gloo_net::http::Request`
+- Spawning asynchronous tasks inside WASM environments using `wasm_bindgen_futures::spawn_local`
+- Triggering side-effect fetches on mount using Yew's `use_effect_with` hook
+- Deserializing incoming JSON arrays into Rust vectors of structs using Serde
+- Rendering HTML lists dynamically from vectors using map iterators
+- Displaying loading indicators while asynchronous network queries are active
+- Logging request errors to the browser console using `web_sys::console`
+
+---
 
 ## Notes
-### How to Run the Application:
-##### Prerequisites:
-
-- Install `Trunk` (WASM web app bundler): `cargo install trunk`
-
-- Install `wasm-bindgen`: `cargo install wasm-bindgen-cli`
-
-##### Set up the WebSocket server:
-
-- You'll need a WebSocket server running at `ws://localhost:9001`
-
-- This could be the server from `Project 55`
-
-##### Run the Yew frontend:
-```
-trunk serve --open
-```
-##### Development workflow:
-
-The command will:
-
-- Compile your Rust code to WebAssembly
-
-- Bundle it with your HTML/CSS
-
-- Start a development server
-
-- Open your browser to `http://localhost:8080`
-
-##### Testing:
-- Open multiple browser tabs/windows to test the chat functionality
-
-- Messages should appear in real-time across all connected clients
-
-
-
-
-
-
-
-
-
-
-
+- `wasm_bindgen_futures::spawn_local` allows running async futures on the browser's single-threaded event loop.
+- If the backend API server is down, the console will show connection errors and the loading indicator will stop.
+- Try running this frontend along with the PostgreSQL CRUD App (Project 067) to view your actual todo items in the browser.

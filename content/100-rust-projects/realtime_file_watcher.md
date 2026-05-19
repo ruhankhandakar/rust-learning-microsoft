@@ -1,30 +1,32 @@
 # Project 081 – Real-Time File Watcher
 
-## What I Built
+## Code
+Watches a specified file or directory for modification events using the `notify` crate, sending events through an `mpsc` channel to print modified file paths to the console.
 
-A tool that watches a file or directory and prints a message every time it’s modified. Using the notify crate to set up real-time filesystem monitoring, which is great for auto-reloaders, compilers, or backup triggers.
+---
 
-## What I Learned
-Added these features:
-- Trigger a shell command or reload task
-- Send desktop notifications (notify-rust)
+## Problem
+Developer utilities and sync clients need to watch directories for changes in real-time without constantly scanning files, which consumes high CPU cycles.
+
+---
+
+## Goal
+Build a directory-watching tool that takes path arguments, hooks recommended OS event watchers, and processes modification events.
+
+---
+
+## What I Learn
+- Interfacing with OS file monitoring APIs using the `notify` crate
+- Setting recursive directory watch constraints via `RecursiveMode::Recursive`
+- Transmitting file events from background threads using standard channels (`std::sync::mpsc::channel`)
+- Pattern matching event varieties using the `EventKind` enum
+- Extracting modified file paths from event records
+- Command-line argument collection and validation
+- Clean exit handling when receiver channels disconnect
+
+---
 
 ## Notes
-
-### How to Run the Application:
-
-1. Create a file in root directory named `some_file.txt`
-
-2. Run the CLI:
-
-```
-cargo run -- ./some_file.txt
-
-```
-
-3. Edit the file in another terminal or text editor, and watch the updates roll in:
-
-```
-👁️ Watching for changes in: ./some_file.txt
-📝 File modified: ["some_file.txt"]
-```
+- `RecommendedWatcher` selects the best monitoring backend for the target OS (such as `inotify` on Linux, `FSEvents` on macOS, or `ReadDirectoryChangesW` on Windows).
+- Rapid file changes (e.g. from editor auto-saves) can trigger multiple events in quick succession, requiring debouncers in production apps.
+- Try running the watcher in one terminal and modifying a file inside the watched folder in another terminal to verify event logs.

@@ -1,32 +1,32 @@
-# Project 093 – Browser Automation with Fantoccini (WebDriver Client in Rust)
+# Project 093 – Personal Wiki Generator
 
-## What I Built
-A Rust CLI  tool that scans a folder of .md files, builds a navigable HTML wiki, and generates an index of links. Combining directory walking, Markdown rendering, and template generation. 
+## Code
+Generates a static personal wiki from a folder of Markdown files, converting each file to HTML using `pulldown-cmark`, wrapping pages in navigation layouts, and rendering an index of links.
 
+---
 
-## What I Learned
+## Problem
+Maintaining a personal documentation hub requires compiling markdown documents, nesting pages within shared navigation layouts, and generating directories.
+
+---
+
+## Goal
+Build a static wiki builder that creates output directories, walks markdown pages, generates links, and writes index files.
+
+---
+
+## What I Learn
+- Scanning local directories recursively using the `walkdir::WalkDir` crate
+- Creating directory levels and file targets using the standard `Path` and `PathBuf` libraries
+- Stripping source directory prefixes to preserve relative folder structures
+- Translating markdown formatting to HTML snippet strings using `pulldown_cmark`
+- Formatting HTML files containing navigation panels and title variables
+- Collecting generated page links to dynamically construct a master `index.html` file
+- Writing output page buffers to disk paths
+
+---
 
 ## Notes
-### Run the Generator
-```
-cargo run
-```
-Then open public/index.html in your browser 📂
-
-### Example Output
-```
-📘 My Wiki
- 
-• [intro.html](intro.html)  
-• [topics/rust.html](topics/rust.html)  
-• [topics/async.html](topics/async.html)
-```
-
-### Key Concepts:
-- `WalkDir` to recursively find Markdown files
-
-- Convert `.md` to `.html` with `pulldown-cmark`
-
-- Generate internal HTML links for a full index
-
-You now have a personal offline Markdown wiki—great for documentation, knowledge bases, or local publishing.
+- Using `path.strip_prefix` allows the wiki generator to copy the directory structure of the source folder into the output folder.
+- Relative paths are formatted using slash replacements (`replace("\\", "/")`) to guarantee that links resolve correctly in browser environments.
+- Try creating a hierarchy of folders and markdown files, run the wiki builder, and open the compiled `index.html` to explore.

@@ -1,46 +1,32 @@
 # Project 066 – SQLite Integration with Actix-Web
 
-## What I Built
-An SQLite database into a Actix-Web server using SQLx, enabling persistent storage for the app
+## Code
+Integrates an Actix-web server with an SQLite database using SQLx, providing asynchronous routes to fetch posts and insert new records into the database.
 
-## What I Learned
+---
 
+## Problem
+In-memory storage is volatile and clears data on server restarts. Persistence requires integrating asynchronous web routes with relational database connections.
+
+---
+
+## Goal
+Build a persistent blog API backed by an SQLite database, using SQLx to run async SQL queries and map results to structures.
+
+---
+
+## What I Learn
+- Connecting to SQLite database files using the asynchronous `SqlitePool`
+- Managing database pools inside web app data states
+- Writing asynchronous SQL queries using SQLx's query utilities
+- Mapping database row records to structs using `#[derive(FromRow)]`
+- Binding query arguments dynamically using the `.bind` syntax to prevent SQL injection
+- Executing database statements asynchronously inside web handlers
+- Gracefully handling database connection failures during server startups
+
+---
 
 ## Notes
-#### Database Setup
-Create a SQLite file and run this SQL manually or via migration:
-
-
-```
--- posts.sql
-CREATE TABLE IF NOT EXISTS posts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    content TEXT NOT NULL
-);
-```
-
-#### Apply it via CLI:
-
-`sqlite3 blog.db < posts.sql
-`
-
-
-#### Run the App
-```
-cargo run
-```
-
-#### Test with curl:
-1. Add a post:
-```
-curl -X POST -H "Content-Type: application/json" \
--d '{"title":"SQLite Test", "content":"Rust + SQLx is cool"}' \
-http://127.0.0.1:8080/posts
-```
-
-2. List posts:
-```
-curl http://127.0.0.1:8080/posts
-```
-
+- `SqlitePool::connect` manages a connection pool automatically, sharing database connections across multiple thread workers.
+- SQLx performs compile-time query validation when using the `query!` macro, though this project uses runtime queries for simplicity.
+- Try creating the `posts` table in SQLite before running the server, then send post creation requests to verify persistence.

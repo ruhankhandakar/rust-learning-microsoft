@@ -1,42 +1,32 @@
-# Project 071 – Admin Dashboard UI with Yew
+# Project 084 – Generative ASCII Art Tool
 
-## What I Built
-A clean and reactive Admin Dashboard UI using Yew, displaying mock data like total users, sales, and orders. 
-## What I Learned
+## Code
+Generates mathematical wave patterns and random static patterns in the terminal, mapping coordinate brightness levels to character density arrays.
 
+---
+
+## Problem
+Rendering retro graphical animations in terminal interfaces requires translating coordinates to pixels and mapping values to ASCII character arrays.
+
+---
+
+## Goal
+Build an ASCII art generator that takes menu selections, calculates wave equations, maps floats to density characters, and renders grids.
+
+---
+
+## What I Learn
+- Rendering retro terminal grid coordinates using nested loops
+- Implementing sinusoids and cosines using standard math constants like `std::f64::consts::PI`
+- Normalizing values (like sinusoids) to fit standard float bounds (`0.0` to `1.0`)
+- Generating random floats using the external `rand::Rng` helper trait
+- Mapping values to character arrays by index rounding
+- Flushing outputs and reading console inputs
+- Drawing coordinate lines without allocating intermediate buffers
+
+---
 
 ## Notes
-### How to Run the Application:
-##### Prerequisites:
-
-- Install `Trunk` (WASM web app bundler): `cargo install trunk`
-
-- Install `wasm-bindgen`: `cargo install wasm-bindgen-cli`
-
-##### Run the Yew frontend:
-```
-trunk serve --open
-```
-##### Development workflow:
-
-The command will:
-
-- Compile your Rust code to WebAssembly
-
-- Bundle it with your HTML/CSS
-
-- Start a development server
-
-- Open your browser to `http://localhost:8080`
-
-
-
-
-
-
-
-
-
-
-
-
+- The wave pattern uses standard mathematical normalization: `(fx.sin() + fy.cos() + 2.0) / 4.0` guarantees that values map to the 0-1 range.
+- Terminal character heights are usually taller than widths, meaning circles can look like ovals unless adjusted for aspect ratio.
+- Try tweaking the wave multiplier to change the density and frequency of the output pattern.

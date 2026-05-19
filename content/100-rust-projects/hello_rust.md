@@ -1,57 +1,32 @@
 # Project 001 – Hello Rust CLI
 
-## What I Built
-A simple Rust CLI that prints "Hello, Rust!" to the console using `println!`.
+## Code
+Prints "Hello, Rust!" and a welcome message to the console using the `println!` macro.
 
-## What I Learned
-- How to set up Rust on your PC: You can install Rust using [rustup](https://www.rust-lang.org/tools/install), which is the recommended installer. It sets up everything you need including the compiler (rustc), the package manager (cargo), and more.
-Alternatively, if you don’t want to install anything, you can try out Rust directly in your browser using [Rust Playground](https://play.rust-lang.org/?version=stable&mode=debug&edition=2024).
+---
 
-- How to initialize a Rust project using cargo new
-cargo is Rust’s official package manager and build tool. When you run:
-```
-cargo new hello_rust
-```
-It creates a new folder with all the necessary files to start coding — including a basic Rust file (main.rs) and configuration file (Cargo.toml). 
+## Problem
+Learners starting with a new systems programming language need a minimal, zero-dependency baseline to verify that their toolchain, compiler, package manager, and build environments are fully functional.
 
-- Compiling and running Rust projects using cargo run
-To compile and run your code, you just need:
-```
-cargo run
-```
-This compiles the code and runs it in one go 
+---
 
-- Simple Rust commands
+## Goal
+Generate a fresh binary package, build it, and output a basic greeting message to standard output.
 
-- The basic project structure in Rust
+---
 
+## What I Learn
+- `fn main` as the mandatory entry point of all executable Rust programs
+- `println!` macro to print text lines to standard output
+- `cargo new` CLI command to bootstrap a standardized project skeleton
+- `cargo run` utility to automatically compile and run the application in a single step
+- `Cargo.toml` configuration file structure and how it manages metadata and dependencies
+- Difference between a standard function and a macro (indicated by the `!`) in Rust
+- Standard directory layout (e.g., `src/main.rs`) expected by the Cargo build system
+
+---
 
 ## Notes
-Rust is a system programming language focused on safety, performance, and concurrency.
-Rust is designed to give you the speed of C/C++ with the safety of modern languages like Python or JavaScript.
-It eliminates entire categories of bugs, such as null pointer derefrencing and data races, by enforcing strict rules at compile-time
-
-Why use Rust?
-- Memory safety without garbage collection
-Rust uses ownership and borrowing rules to manage memory without needing a garbage collector. This makes it fast and reliable.
-
-- Concurrency without data races
-Thanks to its ownership model, Rust prevents common bugs in concurrent programming like data races at compile time.
-
-- High performance
-Rust compiles to machine code, making it ideal for building blazing-fast apps and command-line tools.
-
-- Great ecosystem
-With tools like cargo, crates.io (Rust’s package registry), and a supportive community, Rust is very beginner-friendly for a systems language.
-
-
-
-
-
-
-
-
-
-
-
-
+- `println!` executes compile-time type-safety checks on format strings, preventing common runtime format vulnerabilities.
+- Cargo projects use a locked dependency file (`Cargo.lock`) to guarantee reproducible builds across machines.
+- Try modifying the message inside `println!` and running `cargo build` to inspect the generated binary in the `target/` directory.

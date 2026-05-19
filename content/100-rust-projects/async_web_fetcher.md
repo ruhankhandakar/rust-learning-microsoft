@@ -1,42 +1,32 @@
-# Project 071 – Async Web Fetcher (Tokio + Reqwest)
+# Project 077 – Async Web Fetcher (Tokio + Reqwest)
 
-## What I Built
-A  CLI tool that fetches and prints the body of a web page asynchronously using tokio and reqwest. 
+## Code
+Fetches web page content asynchronously using the `reqwest` crate, executing the async entry point within the `tokio` runtime and printing a body preview.
 
-## What I Learned
+---
+
+## Problem
+Performing network requests synchronously blocks threads, wasting CPU cycles on network latency. Asynchronous runtimes allow programs to run other tasks while waiting for network responses.
+
+---
+
+## Goal
+Build an asynchronous CLI web fetcher using Reqwest and Tokio, printing response lengths and body previews.
+
+---
+
+## What I Learn
+- Initializing asynchronous main entry points using the `#[tokio::main]` macro
+- Sending HTTP GET requests asynchronously using `reqwest::get` and `.await`
+- Extracting response body text asynchronously using the `text()` method
+- Handling network connection timeouts and HTTP errors using `reqwest::Error`
+- Restricting text previews using range bounds and safe minimum helpers
+- Configuring dependencies in `Cargo.toml` with specific async features
+- Understanding future execution paths in async runtimes
+
+---
 
 ## Notes
-### How to Run the Application:
-##### Prerequisites:
-
-- Install `Trunk` (WASM web app bundler): `cargo install trunk`
-
-- Install `wasm-bindgen`: `cargo install wasm-bindgen-cli`
-
-##### Run the Yew frontend:
-```
-trunk serve --open
-```
-##### Development workflow:
-
-The command will:
-
-- Compile your Rust code to WebAssembly
-
-- Bundle it with your HTML/CSS
-
-- Start a development server
-
-- Open your browser to `http://localhost:8080`
-
-
-
-
-
-
-
-
-
-
-
-
+- The `#[tokio::main]` macro transforms the synchronous `fn main()` into an async executor wrapper that manages the thread pool.
+- Running `.await` yields control back to the scheduler, allowing other spawned tasks to execute while waiting for network packets.
+- Try changing the target URL to fetch JSON data from a public API and observe the output format.

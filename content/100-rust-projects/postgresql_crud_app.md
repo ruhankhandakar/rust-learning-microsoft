@@ -1,80 +1,32 @@
-# Project 067 – PostgreSQL CRUD App with SQLx + Actix-Web  
+# Project 067 – PostgreSQL CRUD App with SQLx + Actix-Web
 
-## What I Built
-An PostgreSQL database into a Actix-Web server using SQLx, enabling scalable, production-grade data storage and implementing CRUD operations for a Todo app.
+## Code
+Implements a persistent Todo API backend using Actix-web and PostgreSQL, executing CRUD queries with SQLx, retrieving returning records, and checking database health status.
 
-## What I Learned
+---
 
+## Problem
+Persistent Todo managers need to connect to external databases, execute CRUD commands asynchronously, handle query errors, and return status summaries.
+
+---
+
+## Goal
+Build a PostgreSQL CRUD API using SQLx and Actix-web, connecting to databases, executing database mutations, and validating connections.
+
+---
+
+## What I Learn
+- Connecting to PostgreSQL databases using `PgPoolOptions` configuration builders
+- Loading database connection strings from `.env` environment files using `dotenvy`
+- Executing SQL updates and deletions, checking affected rows via `rows_affected()`
+- Mapping query results directly to structures using `sqlx::query_as`
+- Retrieving newly created record fields using database `RETURNING` queries
+- Building health-check routes validating database connection statuses
+- Configuring connection pools with custom pool limits (`max_connections`)
+
+---
 
 ## Notes
-##### Prerequisites:
-###### For .env File:
-Create a .env file with your database URL:
-```
-DATABASE_URL=postgres://postgres:password@localhost/todo_db
-```
-Make sure the database todo_db exists and PostgreSQL is running.
-
-###### Database Schema:
-Run this SQL to initialize the table:
-
-```CREATE TABLE IF NOT EXISTS todos (
-    id SERIAL PRIMARY KEY,
-    title TEXT NOT NULL,
-    completed BOOLEAN NOT NULL DEFAULT FALSE
-);
-```
-
-#### Start PostgreSQL with Docker Compose
-```
-# Start PostgreSQL
-docker-compose up -d
-
-# Check if it's running
-docker-compose ps
-
-# View logs
-docker-compose logs postgres
-```
-
-#### Test the database connection
-```
-# Connect to PostgreSQL inside the container
-docker-compose exec postgres psql -U postgres -d todo_db -c "SELECT version();"
-
-# Check if table was created
-docker-compose exec postgres psql -U postgres -d todo_db -c "\dt"
-
-# View table structure
-docker-compose exec postgres psql -U postgres -d todo_db -c "\d todos"
-```
-
-### How to Run the Application:
-##### Run the App
-```
- # Start PostgreSQL
-docker-compose up -d
-
-# Wait for PostgreSQL to be ready
-sleep 5
-
-# Run your Rust application
-cargo run
-```
-
-##### Sample Commands:
-```
-# Add a todo
-curl -X POST -H "Content-Type: application/json" \
--d '{"title": "Learn Actix + SQLx"}' http://localhost:8080/todos
- 
-# List todos
-curl http://localhost:8080/todos
- 
-# Update todo
-curl -X PUT -H "Content-Type: application/json" \
--d '{"completed": true}' http://localhost:8080/todos/1
- 
-# Delete todo
-curl -X DELETE http://localhost:8080/todos/1
-```
+- `connect_lazy` creates a connection pool immediately without validating connection settings, deferring actual validation until the first query runs.
+- `dotenvy::dotenv()` loads environment variables from a local `.env` file, keeping database credentials out of version control.
+- Try running a PostgreSQL database, setting the `DATABASE_URL` variable, and querying `/health` to verify integration.

@@ -1,6 +1,6 @@
 {
   "upstreamRepo": "emmaglorypraise/100rustprojects",
-  "generatedAt": "2026-05-16T09:27:38.639Z",
+  "generatedAt": "2026-05-19T11:45:17.128Z",
   "projects": [
     {
       "day": 1,
@@ -138,6 +138,15 @@
       "projectDir": "memory_mgt_demo"
     },
     {
+      "day": 16,
+      "title": "Asset Management CLI",
+      "typeLabel": "🧮 CLI",
+      "status": "✅ Done",
+      "chapterSlug": "asset_manager",
+      "noteFile": "asset_manager.md",
+      "projectDir": "asset-tracker"
+    },
+    {
       "day": 17,
       "title": "String Manipulation Tool",
       "typeLabel": "🧮 CLI",
@@ -156,6 +165,15 @@
       "projectDir": "contact_manager"
     },
     {
+      "day": 19,
+      "title": "Error Handling Demo",
+      "typeLabel": "🧮 CLI",
+      "status": "✅ Done",
+      "chapterSlug": "error_handling_demo",
+      "noteFile": "error_handling_demo.md",
+      "projectDir": "error_handling"
+    },
+    {
       "day": 20,
       "title": "Linked List Implementation",
       "typeLabel": "🧠 Data Structure/Algorithm",
@@ -172,6 +190,24 @@
       "chapterSlug": "crud_in_file",
       "noteFile": "crud_in_file.md",
       "projectDir": "crud_in_file"
+    },
+    {
+      "day": 22,
+      "title": "Enum-Based State Machine",
+      "typeLabel": "🧮 CLI",
+      "status": "✅ Done",
+      "chapterSlug": "state_machine",
+      "noteFile": "state_machine.md",
+      "projectDir": "state_machine"
+    },
+    {
+      "day": 23,
+      "title": "Custom Error Types in CLI Tools",
+      "typeLabel": "🧮 CLI",
+      "status": "✅ Done",
+      "chapterSlug": "custom_error_types",
+      "noteFile": "custom_error_types.md",
+      "projectDir": "custom_error_types"
     },
     {
       "day": 24,
@@ -325,6 +361,15 @@
       "chapterSlug": "mutex_and_arc_demo",
       "noteFile": "mutex_and_arc_demo.md",
       "projectDir": "mutex_arc_demo"
+    },
+    {
+      "day": 41,
+      "title": "Concurrency-Based Data Processing",
+      "typeLabel": "🧮 CLI",
+      "status": "✅ Done",
+      "chapterSlug": "concurrency_based_data",
+      "noteFile": "concurrency_based_data.md",
+      "projectDir": "concurrency_based_data_processing"
     },
     {
       "day": 42,
@@ -564,7 +609,16 @@
       "day": 68,
       "title": "Todo App with Actix-Web + PostgreSQL (Full CRUD)",
       "typeLabel": "💾 Database",
-      "status": "🔄 WIP",
+      "status": "✅ Done",
+      "chapterSlug": "postgresql_full_todo",
+      "noteFile": "postgresql_full_todo.md",
+      "projectDir": "postgresql_full_todo"
+    },
+    {
+      "day": 68,
+      "title": "Chat Frontend UI with Yew",
+      "typeLabel": "🌐 Web/HTTP",
+      "status": "✅ Done",
       "chapterSlug": "yew_chat_ui",
       "noteFile": "yew_chat_ui.md",
       "projectDir": "yew_chat_ui"
@@ -613,6 +667,15 @@
       "chapterSlug": "weather_dashboard",
       "noteFile": "weather_dashboard.md",
       "projectDir": "weather_dashboard"
+    },
+    {
+      "day": 74,
+      "title": "Banking System CLI",
+      "typeLabel": "🧮 CLI",
+      "status": "✅ Done",
+      "chapterSlug": "banking_system",
+      "noteFile": "banking_system.md",
+      "projectDir": "banking_system"
     },
     {
       "day": 75,
