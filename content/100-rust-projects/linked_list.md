@@ -1,34 +1,32 @@
 # Project 020 – Linked List Implementation
 
-## What I Built
-A Rust CLI that implements a singly linked list from scratch in Rust using Box and Option. 
+## Code
+Implements a singly linked list in safe Rust using `Box` and `Option` wrappers, supporting operations like pushing to front/back, deleting nodes, checking containment, and custom display formatting.
 
-## What I Learned
-- Boxes(`Box<T>`) allow you to store data on the heap rather than the stack. What remains on the stack is the pointer to the heap data. It is a smart pointer.
+---
 
-- A linked list is a linear data structure that stores data in nodes, where each node contains a data element and a reference (or link) to the next node in the sequence. This structure allows for efficient insertion and deletion of elements, especially compared to static arrays. 
+## Problem
+Creating recursive data structures in Rust is challenging due to strict ownership, borrow checking, and compile-time size requirements for structs.
 
-- Practiced managing heap-allocated memory, manual traversal, insertion, deletion, and value search—without relying on built-in containers like Vec.
+---
+
+## Goal
+Build a safe singly linked list data structure utilizing recursive structs, Box allocation, Option helpers, and mutable traversal pointers.
+
+---
+
+## What I Learn
+- Representing recursive nodes using `Option<Box<Node>>` containers
+- Using `Option::take` to extract value ownership out of references, leaving `None` behind
+- Navigating nested node graphs by reassigning mutable references (`&mut self.head`)
+- In-place deletion and node relinking using pattern matching on option variants
+- Implementing `Display` trait to customize string rendering of objects
+- Heap-allocating node cells with `Box::new` to handle dynamic growth
+- Iterative node traversal loops using `while let Some(node)`
+
+---
 
 ## Notes
-
-When to use Box:
-- When you have a type whose size can’t be known at compile time and you want to use a value of that type in a context that requires an exact size
-- When you have a large amount of data and you want to transfer ownership but ensure the data won’t be copied when you do so
-- When you want to own a value and you care only that it’s a type that implements a particular trait rather than being of a specific type
-
-Example:
-```
-fn main() {
-    let b = Box::new(5);
-    println!("b = {b}");
-}
-```
-
-
-
-
-
-
-
-
+- Recursive structs require `Box` wrapping to determine compile-time size; without it, the compiler would reject the struct due to infinite size.
+- Traversing using mutable references requires careful reborrowing to avoid violating ownership limits.
+- Try implementing a `pop` function that removes and returns the first element from the list.

@@ -1,39 +1,32 @@
-# Project 064 – CRUD API with Actix-Web    
+# Project 064 – CRUD API with Actix-Web
 
-## What I Built
-A fully functional CRUD API for a Post resource using Actix-Web, storing data in-memory tohandle GET, POST, PUT, DELETE requests, core operations in any RESTful service.
+## Code
+Implements a RESTful CRUD API server managing blog posts stored in an in-memory `HashMap` guarded by a Mutex, supporting resource listing, retrieving by ID, creation, updates, and deletion.
 
-## What I Learned
+---
 
+## Problem
+Web services must handle CRUD operations on target resources, extracting identifiers from URL paths, verifying resource existence, and returning appropriate HTTP responses.
+
+---
+
+## Goal
+Build a CRUD API using Actix-web, mapping database operations to a thread-safe map, extracting path IDs, and validating requests.
+
+---
+
+## What I Learn
+- Mapping REST routes to standard CRUD verbs (GET, POST, PUT, DELETE)
+- Extracting parameter values from URL path segments using `web::Path<T>`
+- Retrieving single values from maps and handling missing records safely
+- Inserting and updating map records using shared Mutex write locks
+- Deleting resources by key using `HashMap::remove`
+- Returning structured JSON data formats representing collections
+- Registering parameter routes using placeholder brackets (e.g. `/posts/{id}`)
+
+---
 
 ## Notes
-
-### Run the Server
-```
-cargo run
-```
-
-### Test It with curl:
-1. Create a post:
-```
-curl -X POST -H "Content-Type: application/json" \
--d '{"id": 1, "title": "Hello", "content": "Actix is awesome"}' \
-http://127.0.0.1:8080/posts
-```
-
-2. List posts:
-```
-curl http://127.0.0.1:8080/posts
-```
-
-3. Update a post:
-```
-curl -X PUT -H "Content-Type: application/json" \
--d '{"id": 1, "title": "Updated", "content": "Edited content"}' \
-http://127.0.0.1:8080/posts/1
-```
-
-4. Delete a post:
-```
-curl -X DELETE http://127.0.0.1:8080/posts/1
-```
+- Using `id.into_inner()` extracts the nested parameter value from the `web::Path<T>` wrapper, resolving it to the underlying type (e.g. `usize`).
+- Changes made to the in-memory map are volatile; restarting the server clears all registered blog posts.
+- Try creating a post with a POST request, querying it with a GET request, and then deleting it to test the full CRUD lifecycle.

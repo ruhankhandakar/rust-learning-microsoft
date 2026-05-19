@@ -1,40 +1,32 @@
-# Project 086 – YouTube Audio/Video Downloader (via yt-dlp + Rust CLI)
+# Project 087 – YouTube Audio/Video Downloader
 
-## What I Built
-A Rust CLI tool that that lets users download audio from a YouTube video using the popular yt-dlp tool under the hood.
+## Code
+Spawns the `yt-dlp` CLI tool to download videos or extract audio using `Command::new`, validating executable availability in the OS path, and routing stderr output.
 
-## What I Learned
-`Prerequisite`: Ensure you have yt-dlp installed and available in your PATH.
-```
-pip install yt-dlp
-# or
-brew install yt-dlp
-```
+---
+
+## Problem
+Downloading online media formats and extracting MP3 files requires spawning external system tools (like `yt-dlp` and `ffmpeg`) and handling execution results.
+
+---
+
+## Goal
+Build a terminal downloader that checks if `yt-dlp` is installed, takes choices, and streams download processes.
+
+---
+
+## What I Learn
+- Spawning OS command-line tools from Rust using `std::process::Command`
+- Checking CLI tool availability in the user's path using the `which` command
+- Redirecting stdout/stderr output streams using `Stdio::null()`
+- Running downloads and passing custom formatting arguments (like MP3 extracts)
+- Checking execution success states using `status.success()`
+- Extracting and parsing stderr outputs to identify missing dependencies (like `ffmpeg`)
+- Pattern matching downloader options using custom enums
+
+---
+
 ## Notes
-### How to Run the Application:
-
-```
-cargo run
-
-```
-
-### Example Interaction
-
-```
-🎧 YouTube Audio Downloader
-🔗 Enter YouTube URL: https://www.youtube.com/watch?v=dQw4w9WgXcQ
-https://www.youtube.com/watch?v=8gwESf9cFPQ
-⬇️ Downloading audio...
-✅ Audio downloaded successfully!
-```
-
-
-
-
-
-
-
-
-
-
-
+- `yt-dlp` is a command-line media downloader, and `ffmpeg` is required to transcode video formats into MP3 audio formats.
+- Spawning processes blocks the main thread; for graphical applications, running commands on separate threads keeps the UI responsive.
+- Try running the program to download a short video, checking if dependencies are installed in your shell first.

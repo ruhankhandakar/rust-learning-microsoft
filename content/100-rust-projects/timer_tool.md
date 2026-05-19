@@ -1,51 +1,32 @@
 # Project 011 – Basic Timer Tool
 
-## What I Built
-A Rust CLI timer tool that allows users to set a time for a specified duration and notifies them when time is up.
+## Code
+Launches a command-line countdown timer that takes an hours-minutes-seconds configuration, spawns a background input thread, and allows the user to pause ('p') and resume ('r') execution.
 
-## What I Learned
-```
-use std::{io, thread, time::Duration};
-use std::io::Write;
-use std::sync::mpsc;
-use std::thread::sleep;
-```
+---
 
-```
-std::io
-```
+## Problem
+Building responsive interactive utilities requires managing blocking input prompts concurrently with dynamic system updates, preventing input waits from halting count ticks.
 
-We need io to read user input (io::stdin().read_line(...)) and to flush the prompt to the console (io::stdout().flush().unwrap()).
+---
 
-```
-std::thread
-```
+## Goal
+Build a terminal timer that reads time offsets, handles non-blocking terminal input checks via channel communication, ticks down every second, and processes pause/resume commands.
 
-We spawn a background thread to listen for pause/resume commands. Anything involving thread::spawn(...) or channel communication needs this import.
+---
 
-```
-std::time::Duration
-```
+## What I Learn
+- `std::thread::spawn` to run background tasks parallel to the main program loop
+- `std::sync::mpsc::channel` (multi-producer, single-consumer) to send controls between threads
+- Non-blocking message checks using `try_recv` on receiver endpoints
+- Thread suspending using `std::thread::sleep` with `Duration` increments
+- Modulo and division calculations to transform seconds into standard time segments (`HH:MM:SS`)
+- Carriage return (`\r`) in prints to redraw the same terminal line repeatedly
+- Multi-threaded synchronization patterns and sharing cross-thread variables
 
-We use Duration::from_secs(1) (and later from_millis(200)) to pause the main loop for a given interval. This makes the countdown tick once per second (or check for commands every 200 ms when paused).
+---
 
-```
-std::io::Write
-```
-
-The Write trait provides flush(). We call io::stdout().flush().unwrap() to force the “Time Remaining…” prompt to appear immediately without waiting for a newline.
-
-```
-std::sync::mpsc
-```
-
-mpsc (multi-producer, single-consumer) channels let us send a small message ('p' or 'r') from the “listener” thread into the main timer loop. We call mpsc::channel() to create (tx, rx), where tx is the transmitter held by the spawned thread, and rx is the receiver used by the main loop.
-
-```
-std::thread::sleep
-```
-
-For convenience, we imported sleep directly so we can write sleep(Duration::from_secs(1)) instead of thread::sleep(...). This pauses whichever thread is running for that duration.
 ## Notes
-Printing with a carriage returns `\r` so it overwrites the same line each second. `\n` writes on  a new line instead.
-
+- Using `try_recv` prevents the receiver from blocking the main loop, allowing countdown ticks to continue even if no input is sent.
+- The spawned input thread stays alive reading stdin, meaning the terminal environment must be handled correctly upon program completion.
+- Try introducing an audible bell character `\x07` or console beep when the timer finishes.

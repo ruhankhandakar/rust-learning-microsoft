@@ -1,53 +1,32 @@
-# Project 067 – Chat Frontend UI with Yew 
+# Project 068 – Todo App / Yew Chat Client
 
-## What I Built
-A responsive chat frontend in Yew that connects to a WebSocket backend (like the one from Project 55). This project focuses on bi-directional real-time communication, message lists, and input handling.
+## Code
+Implements a frontend client using the Yew web framework, establishing WebSocket connections with `web-sys`, sending message logs on events, and rendering text lists.
 
-## What I Learned
+---
 
+## Problem
+Building interactive web frontends in Rust requires compiling code to WebAssembly (WASM), handling user inputs, managing component state, and communicating via WebSockets.
+
+---
+
+## Goal
+Build a Yew web frontend that connects to local WebSockets, captures input events, sends text payloads, and updates UI state dynamically.
+
+---
+
+## What I Learn
+- Structuring frontend web components in Rust using the Yew framework
+- Compiling Rust code to WebAssembly targets with `cdylib` crate settings
+- Managing local component states using Yew's `use_state` hook
+- Managing WebSocket connection objects using browser APIs via `web_sys::WebSocket`
+- Binding input events and extracting input values from page elements
+- Emitting callbacks on user actions using Yew's `Callback` utilities
+- Registering connection side-effects using the `use_effect` hook
+
+---
 
 ## Notes
-### How to Run the Application:
-##### Prerequisites:
-
-- Install `Trunk` (WASM web app bundler): `cargo install trunk`
-
-- Install `wasm-bindgen`: `cargo install wasm-bindgen-cli`
-
-##### Set up the WebSocket server:
-
-- You'll need a WebSocket server running at `ws://localhost:9001`
-
-- This could be the server from `Project 55`
-
-##### Run the Yew frontend:
-```
-trunk serve --open
-```
-##### Development workflow:
-
-The command will:
-
-- Compile your Rust code to WebAssembly
-
-- Bundle it with your HTML/CSS
-
-- Start a development server
-
-- Open your browser to `http://localhost:8080`
-
-##### Testing:
-- Open multiple browser tabs/windows to test the chat functionality
-
-- Messages should appear in real-time across all connected clients
-
-
-
-
-
-
-
-
-
-
-
+- To compile and run Yew apps, developers use WASM builders like Trunk to bundle code and serve the application in a local browser.
+- JavaScript callbacks are wrapped in Rust `Closure` elements, which must be explicitly forgotten (`onmessage.forget()`) to prevent them from being garbage-collected early.
+- Try running the WebSocket Echo Server (Project 055), opening the Yew chat client in a browser, and sending messages to verify echo logs.

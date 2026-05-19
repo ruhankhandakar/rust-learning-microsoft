@@ -1,54 +1,32 @@
-# Project 086 – Time Zone Converter CLI (with chrono-tz)
+# Project 086 – Time Zone Converter CLI
 
-## What I Built
-A CLI tool that converts datetime strings between time zones using the chrono and chrono-tz crates. Learn't to parse strings, convert them across zones, and handle user input for global time conversions.
+## Code
+Converts datetime strings across timezones, validating inputs against IANA names and abbreviations with `chrono` and `chrono-tz`, and checking for DST gaps/ambiguities.
 
-## What I Learned
+---
 
+## Problem
+Converting times across regions requires checking for IANA designations, mapping abbreviations (like EST), parsing formats, and handling DST changes.
+
+---
+
+## Goal
+Build a timezone converter that accepts datetime inputs, maps abbreviations, handles local-to-target conversions, and flags DST errors.
+
+---
+
+## What I Learn
+- Parsing and manipulating timezones using the `chrono-tz` crate
+- Mapping common abbreviations (like PST, EST, GMT) to IANA timezone names using `HashMap`
+- Handling the "now" keyword to fetch current UTC times and project them locally
+- Parsing date and time strings across multiple formats using `NaiveDateTime::parse_from_str`
+- Converting times from local to target zones using `from_local_datetime`
+- Handling ambiguous DST transitions (when clocks fall back) using `LocalResult::Ambiguous`
+- Handling non-existent times (when clocks spring forward) using `LocalResult::None`
+
+---
 
 ## Notes
-### How to Run the Application:
-```
-cargo run
-
-```
-
-### Example Interaction
-
-```
-# Lagos to New York:
-
-🕒 Enter datetime: 2025-06-15 14:00
-🌐 Source timezone: WAT
-🌐 Target timezone: EST
-
-✅ 2025-06-15 14:00:00 in WAT (Africa/Lagos) → 2025-06-15 09:00:00 in EST (America/New_York)
-
-
-# Nairobi to London:
-
-🕒 Enter datetime: 2025-12-01 09:30
-🌐 Source timezone: EAT  
-🌐 Target timezone: GMT
-
-✅ 2025-12-01 09:30:00 in EAT (Africa/Nairobi) → 2025-12-01 06:30:00 in GMT (Europe/London)
-
-# Johannesburg to Dubai:
-
-🕒 Enter datetime: now
-🌐 Source timezone: SAST
-🌐 Target timezone: GST
-
-✅ 2024-01-15 13:45:00 in SAST (Africa/Johannesburg) → 2024-01-15 15:45:00 in GST (Asia/Dubai)
-```
-
-
-
-
-
-
-
-
-
-
-
+- Timezone abbreviations are not unique (e.g. "CST" can mean Central Standard Time in North America or China Standard Time), so mapping them requires making assumptions.
+- Daylight Saving Time shifts create ambiguous states where the same clock time occurs twice, or nonexistent states where clock times are skipped.
+- Try entering a datetime during a DST transition (e.g. spring forward or autumn fallback) to check how the converter handles anomalies.

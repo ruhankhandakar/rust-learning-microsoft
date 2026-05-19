@@ -1,35 +1,32 @@
 # Project 062 – REST API Server with Actix-Web
 
-## What I Built
-A simple RESTful API using Actix-Web that handles CRUD-like HTTP requests for a Book resource. Covering routing, JSON serialization, and handling dynamic data via endpoints.
+## Code
+Implements a REST API server managing a collection of books stored in an in-memory vector protected by a Mutex, supporting GET requests to list books and POST requests to add books.
 
-## What I Learned
+---
 
+## Problem
+In-memory web APIs must share data collections across threads, parse JSON payloads from client requests, and return data formatted in standard JSON arrays.
+
+---
+
+## Goal
+Build a book registry server using Actix-web, wrapping dynamic vectors in thread-safe containers, deserializing request payloads, and outputting JSON book records.
+
+---
+
+## What I Learn
+- Storing collections in shared memory using `web::Data<AppState>`
+- Protecting vector modifications against concurrent thread access using Mutex locks
+- Deserializing client JSON payloads using the `web::Json<T>` extractor
+- Serializing list responses to JSON arrays automatically using Responder structures
+- Binding routes to path targets using `web::get().to(...)` and `web::post().to(...)`
+- Instantiating server configurations using `HttpServer::new` closures
+- Structuring model types bounding them with Serde traits
+
+---
 
 ## Notes
-### Run the Server
-```
-cargo run
-```
-### Test with curl or Postman:
-1. GET all books
-
-```
-curl http://127.0.0.1:8080/books
-```
-2. POST new book
-
-```
-curl -X POST -H "Content-Type: application/json" \
--d '{"id":1,"title":"Rust in Action","author":"Tim McNamara"}' \
-http://127.0.0.1:8080/books
-```
-
-
-
-
-
-
-
-
-
+- `book.into_inner()` extracts the nested `Book` struct from the `web::Json<Book>` wrapper, transferring ownership of the parsed book.
+- A standard Mutex blocks threads waiting for access; for high-performance databases, using databases or concurrent maps is preferred.
+- Try testing the server by sending a POST request with a book JSON payload using tools like curl.

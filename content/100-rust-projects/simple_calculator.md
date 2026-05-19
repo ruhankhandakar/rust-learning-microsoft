@@ -1,30 +1,32 @@
 # Project 003 – Simple Calculator
 
-## What I Built
-A Rust CLI calculator that supports basic arithmetic operations like addition, substraction, multiplication and deletion.
+## Code
+Parses a whitespace-delimited mathematical expression from stdin and executes basic arithmetic operations (+, -, *, /).
 
-## What I Learned
-```
-io::stdout().flush().unwrap();
-```
-That call grabs the program’s standard‐output stream, requests that any text still sitting in its internal buffer be written out to the terminal immediately (rather than waiting for a newline or the buffer to fill), and then unwrap() will panic if for some reason the flush fails. In practice you use io::stdout().flush().unwrap() right after a print! that doesn’t include a newline so that your prompt appears on the screen before your code blocks waiting for input.
+---
 
-to use:
-```
-use std::io::{self, Write};
+## Problem
+Users need a quick way to evaluate basic binary math operations via CLI, which requires parsing a text stream, isolating operands and operators, and handling division-by-zero errors safely.
 
-```
+---
+
+## Goal
+Build a command-line calculator that parses standard format expressions, validates input formats, evaluates calculations, and exits gracefully on errors.
+
+---
+
+## What I Learn
+- `split_whitespace` iterator to divide a string into parts based on whitespace
+- `collect` to transform iterators into concrete collection types like `Vec<&str>`
+- `Vec` indexing and bounds checking in Rust
+- Parsing string slices (`&str`) to double-precision floats (`f64`)
+- Matching mathematical operator strings using `match` patterns
+- Stderr writing and exit status handling using `std::process::exit`
+- Handling division by zero with custom validation rules
+
+---
+
 ## Notes
-
-
-    
-
-
-
-
-
-
-
-
-
-
+- Iterators in Rust are lazy; calling `.collect()` is required to consume the iterator and allocate memory for the vector.
+- Division by zero on `f64` returns `inf` or `NaN` in IEEE 754, but this app explicitly intercepts zero division to exit early.
+- Try extending the operator list to support modulo (`%`) or exponentiation (`^`).

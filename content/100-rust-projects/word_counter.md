@@ -1,51 +1,32 @@
 # Project 005 – Word Counter
 
-## What I Built
-A Rust CLI tool that counts the number of words, lines and characters in a text file 
+## Code
+Reads a text file specified by a command-line argument and counts its total words, lines, and characters.
 
-## What I Learned
-```
-use std::env;
-```
-This imports the env module, which lets you interact with the environment your program is running in.
+---
 
-This allows you access command-line arguments and environment variables.
+## Problem
+Text analysis and file handling require extracting parameters from command-line environments, opening local file handles, reading data safely into memory, and running fast string tokenization.
 
+---
 
+## Goal
+Build a command-line tool that accepts a file path argument, handles missing-file errors, reads the file's text, and outputs text statistics.
 
-```
-use std::fs::File;
-```
-This imports the File struct from the file system module (std::fs).
-It allows your program access to open, read, or write to files.
+---
 
-Example
-```
-let file = File::open("my_file.txt")?;
-```
+## What I Learn
+- `std::env::args` to collect CLI arguments into a `Vec<String>`
+- `std::fs::File::open` to open a file read-only stream handle
+- `read_to_string` to read text stream data directly into a mutable `String` buffer
+- `split_whitespace` to count words while ignoring varying spacing patterns
+- `lines` string method to parse newline boundaries
+- `chars` method to accurately count Unicode code points rather than raw bytes
+- Error mapping of standard file errors to descriptive user messages
 
-`File::open()` opens an existing file for reading.
-
-You can also do `File::create()` to make a new file for writing.
-
-```
-use std::io::{self, Read};
-```
-This handles input/output and read file content as text or bytes
-
-
+---
 
 ## Notes
-
-
-    
-
-
-
-
-
-
-
-
-
-
+- `chars().count()` counts Unicode characters, which can differ from the raw byte length (`len()`) if multi-byte characters are present.
+- Storing full file content in a single `String` can exhaust memory on massive files; a buffered reader is preferred for larger datasets.
+- Try passing a directory path instead of a file path to see how the open file handler responds to access errors.
