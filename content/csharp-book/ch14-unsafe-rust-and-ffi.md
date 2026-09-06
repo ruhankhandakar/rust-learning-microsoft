@@ -10,6 +10,7 @@ Unsafe Rust allows you to perform operations that the borrow checker cannot veri
 > **Advanced coverage**: For safe abstraction patterns over unsafe code (arena allocators, lock-free structures, custom vtables), see [Rust Patterns](../../rust-patterns-book/src/summary.md).
 
 ### When You Need Unsafe
+
 ```rust
 // 1. Dereferencing raw pointers
 let mut value = 42;
@@ -43,6 +44,7 @@ unsafe trait UnsafeTrait {
 ```
 
 ### C# Comparison: unsafe Keyword
+
 ```csharp
 // C# unsafe - similar concept, different scope
 unsafe void UnsafeExample()
@@ -67,6 +69,7 @@ unsafe void PinnedExample()
 ```
 
 ### Safe Wrappers
+
 ```rust
 /// The key pattern: wrap unsafe code in a safe API
 pub struct SafeBuffer {
@@ -108,7 +111,7 @@ graph LR
     end
     MI -->|"C ABI call"| FFI["FFI Boundary"]
     subgraph "Rust cdylib (.so / .dll)"
-        FFI --> RF["extern \"C\" fn<br/>#[no_mangle]"]
+        FFI --> RF["extern #quot;C#quot; fn<br/>#[no_mangle]"]
         RF --> Safe["Safe Rust<br/>internals"]
     end
 
@@ -118,6 +121,7 @@ graph LR
 ```
 
 ### Rust Library (compiled as cdylib)
+
 ```rust
 // src/lib.rs
 #[no_mangle]
@@ -149,6 +153,7 @@ crate-type = ["cdylib"]
 ```
 
 ### C# Consumer (P/Invoke)
+
 ```csharp
 using System.Runtime.InteropServices;
 
@@ -176,6 +181,7 @@ When exposing Rust functions to C#, these rules prevent the most common bugs:
 2. **`#[no_mangle]`** — prevents the Rust compiler from mangling the function name. Without it, C# can't find the symbol.
 
 3. **Never let a panic cross the FFI boundary** — a Rust panic unwinding into C# is **undefined behavior**. Catch panics at FFI entry points:
+
     ```rust
     #[no_mangle]
     pub extern "C" fn safe_ffi_function() -> i32 {
@@ -190,6 +196,7 @@ When exposing Rust functions to C#, these rules prevent the most common bugs:
     ```
 
 4. **Opaque vs transparent structs** — if C# only holds a pointer (opaque handle), `#[repr(C)]` is not needed. If C# reads struct fields via `StructLayout`, you **must** use `#[repr(C)]`:
+
     ```rust
     // Opaque — C# only holds IntPtr. No #[repr(C)] needed.
     pub struct Connection { /* Rust-only fields */ }
@@ -208,6 +215,7 @@ When exposing Rust functions to C#, these rules prevent the most common bugs:
 This pattern is common in production: Rust owns an object, C# holds an opaque handle, and explicit create/destroy functions manage the lifecycle.
 
 **Rust side** (`src/lib.rs`):
+
 ```rust
 use std::ffi::{c_char, CStr};
 
@@ -261,6 +269,7 @@ pub extern "C" fn processor_free(ptr: *mut ImageProcessor) {
 ```
 
 **C# side**:
+
 ```csharp
 using System.Runtime.InteropServices;
 
@@ -326,6 +335,7 @@ extern "C" {
 ```
 
 Requirements:
+
 1. Create a `SafeBuffer` struct that wraps the raw pointer
 2. Implement `Drop` to call `lib_free_buffer`
 3. Provide a safe `&[u8]` view via `as_slice()`
@@ -378,6 +388,3 @@ fn process(buf: &SafeBuffer) {
 </details>
 
 ***
-
-
-
