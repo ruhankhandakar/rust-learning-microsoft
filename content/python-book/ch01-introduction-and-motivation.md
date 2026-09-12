@@ -265,7 +265,7 @@ fn cpu_work(n: u64) -> u64 {
 fn main() {
     let start = std::time::Instant::now();
     let handles: Vec<_> = (0..4)
-        .map(|_| thread::spawn(|| cpu_work(10_000_000)))
+        .map(|_| thread::spawn(|| cpu_work(3_000_000)))
         .collect();
 
     let results: Vec<u64> = handles.into_iter()
@@ -404,6 +404,7 @@ graph LR
         PY_GIL --> PY_OS["OS / Hardware"]
     end
 
+    PY ~~~ RS
     subgraph RS["🦀 Rust"]
         direction TB
         RS_CODE["Your Code"] --> RS_NONE["No runtime overhead"]
