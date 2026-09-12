@@ -322,6 +322,7 @@ flowchart TB
         VT --> I1["Article::summarize()"]
         VT --> I2["Tweet::summarize()"]
     end
+    Static ~~~ Dynamic
     style Static fill:#d4edda
     style Dynamic fill:#fff3cd
 ```
