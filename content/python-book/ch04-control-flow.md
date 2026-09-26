@@ -218,6 +218,8 @@ flowchart LR
         P2 --> P4["result used later"]
         P3 --> P4
     end
+
+    Python ~~~ Rust
     subgraph Rust ["Rust — Expressions"]
         R1["let result = if cond"] --> R2["{ 'yes' }"]
         R1 --> R3["{ 'no' }"]
