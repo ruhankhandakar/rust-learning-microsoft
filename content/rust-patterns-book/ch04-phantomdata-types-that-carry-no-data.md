@@ -46,45 +46,58 @@ struct Slice<'a, T> {
 Use `PhantomData` to prevent mixing values from different "sessions" or "contexts":
 
 ```rust
+use std::cell::RefCell;
 use std::marker::PhantomData;
 
-/// A handle that's valid only within a specific arena's lifetime
+/// A handle branded to a specific arena instance.
+/// Invariant over 'arena — prevents using a handle from one arena with another.
 struct ArenaHandle<'arena> {
     index: usize,
-    _brand: PhantomData<&'arena ()>,
+    _brand: PhantomData<*mut &'arena ()>,
 }
 
-struct Arena {
-    data: Vec<String>,
+/// An arena that brands each handle with its unique lifetime.
+struct Arena<'arena> {
+    data: RefCell<Vec<String>>,
+    _phantom: PhantomData<&'arena ()>,
 }
 
-impl Arena {
-    fn new() -> Self {
-        Arena { data: Vec::new() }
-    }
+/// Create an arena and pass it to a closure.
+/// Each call gets a unique, opaque lifetime that can't be forged.
+fn with_arena<R>(f: impl for<'arena> FnOnce(&Arena<'arena>) -> R) -> R {
+    let arena = Arena {
+        data: RefCell::new(Vec::new()),
+        _phantom: PhantomData,
+    };
+    f(&arena)
+}
 
+impl<'arena> Arena<'arena> {
     /// Allocate a string and return a branded handle
-    fn alloc<'a>(&'a mut self, value: String) -> ArenaHandle<'a> {
-        let index = self.data.len();
-        self.data.push(value);
+    fn alloc(&self, value: String) -> ArenaHandle<'arena> {
+        let mut data = self.data.borrow_mut();
+        let index = data.len();
+        data.push(value);
         ArenaHandle { index, _brand: PhantomData }
     }
 
     /// Look up by handle — only accepts handles from THIS arena
-    fn get<'a>(&'a self, handle: ArenaHandle<'a>) -> &'a str {
-        &self.data[handle.index]
+    fn get(&self, handle: &ArenaHandle<'arena>) -> String {
+        let data = self.data.borrow();
+        data[handle.index].clone()
     }
 }
 
 fn main() {
-    let mut arena1 = Arena::new();
-    let handle1 = arena1.alloc("hello".to_string());
+    with_arena(|arena1| {
+        let handle1 = arena1.alloc("hello".to_string());
+        println!("{}", arena1.get(&handle1)); // ✅
 
-    // Can't use handle1 with a different arena — lifetimes won't match
-    // let mut arena2 = Arena::new();
-    // arena2.get(handle1); // ❌ Lifetime mismatch
-
-    println!("{}", arena1.get(handle1)); // ✅
+        // Can't use handle1 with a different arena — compile-time error
+        // with_arena(|arena2| {
+        //     arena2.get(&handle1); // ❌ borrowed data escapes outside of closure
+        // });
+    });
 }
 ```
 

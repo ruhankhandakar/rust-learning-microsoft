@@ -63,7 +63,7 @@ let n: i32 = "42".parse()?;                    // Propagate error with ?
 ### The From/Into Relationship
 
 ```mermaid
-flowchart LR
+flowchart TB
     A["impl From&lt;A&gt; for B"] -->|"auto-generates"| B["impl Into&lt;B&gt; for A"]
     C["Celsius::from(Fahrenheit(212.0))"] ---|"same as"| D["Fahrenheit(212.0).into()"]
     style A fill:#d4edda
