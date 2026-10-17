@@ -208,7 +208,7 @@ impl Stats {
     }
 }
 
-async fn compute_stats<S: futures::Stream<Item = f64> + Unpin>(stream: S) -> Stats {
+async fn compute_stats<S: futures::Stream<Item = f64>>(stream: S) -> Stats {
     stream
         .fold(
             Stats { count: 0, min: f64::INFINITY, max: f64::NEG_INFINITY, sum: 0.0 },

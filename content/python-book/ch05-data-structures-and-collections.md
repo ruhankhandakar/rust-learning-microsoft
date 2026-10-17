@@ -195,6 +195,7 @@ flowchart LR
         PH --> PHT["height: float obj"]
         PH --> PD["__dict__"]
     end
+    Python ~~~ Rust
     subgraph Rust ["Rust Struct (Stack)"]
         RW["width: f64<br/>(8 bytes)"] --- RH["height: f64<br/>(8 bytes)"]
     end
