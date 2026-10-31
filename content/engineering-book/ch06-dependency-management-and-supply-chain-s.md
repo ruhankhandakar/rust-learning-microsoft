@@ -107,7 +107,6 @@ yanked = "deny"               # Fail on yanked crates
 notice = "warn"               # Warn on informational advisories
 
 [licenses]
-unlicensed = "deny"           # All crates must have a license
 allow = [
     "MIT",
     "Apache-2.0",
