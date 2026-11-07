@@ -107,7 +107,7 @@ source .venv/bin/activate              # No activation needed
 ```
 
 ```mermaid
-graph TD
+graph LR
     subgraph Python ["Python Project"]
         PP["pyproject.toml"] --- PS["src/"]
         PS --- PM["myproject/"]
@@ -120,6 +120,7 @@ graph TD
         RS --- RM["main.rs"]
         RC --- RTG["target/ (auto-generated)"]
     end
+    Python ~~~ Rust
     style Python fill:#ffeeba
     style Rust fill:#d4edda
 ```

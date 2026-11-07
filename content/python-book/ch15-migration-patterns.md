@@ -251,7 +251,7 @@ let db_host = get_config()["database"]["host"].as_str().unwrap();
 ## Incremental Adoption Strategy
 
 ```mermaid
-flowchart LR
+flowchart TB
     A["1️⃣ Profile Python<br/>(find hotspots)"] --> B["2️⃣ Write Rust Extension<br/>(PyO3 + maturin)"]
     B --> C["3️⃣ Replace Python Call<br/>(same API)"]
     C --> D["4️⃣ Expand Gradually<br/>(more functions)"]
