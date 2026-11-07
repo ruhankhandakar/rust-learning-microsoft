@@ -283,6 +283,62 @@ fn print_string(s: &str) {
 }
 ```
 
+### Modern C#: Span\<T\> and Inline Arrays
+
+C# has evolved beyond traditional arrays. `Span<T>` provides type-safe, contiguous memory views that can live on the stack, while Inline Arrays (C# 12) offer fixed-size stack buffers.
+
+```csharp
+// C# Span<T> - view into contiguous memory
+Span<int> span = stackalloc int[] { 1, 2, 3, 4, 5 };
+span[0] = 10;
+
+ReadOnlySpan<char> text = "Hello".AsSpan();
+
+// Method accepting any contiguous memory view
+void ProcessSpan(ReadOnlySpan<int> data)
+{
+    for (int i = 0; i < data.Length; i++)
+        Console.WriteLine(data[i]);
+}
+
+// Inline Arrays (C# 12) - fixed-size stack buffer
+[InlineArray(5)]
+struct IntBuffer
+{
+    private int _element;
+}
+```
+
+```rust
+// Rust &[T] / &mut [T] - borrowed view into contiguous memory
+let mut array = [1, 2, 3, 4, 5];
+let slice: &mut [i32] = &mut array;
+slice[0] = 10;
+
+let slice: &[i32] = &array;
+let text: &str = "Hello";
+
+// Function accepting any sequential data
+fn process_slice(data: &[i32]) {
+    for (i, num) in data.iter().enumerate() {
+        println!("Index {}: {}", i, num);
+    }
+}
+
+// Fixed-size arrays (stack allocated)
+let buffer: [i32; 5] = [0; 5];
+```
+
+| C# | Rust |
+|----|------|
+| `Span<T>` (ref struct, stack-only) | `&mut [T]` / `&[T]` (borrowed slice) |
+| `ReadOnlySpan<T>` | `&[T]` (immutable slice) |
+| `ReadOnlySpan<char>` / `string.AsSpan()` | `&str` (string slice) |
+| `[InlineArray(N)]` struct (C# 12) | `[T; N]` (fixed-size array) |
+| `stackalloc T[]` with `Span<T>` | `let arr: [T; N] = ...` (local array) |
+
+> **Key insight:** Rust's `&[T]` combines the role of C#'s `ArraySegment<T>`, `Span<T>`, and `ReadOnlySpan<T>` — it's a fat pointer (pointer + length) that works with arrays, vectors, and subslices. C#'s Inline Arrays map naturally to Rust's `[T; N]` arrays, which are also stack-allocated by default.
+
 ***
 
 ## Structs vs Classes

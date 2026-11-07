@@ -219,11 +219,7 @@ pub struct Select<A, B> {
     b: B,
 }
 
-impl<A, B> Select<A, B>
-where
-    A: Future + Unpin,
-    B: Future + Unpin,
-{
+impl<A, B> Select<A, B> {
     pub fn new(a: A, b: B) -> Self {
         Select { a, b }
     }
