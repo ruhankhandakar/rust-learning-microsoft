@@ -1,6 +1,6 @@
 {
   "name": "rust-learn",
-  "version": "4.3.20",
+  "version": "4.3.21",
   "private": true,
   "scripts": {
     "dev": "next dev",
