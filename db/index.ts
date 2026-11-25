@@ -41,12 +41,27 @@ interface ActivityDailyTable {
   count: number;
 }
 
+interface ChapterFeedbackTable {
+  id: Generated<number>;
+  book_slug: string;
+  chapter_slug: string;
+  helpful: number;
+  edit_token: string;
+  comment: string | null;
+  user_id: string | null;
+  show_public: Generated<number>;
+  ok_to_quote: Generated<number>;
+  status: Generated<string>;
+  created_at: Generated<string>;
+}
+
 interface Database {
   reading_progress: ReadingProgressTable;
   user_preferences: UserPreferencesTable;
   bookmarks: BookmarksTable;
   learner_state: LearnerStateTable;
   activity_daily: ActivityDailyTable;
+  chapter_feedback: ChapterFeedbackTable;
 }
 
 export const db = new Kysely<Database>({

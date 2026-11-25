@@ -10,6 +10,9 @@ import { ChapterReadMarker } from "@/components/chapter-read-marker";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { SearchTrigger } from "@/components/search-trigger";
 import { HomeButton } from "@/components/home-button";
+import { ShareMenu } from "@/components/share-menu";
+import { ChapterFeedback } from "@/components/chapter-feedback";
+import { REPO_URL } from "@/lib/site-stats";
 import { SettingsDropdownLazy as SettingsDropdown } from "@/components/settings-dropdown-lazy";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { ChapterKeyboardNav } from "@/components/chapter-keyboard-nav";
@@ -147,6 +150,30 @@ export default async function ChapterPage({
   const upstreamUrl = isRust100
     ? "https://github.com/emmaglorypraise/100rustprojects"
     : `https://github.com/microsoft/RustTraining/blob/main/${book.dirName}/src/${chapterSlug}.md`;
+  const chapterUrl = `${BASE_URL}/books/${bookSlug}/${chapterSlug}`;
+  const issueUrl = `${REPO_URL}/issues/new?title=${encodeURIComponent(`Bug on "${current.title}"`)}&body=${encodeURIComponent(`Page: ${chapterUrl}\n\nWhat happened:\n`)}`;
+  const endOfChapter = (
+    <>
+      <ChapterFeedback bookSlug={bookSlug} chapterSlug={chapterSlug} />
+      <section aria-labelledby="report-title" className="mt-8 text-sm">
+        <h2 id="report-title" className="mb-2 font-sans text-sm font-semibold">Found a problem?</h2>
+        <ul className="flex flex-col gap-1.5 text-muted-foreground">
+          <li>
+            Something in the {isRust100 ? "project notes" : "book"} is wrong:{" "}
+            <a href={upstreamUrl} target="_blank" rel="noopener noreferrer" className="font-medium text-foreground underline underline-offset-2 hover:text-primary">
+              suggest a fix on {isRust100 ? "emmaglorypraise/100rustprojects" : "microsoft/RustTraining"}
+            </a>
+          </li>
+          <li>
+            Something on this site is broken:{" "}
+            <a href={issueUrl} target="_blank" rel="noopener noreferrer" className="font-medium text-foreground underline underline-offset-2 hover:text-primary">
+              open an issue
+            </a>
+          </li>
+        </ul>
+      </section>
+    </>
+  );
   const bookAuthor = isRust100
     ? { "@type": "Person", name: "Glory Praise Emmanuel", url: "https://github.com/emmaglorypraise" }
     : { "@type": "Organization", name: "Microsoft", url: "https://github.com/microsoft/RustTraining" };
@@ -223,6 +250,7 @@ export default async function ChapterPage({
             {current.title}
           </span>
           <div className="flex items-center gap-2 shrink-0">
+            <ShareMenu url={chapterUrl} title={`${current.title}, ${book.title}`} />
             <SearchTrigger />
             <SettingsDropdown />
           </div>
@@ -256,6 +284,7 @@ export default async function ChapterPage({
                         runnable={runnable}
                       />
                     </ErrorBoundary>
+                    {endOfChapter}
                   </article>
                   <aside className="hidden lg:block w-full lg:w-[min(42rem,48%)] shrink-0 lg:sticky lg:top-[4.5rem] lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto">
                     <Rust100ProjectSourcePanel
@@ -300,6 +329,7 @@ export default async function ChapterPage({
                   ))}
                 </p>
               )}
+              {endOfChapter}
             </article>
           )}
 

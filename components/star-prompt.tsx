@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Star, X } from "lucide-react";
+import { useProgress } from "@/components/progress-provider";
+import { CHAPTER_END_EVENT } from "@/components/chapter-feedback";
 
 const DB_NAME = "star-prompt";
 const STORE_NAME = "state";
 const KEY = "star-prompt-state";
-const ACTIVE_MS = 60_000;
+const MIN_CHAPTERS = 3;
 const REMIND_LATER_MS = 24 * 60 * 60 * 1000;
 
 interface PromptState {
@@ -45,102 +47,83 @@ async function setState(state: PromptState) {
 }
 
 export function StarPrompt() {
+  const { readSet } = useProgress();
   const [show, setShow] = useState(false);
   const [visible, setVisible] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const read = readSet.size;
 
   useEffect(() => {
+    if (read < MIN_CHAPTERS || show) return;
     let cancelled = false;
 
-    async function check() {
+    async function onChapterEnd() {
       if (/bot|crawl|spider|slurp|googlebot/i.test(navigator.userAgent)) return;
       const state = await getState();
-      if (state?.dismissed) return;
+      if (cancelled || state?.dismissed) return;
       if (state?.remindAfter && Date.now() < state.remindAfter) return;
-      if (cancelled) return;
-
-      timerRef.current = setTimeout(() => {
-        if (!cancelled) {
-          setShow(true);
-          requestAnimationFrame(() => setVisible(true));
-        }
-      }, ACTIVE_MS);
+      setShow(true);
+      requestAnimationFrame(() => setVisible(true));
     }
 
-    check();
+    window.addEventListener(CHAPTER_END_EVENT, onChapterEnd, { once: true });
     return () => {
       cancelled = true;
-      if (timerRef.current) clearTimeout(timerRef.current);
+      window.removeEventListener(CHAPTER_END_EVENT, onChapterEnd);
     };
-  }, []);
+  }, [read, show]);
 
-  const dismiss = async () => {
+  const close = (state: PromptState) => {
     setVisible(false);
     setTimeout(() => setShow(false), 300);
-    await setState({ dismissed: true, remindAfter: null });
+    setState(state);
   };
-
-  const remindLater = async () => {
-    setVisible(false);
-    setTimeout(() => setShow(false), 300);
-    await setState({ dismissed: false, remindAfter: Date.now() + REMIND_LATER_MS });
-  };
+  const dismiss = () => close({ dismissed: true, remindAfter: null });
+  const remindLater = () => close({ dismissed: false, remindAfter: Date.now() + REMIND_LATER_MS });
 
   if (!show) return null;
 
   return (
     <div
-      className={`fixed bottom-6 right-6 z-50 max-w-sm w-[calc(100%-3rem)] sm:w-auto transition-all duration-300 ${
-        visible
-          ? "translate-y-0 opacity-100"
-          : "translate-y-4 opacity-0"
+      role="status"
+      className={`fixed bottom-6 right-6 z-50 w-[calc(100%-3rem)] max-w-sm transition-[transform,opacity] duration-300 motion-reduce:transition-none sm:w-auto ${
+        visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
       }`}
     >
-      <div className="relative rounded-xl border border-border bg-background/95 backdrop-blur-lg shadow-2xl shadow-black/20 p-5">
+      <div className="relative rounded-2xl border border-border bg-card p-5 shadow-[0_12px_32px_-8px_rgb(0_0_0/0.45)]">
         <button
+          type="button"
           onClick={remindLater}
-          className="absolute top-3 right-3 text-muted-foreground hover:text-foreground transition-colors"
+          className="absolute right-3 top-3 rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
           aria-label="Close"
         >
-          <X className="h-4 w-4" />
+          <X className="h-4 w-4" aria-hidden="true" />
         </button>
-
-        <div className="flex items-start gap-3.5">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-500">
-            <Star className="h-5 w-5" fill="currentColor" />
-          </div>
-          <div className="min-w-0">
-            <p className="font-semibold text-sm leading-tight mb-1">
-              Enjoying Rust Training?
-            </p>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              A star on GitHub helps others discover this project and keeps it going!
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-1.5 mt-3.5">
+        <p className="mb-1 pr-6 font-semibold">You&apos;ve read {read} chapters. Nice work.</p>
+        <p className="text-sm text-muted-foreground">If this site helped, a star on GitHub helps other learners find it.</p>
+        <div className="mt-4 flex flex-wrap items-center gap-2">
           <a
             href="https://github.com/ruhankhandakar/rust-learning-microsoft"
             target="_blank"
             rel="noopener noreferrer nofollow"
             onClick={dismiss}
-            className="inline-flex items-center gap-1 rounded-md bg-primary px-2.5 py-1 text-[11px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors whitespace-nowrap"
+            className="inline-flex min-h-10 items-center gap-1.5 rounded-[10px] bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            <Star className="h-3 w-3" />
-            Star
+            <Star className="h-4 w-4" aria-hidden="true" />
+            Star on GitHub
           </a>
           <button
+            type="button"
             onClick={remindLater}
-            className="rounded-md px-2 py-1 text-[11px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors whitespace-nowrap"
+            className="min-h-10 rounded-[10px] px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
-            Later
+            Not now
           </button>
           <button
+            type="button"
             onClick={dismiss}
-            className="rounded-md px-2 py-1 text-[11px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors whitespace-nowrap"
+            className="min-h-10 rounded-[10px] px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
-            Don&apos;t show again
+            Don&apos;t ask again
           </button>
         </div>
       </div>

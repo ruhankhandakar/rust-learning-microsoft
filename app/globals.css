@@ -100,6 +100,31 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
   --sidebar-accent-foreground: oklch(0.25 0.02 50);
   --sidebar-border: oklch(0.90 0.01 55);
   --sidebar-ring: oklch(0.65 0.17 45);
+
+  --code-surface: oklch(0.155 0.005 260);
+  --code-border: oklch(0.24 0.006 260);
+  --code-ink: oklch(0.82 0.008 260);
+  --code-ink-strong: oklch(0.9 0.008 260);
+  --code-control: oklch(0.19 0.005 260);
+  --code-control-border: oklch(0.28 0.006 260);
+  --code-control-hover: oklch(0.26 0.006 260);
+  --code-control-ink: oklch(0.75 0.01 260);
+  --code-muted: oklch(0.68 0.01 260);
+  --code-hover-soft: oklch(0.22 0.006 260);
+  --code-sunken: oklch(0.13 0.004 260);
+  --code-ok: oklch(0.76 0.12 150);
+  --code-fail: oklch(0.74 0.14 25);
+  --code-stderr: oklch(0.8 0.09 30);
+  --code-focus: oklch(0.7 0.12 45);
+  --syntax-keyword: oklch(0.73 0.10 45);
+  --syntax-string: oklch(0.70 0.09 150);
+  --syntax-comment: oklch(0.58 0.01 260);
+  --syntax-function: oklch(0.75 0.09 80);
+  --syntax-type: oklch(0.72 0.08 210);
+  --syntax-number: oklch(0.70 0.09 310);
+  --syntax-literal: oklch(0.70 0.09 45);
+  --diagram-light-surface: oklch(0.97 0.002 60);
+  --diagram-light-border: oklch(0.90 0.01 55);
 }
 
 .dark {
@@ -282,14 +307,14 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
 .prose .pre-wrapper {
   position: relative;
   margin: 1.5rem 0;
-  background: oklch(0.155 0.005 260);
+  background: var(--code-surface);
   border-radius: var(--radius-lg);
-  border: 1px solid oklch(0.24 0.006 260);
+  border: 1px solid var(--code-border);
 }
 
 .prose .pre-wrapper pre {
   background: transparent !important;
-  color: oklch(0.82 0.008 260);
+  color: var(--code-ink);
   padding: 1.25rem;
   border-radius: inherit;
   overflow-x: auto;
@@ -310,9 +335,9 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
   height: 2rem;
   width: 2rem;
   border-radius: var(--radius-md);
-  border: 1px solid oklch(0.28 0.006 260);
-  background: oklch(0.19 0.005 260);
-  color: oklch(0.55 0.01 260);
+  border: 1px solid var(--code-control-border);
+  background: var(--code-control);
+  color: var(--code-muted);
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.15s, background 0.15s, color 0.15s;
@@ -329,18 +354,18 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
 }
 
 .prose .pre-wrapper .copy-btn:hover {
-  background: oklch(0.26 0.006 260);
-  color: oklch(0.82 0.008 260);
+  background: var(--code-control-hover);
+  color: var(--code-ink);
 }
 
 .prose pre {
-  background: oklch(0.155 0.005 260) !important;
-  color: oklch(0.82 0.008 260);
+  background: var(--code-surface) !important;
+  color: var(--code-ink);
   padding: 1.25rem;
   border-radius: var(--radius-lg);
   overflow-x: auto;
   margin: 1.5rem 0;
-  border: 1px solid oklch(0.24 0.006 260);
+  border: 1px solid var(--code-border);
   font-size: 0.875rem;
   line-height: 1.7;
 }
@@ -393,57 +418,57 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
 
 /* highlight.js overrides — soft palette for long reading */
 .hljs-keyword {
-  color: oklch(0.73 0.10 45);
+  color: var(--syntax-keyword);
   font-weight: 600;
 }
 
 .hljs-string {
-  color: oklch(0.70 0.09 150);
+  color: var(--syntax-string);
 }
 
 .hljs-comment {
-  color: oklch(0.50 0.01 260);
+  color: var(--syntax-comment);
   font-style: italic;
 }
 
 .hljs-function .hljs-title,
 .hljs-title.function_ {
-  color: oklch(0.75 0.09 80);
+  color: var(--syntax-function);
 }
 
 .hljs-type,
 .hljs-built_in {
-  color: oklch(0.72 0.08 210);
+  color: var(--syntax-type);
 }
 
 .hljs-number {
-  color: oklch(0.70 0.09 310);
+  color: var(--syntax-number);
 }
 
 .hljs-literal {
-  color: oklch(0.70 0.09 45);
+  color: var(--syntax-literal);
 }
 
 .hljs-attr {
-  color: oklch(0.72 0.08 210);
+  color: var(--syntax-type);
 }
 
 .hljs-symbol {
-  color: oklch(0.70 0.09 45);
+  color: var(--syntax-literal);
 }
 
 .mermaid-diagram svg {
   max-width: 100%;
   height: auto;
   border-radius: var(--radius-lg);
-  background: oklch(0.155 0.005 260);
+  background: var(--code-surface);
   padding: 1.5rem;
-  border: 1px solid oklch(0.24 0.006 260);
+  border: 1px solid var(--code-border);
 }
 
 :root:not(.dark) .mermaid-diagram svg {
-  background: oklch(0.97 0.002 60);
-  border-color: oklch(0.90 0.01 55);
+  background: var(--diagram-light-surface);
+  border-color: var(--diagram-light-border);
 }
 
 /* ── Rust Playground actions (components/rust-code-actions.tsx); code blocks stay dark in both themes ── */
@@ -453,7 +478,7 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
   justify-content: flex-end;
   gap: 0.5rem;
   padding: 0.5rem 0.75rem;
-  border-top: 1px solid oklch(0.24 0.006 260);
+  border-top: 1px solid var(--code-border);
 }
 
 .prose .rust-action-btn {
@@ -463,9 +488,9 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
   height: 1.75rem;
   padding: 0 0.625rem;
   border-radius: var(--radius-md);
-  border: 1px solid oklch(0.28 0.006 260);
-  background: oklch(0.19 0.005 260);
-  color: oklch(0.75 0.01 260);
+  border: 1px solid var(--code-control-border);
+  background: var(--code-control);
+  color: var(--code-control-ink);
   font-size: 0.75rem;
   font-weight: 500;
   text-decoration: none;
@@ -474,8 +499,8 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
 }
 
 .prose .rust-action-btn:hover {
-  background: oklch(0.26 0.006 260);
-  color: oklch(0.9 0.008 260);
+  background: var(--code-control-hover);
+  color: var(--code-ink-strong);
 }
 
 .prose .rust-action-btn[aria-disabled="true"] {
@@ -486,15 +511,15 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
 .prose .rust-action-btn:focus-visible,
 .prose .rust-output-close:focus-visible,
 .prose .rust-output summary:focus-visible {
-  outline: 2px solid oklch(0.7 0.12 45);
+  outline: 2px solid var(--code-focus);
   outline-offset: 2px;
 }
 
 .prose .rust-output {
-  border-top: 1px solid oklch(0.24 0.006 260);
+  border-top: 1px solid var(--code-border);
   padding: 0.75rem;
   font-size: 0.8125rem;
-  color: oklch(0.82 0.008 260);
+  color: var(--code-ink);
 }
 
 .prose .rust-output-header {
@@ -511,17 +536,17 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
 }
 
 .prose .rust-output-ok {
-  color: oklch(0.76 0.12 150);
+  color: var(--code-ok);
 }
 
 .prose .rust-output-fail {
-  color: oklch(0.74 0.14 25);
+  color: var(--code-fail);
 }
 
 .prose .rust-output-note,
 .prose .rust-output-empty,
 .prose .rust-output summary {
-  color: oklch(0.62 0.01 260);
+  color: var(--code-muted);
   font-size: 0.75rem;
 }
 
@@ -535,13 +560,13 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
   border: none;
   border-radius: var(--radius-sm);
   background: transparent;
-  color: oklch(0.62 0.01 260);
+  color: var(--code-muted);
   cursor: pointer;
 }
 
 .prose .rust-output-close:hover {
-  background: oklch(0.22 0.006 260);
-  color: oklch(0.9 0.008 260);
+  background: var(--code-hover-soft);
+  color: var(--code-ink-strong);
 }
 
 .prose .rust-output pre.rust-output-stream {
@@ -549,15 +574,15 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
   padding: 0.625rem 0.75rem;
   max-height: 20rem;
   overflow: auto;
-  background: oklch(0.13 0.004 260) !important;
-  border: 1px solid oklch(0.22 0.006 260);
+  background: var(--code-sunken) !important;
+  border: 1px solid var(--code-hover-soft);
   border-radius: var(--radius-md);
   font-size: 0.8125rem;
   line-height: 1.6;
 }
 
 .prose .rust-output pre.rust-output-stderr {
-  color: oklch(0.8 0.09 30);
+  color: var(--code-stderr);
 }
 
 .prose .rust-output-empty {
