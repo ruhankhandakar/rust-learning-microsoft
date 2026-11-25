@@ -29,10 +29,24 @@ interface BookmarksTable {
   created_at: Generated<string>;
 }
 
+interface LearnerStateTable {
+  user_id: string;
+  state: string;
+  updated_at: Generated<string>;
+}
+
+interface ActivityDailyTable {
+  day: string;
+  kind: string;
+  count: number;
+}
+
 interface Database {
   reading_progress: ReadingProgressTable;
   user_preferences: UserPreferencesTable;
   bookmarks: BookmarksTable;
+  learner_state: LearnerStateTable;
+  activity_daily: ActivityDailyTable;
 }
 
 export const db = new Kysely<Database>({

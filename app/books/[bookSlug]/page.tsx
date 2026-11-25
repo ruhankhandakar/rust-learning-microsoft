@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BOOKS, getBookBySlug } from "@/lib/books";
@@ -13,6 +14,7 @@ import { SearchTrigger } from "@/components/search-trigger";
 import { SettingsDropdownLazy as SettingsDropdown } from "@/components/settings-dropdown-lazy";
 import { HomeButton } from "@/components/home-button";
 import { BookProgressBar } from "@/components/book-progress";
+import { ContinueReading } from "@/components/continue-reading";
 import { ChapterCheckmark } from "@/components/chapter-checkmark";
 import { BookCacheTrigger } from "@/components/book-cache-trigger";
 import { APP_VERSION } from "@/lib/version";
@@ -33,6 +35,32 @@ const LEVEL_STYLES: Record<string, string> = {
 
 export function generateStaticParams() {
   return BOOKS.map((book) => ({ bookSlug: book.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ bookSlug: string }>;
+}): Promise<Metadata> {
+  const book = getBookBySlug((await params).bookSlug);
+  if (!book) return {};
+  const title = book.slug === "100-rust-projects" ? book.title : `${book.title} — free online Rust book`;
+  const description = `${book.description} For ${book.audience}.`;
+  const url = `/books/${book.slug}`;
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "website",
+      siteName: "Rust Training",
+      locale: "en_US",
+      title,
+      description,
+      url,
+    },
+    twitter: { card: "summary", title, description },
+  };
 }
 
 export default async function BookPage({
@@ -138,6 +166,9 @@ export default async function BookPage({
 
           {/* Right: Table of Contents */}
           <main>
+            <div className="mb-6 empty:hidden">
+              <ContinueReading bookSlug={bookSlug} />
+            </div>
             <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">
               Table of Contents
             </h2>

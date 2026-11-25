@@ -2,10 +2,10 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Rust Training by Microsoft",
+    name: "Rust Training",
     short_name: "Rust Training",
     description:
-      "A curated collection of free Rust programming books and tutorials, built by Ruhan Khandakar. Learn Rust from beginner to advanced.",
+      "An unofficial, free reader for Microsoft's open-source RustTraining books, built by Ruhan Khandakar. Learn Rust from beginner to advanced.",
     start_url: "/",
     display: "standalone",
     background_color: "#1a1a1a",

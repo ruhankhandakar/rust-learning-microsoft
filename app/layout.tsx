@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono, Inter, Lora, Merriweather, JetBrains_Mono } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next"
-import { SpeedInsights } from "@vercel/speed-insights/next"
 
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -12,7 +10,9 @@ import { ServiceWorkerRegister } from "@/components/sw-register";
 import { FontProvider } from "@/components/font-provider";
 import { BookmarkProvider } from "@/components/bookmark-provider";
 import { SessionProvider } from "@/components/session-provider";
+import { LearnerSync } from "@/components/learner-sync";
 import { StarPrompt } from "@/components/star-prompt";
+import { PageViewCounter } from "@/components/page-view-counter";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,12 +48,15 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://rust.learningz.xyz"),
   title: {
-    default: "Rust Training by Microsoft — Learn Rust Programming",
-    template: "%s | Rust Training by Microsoft",
+    default: "Rust Training — Learn Rust with Microsoft's Free Rust Books",
+    template: "%s | Rust Training",
   },
   description:
-    "A curated collection of free Rust programming books and tutorials from Microsoft, built by Ruhan Khandakar. Learn Rust from beginner to advanced with interactive reading, progress tracking, and bookmarks.",
+    "An unofficial, free reader for Microsoft's open-source RustTraining books and 100 Rust Projects, built by Ruhan Khandakar. Learn Rust from beginner to advanced with progress tracking, bookmarks, search and offline reading.",
   applicationName: "Rust Training",
+  alternates: {
+    types: { "application/rss+xml": [{ url: "/rss.xml", title: "Rust Training: what changed" }] },
+  },
   authors: [{ name: "Ruhan Khandakar" }],
   creator: "Ruhan Khandakar",
   publisher: "Ruhan Khandakar",
@@ -70,18 +73,18 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     type: "website",
-    title: "Rust Training by Microsoft — Learn Rust Programming",
+    title: "Rust Training — Learn Rust with Microsoft's Free Rust Books",
     description:
-      "A curated collection of free Rust programming books and tutorials. Learn Rust from beginner to advanced with progress tracking and bookmarks.",
-    siteName: "Rust Training by Microsoft",
+      "An unofficial, free reader for Microsoft's open-source RustTraining books. Learn Rust from beginner to advanced with progress tracking and bookmarks.",
+    siteName: "Rust Training",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rust Training by Microsoft",
+    title: "Rust Training",
     description:
-      "Free Rust programming books and tutorials. Learn Rust from beginner to advanced.",
-    creator: "ruhankhandakar",
+      "Free Rust books from Microsoft's RustTraining, in an unofficial reader with progress tracking and offline mode.",
+    creator: "@KhandakarRuhan",
   },
   robots: {
     index: true,
@@ -126,14 +129,18 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebSite",
-              name: "Rust Training by Microsoft | Ruhan Khandakar",
+              name: "Rust Training",
               description:
-                "A curated collection of free Rust programming books and tutorials. Learn Rust from beginner to advanced.",
+                "An unofficial, free reader for Microsoft's open-source RustTraining books. Learn Rust from beginner to advanced.",
               url: "https://rust.learningz.xyz",
               author: {
                 "@type": "Person",
                 name: "Ruhan Khandakar",
                 url: "https://x.com/KhandakarRuhan",
+                sameAs: [
+                  "https://x.com/KhandakarRuhan",
+                  "https://github.com/ruhankhandakar",
+                ],
               },
               publisher: {
                 "@type": "Person",
@@ -143,17 +150,24 @@ export default function RootLayout({
             }),
           }}
         />
+        {process.env.NEXT_PUBLIC_CF_BEACON_TOKEN && (
+          <Script
+            type="module"
+            src="https://static.cloudflareinsights.com/beacon.min.js"
+            data-cf-beacon={JSON.stringify({ token: process.env.NEXT_PUBLIC_CF_BEACON_TOKEN })}
+          />
+        )}
         <SessionProvider>
           <ThemeProvider>
             <FontProvider>
               <ProgressProvider>
                 <BookmarkProvider>
                   {children}
-                  <SpeedInsights />
-                  <Analytics />
                   <OfflineIndicator />
                   <ServiceWorkerRegister />
                   <StarPrompt />
+                  <LearnerSync />
+                  <PageViewCounter />
                 </BookmarkProvider>
               </ProgressProvider>
             </FontProvider>

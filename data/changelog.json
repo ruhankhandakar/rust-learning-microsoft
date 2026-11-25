@@ -1,0 +1,1062 @@
+[
+  {
+    "date": "2026-11-13",
+    "books": [
+      {
+        "dir": "async-book",
+        "files": [
+          {
+            "file": "ch06-building-futures-by-hand.md",
+            "added": 1,
+            "removed": 5,
+            "status": "modified"
+          },
+          {
+            "file": "ch10-async-traits.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch11-streams-and-asynciterator.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          }
+        ]
+      },
+      {
+        "dir": "csharp-book",
+        "files": [
+          {
+            "file": "ch05-data-structures-and-collections.md",
+            "added": 56,
+            "removed": 0,
+            "status": "modified"
+          },
+          {
+            "file": "ch14-unsafe-rust-and-ffi.md",
+            "added": 11,
+            "removed": 4,
+            "status": "modified"
+          }
+        ]
+      },
+      {
+        "dir": "engineering-book",
+        "files": [
+          {
+            "file": "ch06-dependency-management-and-supply-chain-s.md",
+            "added": 0,
+            "removed": 1,
+            "status": "modified"
+          }
+        ]
+      },
+      {
+        "dir": "python-book",
+        "files": [
+          {
+            "file": "ch01-introduction-and-motivation.md",
+            "added": 2,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch02-getting-started.md",
+            "added": 2,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch04-control-flow.md",
+            "added": 2,
+            "removed": 0,
+            "status": "modified"
+          },
+          {
+            "file": "ch05-data-structures-and-collections.md",
+            "added": 1,
+            "removed": 0,
+            "status": "modified"
+          },
+          {
+            "file": "ch10-traits-and-generics.md",
+            "added": 1,
+            "removed": 0,
+            "status": "modified"
+          },
+          {
+            "file": "ch11-from-and-into-traits.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch15-migration-patterns.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          }
+        ]
+      },
+      {
+        "dir": "rust-patterns-book",
+        "files": [
+          {
+            "file": "ch02-traits-in-depth.md",
+            "added": 145,
+            "removed": 20,
+            "status": "modified"
+          },
+          {
+            "file": "ch04-phantomdata-types-that-carry-no-data.md",
+            "added": 45,
+            "removed": 24,
+            "status": "modified"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2026-05-04",
+    "books": [
+      {
+        "dir": "csharp-book",
+        "files": [
+          {
+            "file": "ch01-introduction-and-motivation.md",
+            "added": 4,
+            "removed": 1,
+            "status": "modified"
+          }
+        ]
+      },
+      {
+        "dir": "rust-patterns-book",
+        "files": [
+          {
+            "file": "ch08-functional-vs-imperative-when-elegance-wins.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2026-04-28",
+    "books": [
+      {
+        "dir": "c-cpp-book",
+        "files": [
+          {
+            "file": "ch12-closures.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          }
+        ]
+      },
+      {
+        "dir": "rust-patterns-book",
+        "files": [
+          {
+            "file": "ch07-closures-and-higher-order-functions.md",
+            "added": 7,
+            "removed": 7,
+            "status": "modified"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2026-04-25",
+    "books": [
+      {
+        "dir": "async-book",
+        "files": [
+          {
+            "file": "ch16-summary-and-reference-card.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          }
+        ]
+      },
+      {
+        "dir": "c-cpp-book",
+        "files": [
+          {
+            "file": "ch14-unsafe-rust-and-ffi.md",
+            "added": 2,
+            "removed": 2,
+            "status": "modified"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2026-04-20",
+    "books": [
+      {
+        "dir": "async-book",
+        "files": [
+          {
+            "file": "ch10-async-traits.md",
+            "added": 18,
+            "removed": 15,
+            "status": "modified"
+          }
+        ]
+      },
+      {
+        "dir": "engineering-book",
+        "files": [
+          {
+            "file": "ch03-benchmarking-measuring-what-matters.md",
+            "added": 30,
+            "removed": 1,
+            "status": "modified"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2026-04-12",
+    "books": [
+      {
+        "dir": "async-book",
+        "files": [
+          {
+            "file": "ch02-the-future-trait.md",
+            "added": 35,
+            "removed": 18,
+            "status": "modified"
+          },
+          {
+            "file": "ch15-exercises.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          }
+        ]
+      },
+      {
+        "dir": "c-cpp-book",
+        "toc": true,
+        "files": [
+          {
+            "file": "ch05-data-structures.md",
+            "added": 3,
+            "removed": 3,
+            "status": "modified"
+          },
+          {
+            "file": "ch07-ownership-and-borrowing.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch08-crates-and-modules.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch09-error-handling.md",
+            "added": 2,
+            "removed": 2,
+            "status": "modified"
+          },
+          {
+            "file": "ch11-from-and-into-traits.md",
+            "added": 3,
+            "removed": 2,
+            "status": "modified"
+          },
+          {
+            "file": "ch16-1-case-study-lifetime-borrowing.md",
+            "added": 0,
+            "removed": 231,
+            "status": "deleted"
+          },
+          {
+            "file": "ch16-cases-3-5-lifetime-borrowing.md",
+            "added": 231,
+            "removed": 0,
+            "status": "added"
+          }
+        ]
+      },
+      {
+        "dir": "python-book",
+        "files": [
+          {
+            "file": "ch12-closures-and-iterators.md",
+            "added": 8,
+            "removed": 6,
+            "status": "modified"
+          },
+          {
+            "file": "ch14-unsafe-rust-and-ffi.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2026-04-08",
+    "books": [
+      {
+        "dir": "csharp-book",
+        "files": [
+          {
+            "file": "ch05-data-structures-and-collections.md",
+            "added": 2,
+            "removed": 2,
+            "status": "modified"
+          },
+          {
+            "file": "ch14-unsafe-rust-and-ffi.md",
+            "added": 3,
+            "removed": 3,
+            "status": "modified"
+          },
+          {
+            "file": "ch17-capstone-project.md",
+            "added": 4,
+            "removed": 4,
+            "status": "modified"
+          }
+        ]
+      },
+      {
+        "dir": "engineering-book",
+        "files": [
+          {
+            "file": "ch01-build-scripts-buildrs-in-depth.md",
+            "added": 6,
+            "removed": 6,
+            "status": "modified"
+          },
+          {
+            "file": "ch02-cross-compilation-one-source-many-target.md",
+            "added": 5,
+            "removed": 5,
+            "status": "modified"
+          },
+          {
+            "file": "ch03-benchmarking-measuring-what-matters.md",
+            "added": 6,
+            "removed": 6,
+            "status": "modified"
+          },
+          {
+            "file": "ch04-code-coverage-seeing-what-tests-miss.md",
+            "added": 4,
+            "removed": 4,
+            "status": "modified"
+          },
+          {
+            "file": "ch05-miri-valgrind-and-sanitizers-verifying-u.md",
+            "added": 5,
+            "removed": 5,
+            "status": "modified"
+          },
+          {
+            "file": "ch06-dependency-management-and-supply-chain-s.md",
+            "added": 4,
+            "removed": 4,
+            "status": "modified"
+          },
+          {
+            "file": "ch07-release-profiles-and-binary-size.md",
+            "added": 5,
+            "removed": 5,
+            "status": "modified"
+          },
+          {
+            "file": "ch08-compile-time-and-developer-tools.md",
+            "added": 5,
+            "removed": 5,
+            "status": "modified"
+          },
+          {
+            "file": "ch09-no-std-and-feature-verification.md",
+            "added": 8,
+            "removed": 8,
+            "status": "modified"
+          },
+          {
+            "file": "ch10-windows-and-conditional-compilation.md",
+            "added": 7,
+            "removed": 7,
+            "status": "modified"
+          },
+          {
+            "file": "ch11-putting-it-all-together-a-production-cic.md",
+            "added": 6,
+            "removed": 6,
+            "status": "modified"
+          }
+        ]
+      },
+      {
+        "dir": "python-book",
+        "files": [
+          {
+            "file": "ch03-built-in-types-and-variables.md",
+            "added": 4,
+            "removed": 4,
+            "status": "modified"
+          },
+          {
+            "file": "ch05-data-structures-and-collections.md",
+            "added": 2,
+            "removed": 2,
+            "status": "modified"
+          },
+          {
+            "file": "ch06-enums-and-pattern-matching.md",
+            "added": 4,
+            "removed": 4,
+            "status": "modified"
+          },
+          {
+            "file": "ch07-ownership-and-borrowing.md",
+            "added": 5,
+            "removed": 5,
+            "status": "modified"
+          },
+          {
+            "file": "ch09-error-handling.md",
+            "added": 4,
+            "removed": 4,
+            "status": "modified"
+          },
+          {
+            "file": "ch12-closures-and-iterators.md",
+            "added": 2,
+            "removed": 2,
+            "status": "modified"
+          },
+          {
+            "file": "ch15-migration-patterns.md",
+            "added": 4,
+            "removed": 4,
+            "status": "modified"
+          },
+          {
+            "file": "ch16-best-practices.md",
+            "added": 4,
+            "removed": 4,
+            "status": "modified"
+          }
+        ]
+      },
+      {
+        "dir": "rust-patterns-book",
+        "files": [
+          {
+            "file": "ch03-the-newtype-and-type-state-patterns.md",
+            "added": 2,
+            "removed": 2,
+            "status": "modified"
+          },
+          {
+            "file": "ch08-functional-vs-imperative-when-elegance-wins.md",
+            "added": 8,
+            "removed": 8,
+            "status": "modified"
+          }
+        ]
+      },
+      {
+        "dir": "type-driven-correctness-book",
+        "files": [
+          {
+            "file": "ch03-single-use-types-cryptographic-guarantee.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch07-validated-boundaries-parse-dont-validate.md",
+            "added": 6,
+            "removed": 6,
+            "status": "modified"
+          },
+          {
+            "file": "ch18-redfish-server-walkthrough.md",
+            "added": 8,
+            "removed": 8,
+            "status": "modified"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2026-04-06",
+    "books": [
+      {
+        "dir": "async-book",
+        "files": [
+          {
+            "file": "ch03-how-poll-works.md",
+            "added": 48,
+            "removed": 23,
+            "status": "modified"
+          },
+          {
+            "file": "ch04-pin-and-unpin.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch06-building-futures-by-hand.md",
+            "added": 10,
+            "removed": 9,
+            "status": "modified"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2026-04-05",
+    "books": [
+      {
+        "dir": "c-cpp-book",
+        "files": [
+          {
+            "file": "ch12-closures.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          }
+        ]
+      },
+      {
+        "dir": "rust-patterns-book",
+        "files": [
+          {
+            "file": "ch10-error-handling-patterns.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2026-04-03",
+    "books": [
+      {
+        "dir": "c-cpp-book",
+        "files": [
+          {
+            "file": "ch11-from-and-into-traits.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          }
+        ]
+      },
+      {
+        "dir": "rust-patterns-book",
+        "files": [
+          {
+            "file": "ch01-generics-the-full-picture.md",
+            "added": 19,
+            "removed": 4,
+            "status": "modified"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2026-03-31",
+    "books": [
+      {
+        "dir": "async-book",
+        "files": [
+          {
+            "file": "ch10-async-traits.md",
+            "added": 7,
+            "removed": 3,
+            "status": "modified"
+          },
+          {
+            "file": "ch12-common-pitfalls.md",
+            "added": 39,
+            "removed": 10,
+            "status": "modified"
+          }
+        ]
+      },
+      {
+        "dir": "c-cpp-book",
+        "files": [
+          {
+            "file": "ch07-1-lifetimes-and-borrowing-deep-dive.md",
+            "added": 7,
+            "removed": 7,
+            "status": "modified"
+          },
+          {
+            "file": "ch08-crates-and-modules.md",
+            "added": 2,
+            "removed": 0,
+            "status": "modified"
+          }
+        ]
+      },
+      {
+        "dir": "rust-patterns-book",
+        "files": [
+          {
+            "file": "ch13-macros-code-that-writes-code.md",
+            "added": 1,
+            "removed": 2,
+            "status": "modified"
+          },
+          {
+            "file": "ch15-crate-architecture-and-api-design.md",
+            "added": 4,
+            "removed": 23,
+            "status": "modified"
+          },
+          {
+            "file": "ch16-asyncawait-essentials.md",
+            "added": 1,
+            "removed": 2,
+            "status": "modified"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2026-03-29",
+    "books": [
+      {
+        "dir": "async-book",
+        "toc": true,
+        "files": [
+          {
+            "file": "ch00-introduction.md",
+            "added": 3,
+            "removed": 2,
+            "status": "modified"
+          },
+          {
+            "file": "ch04-pin-and-unpin.md",
+            "added": 6,
+            "removed": 4,
+            "status": "modified"
+          },
+          {
+            "file": "ch05-the-state-machine-reveal.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch06-building-futures-by-hand.md",
+            "added": 19,
+            "removed": 11,
+            "status": "modified"
+          },
+          {
+            "file": "ch09-when-tokio-isnt-the-right-fit.md",
+            "added": 31,
+            "removed": 16,
+            "status": "modified"
+          },
+          {
+            "file": "ch14-async-is-an-optimization-not-an-architecture.md",
+            "added": 502,
+            "removed": 0,
+            "status": "added"
+          },
+          {
+            "file": "ch14-exercises.md",
+            "added": 0,
+            "removed": 386,
+            "status": "deleted"
+          },
+          {
+            "file": "ch15-exercises.md",
+            "added": 386,
+            "removed": 0,
+            "status": "added"
+          },
+          {
+            "file": "ch15-summary-and-reference-card.md",
+            "added": 0,
+            "removed": 106,
+            "status": "deleted"
+          },
+          {
+            "file": "ch16-capstone-project.md",
+            "added": 0,
+            "removed": 256,
+            "status": "deleted"
+          },
+          {
+            "file": "ch16-summary-and-reference-card.md",
+            "added": 106,
+            "removed": 0,
+            "status": "added"
+          },
+          {
+            "file": "ch17-capstone-project.md",
+            "added": 256,
+            "removed": 0,
+            "status": "added"
+          }
+        ]
+      },
+      {
+        "dir": "c-cpp-book",
+        "files": [
+          {
+            "file": "ch03-built-in-types.md",
+            "added": 2,
+            "removed": 2,
+            "status": "modified"
+          },
+          {
+            "file": "ch05-data-structures.md",
+            "added": 13,
+            "removed": 3,
+            "status": "modified"
+          },
+          {
+            "file": "ch06-enums-and-pattern-matching.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch08-crates-and-modules.md",
+            "added": 2,
+            "removed": 2,
+            "status": "modified"
+          },
+          {
+            "file": "ch09-1-error-handling-best-practices.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch09-error-handling.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch11-from-and-into-traits.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch12-1-iterator-power-tools.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch12-closures.md",
+            "added": 2,
+            "removed": 2,
+            "status": "modified"
+          }
+        ]
+      },
+      {
+        "dir": "csharp-book",
+        "files": [
+          {
+            "file": "ch01-introduction-and-motivation.md",
+            "added": 5,
+            "removed": 4,
+            "status": "modified"
+          },
+          {
+            "file": "ch02-getting-started.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch05-2-collections-vec-hashmap-and-iterators.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch08-1-package-management-cargo-vs-nuget.md",
+            "added": 2,
+            "removed": 2,
+            "status": "modified"
+          },
+          {
+            "file": "ch09-1-crate-level-error-types-and-result-alias.md",
+            "added": 3,
+            "removed": 0,
+            "status": "modified"
+          },
+          {
+            "file": "ch09-error-handling.md",
+            "added": 11,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch12-closures-and-iterators.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch13-concurrency.md",
+            "added": 2,
+            "removed": 0,
+            "status": "modified"
+          },
+          {
+            "file": "ch15-2-incremental-adoption-strategy.md",
+            "added": 3,
+            "removed": 0,
+            "status": "modified"
+          },
+          {
+            "file": "ch15-migration-patterns-and-case-studies.md",
+            "added": 4,
+            "removed": 6,
+            "status": "modified"
+          }
+        ]
+      },
+      {
+        "dir": "engineering-book",
+        "files": [
+          {
+            "file": "ch06-dependency-management-and-supply-chain-s.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          }
+        ]
+      },
+      {
+        "dir": "python-book",
+        "files": [
+          {
+            "file": "ch01-introduction-and-motivation.md",
+            "added": 2,
+            "removed": 2,
+            "status": "modified"
+          },
+          {
+            "file": "ch05-data-structures-and-collections.md",
+            "added": 2,
+            "removed": 2,
+            "status": "modified"
+          },
+          {
+            "file": "ch07-ownership-and-borrowing.md",
+            "added": 2,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch09-error-handling.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch11-from-and-into-traits.md",
+            "added": 0,
+            "removed": 3,
+            "status": "modified"
+          },
+          {
+            "file": "ch13-concurrency.md",
+            "added": 2,
+            "removed": 0,
+            "status": "modified"
+          },
+          {
+            "file": "ch15-migration-patterns.md",
+            "added": 2,
+            "removed": 2,
+            "status": "modified"
+          }
+        ]
+      },
+      {
+        "dir": "rust-patterns-book",
+        "files": [
+          {
+            "file": "ch00-introduction.md",
+            "added": 22,
+            "removed": 18,
+            "status": "modified"
+          },
+          {
+            "file": "ch01-generics-the-full-picture.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch04-phantomdata-types-that-carry-no-data.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch05-channels-and-message-passing.md",
+            "added": 2,
+            "removed": 2,
+            "status": "modified"
+          },
+          {
+            "file": "ch06-concurrency-vs-parallelism-vs-threads.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch08-functional-vs-imperative-when-elegance-wins.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch09-smart-pointers-and-interior-mutability.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          },
+          {
+            "file": "ch10-error-handling-patterns.md",
+            "added": 2,
+            "removed": 2,
+            "status": "modified"
+          },
+          {
+            "file": "ch11-serialization-zero-copy-and-binary-data.md",
+            "added": 2,
+            "removed": 2,
+            "status": "modified"
+          },
+          {
+            "file": "ch12-unsafe-rust-controlled-danger.md",
+            "added": 2,
+            "removed": 2,
+            "status": "modified"
+          },
+          {
+            "file": "ch13-macros-code-that-writes-code.md",
+            "added": 2,
+            "removed": 2,
+            "status": "modified"
+          },
+          {
+            "file": "ch14-testing-and-benchmarking-patterns.md",
+            "added": 2,
+            "removed": 2,
+            "status": "modified"
+          },
+          {
+            "file": "ch15-crate-architecture-and-api-design.md",
+            "added": 3,
+            "removed": 4,
+            "status": "modified"
+          },
+          {
+            "file": "ch16-asyncawait-essentials.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          }
+        ]
+      },
+      {
+        "dir": "type-driven-correctness-book",
+        "files": [
+          {
+            "file": "ch07-validated-boundaries-parse-dont-validate.md",
+            "added": 5,
+            "removed": 0,
+            "status": "modified"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2026-03-27",
+    "books": [
+      {
+        "dir": "async-book",
+        "files": [
+          {
+            "file": "ch01-why-async-is-different-in-rust.md",
+            "added": 12,
+            "removed": 10,
+            "status": "modified"
+          }
+        ]
+      },
+      {
+        "dir": "c-cpp-book",
+        "files": [
+          {
+            "file": "ch05-data-structures.md",
+            "added": 3,
+            "removed": 3,
+            "status": "modified"
+          }
+        ]
+      },
+      {
+        "dir": "rust-patterns-book",
+        "files": [
+          {
+            "file": "ch02-traits-in-depth.md",
+            "added": 7,
+            "removed": 7,
+            "status": "modified"
+          },
+          {
+            "file": "ch11-serialization-zero-copy-and-binary-data.md",
+            "added": 1,
+            "removed": 1,
+            "status": "modified"
+          }
+        ]
+      }
+    ]
+  }
+]

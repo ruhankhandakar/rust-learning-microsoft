@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { BOOKS } from "@/lib/books";
 import { getBookStructure } from "@/lib/content";
@@ -15,16 +16,17 @@ import { BookProgressBar } from "@/components/book-progress";
 import { LevelTooltip } from "@/components/level-tooltip";
 import { APP_VERSION, CONTENT_LAST_UPDATED } from "@/lib/version";
 import { LocalTime } from "@/components/local-time";
-import { cn } from "@/lib/utils";
+import { ContinueReading } from "@/components/continue-reading";
+import { ReviewDueBadge } from "@/components/review-due-badge";
 
-// Refresh hourly so temporary homepage highlights expire automatically.
-export const revalidate = 3600;
-
-const FEATURED_BOOK_SLUG = "100-rust-projects";
-const FEATURED_UNTIL_ISO = "2026-04-25T23:59:59Z";
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "/",
+    types: { "application/rss+xml": [{ url: "/rss.xml", title: "Rust Training: what changed" }] },
+  },
+};
 
 export default function HomePage() {
-  const highlightActive = Date.now() < Date.parse(FEATURED_UNTIL_ISO);
   const booksWithCounts = BOOKS.map((book) => {
     const structure = getBookStructure(book.dirName);
     return { ...book, chapterCount: structure.flatChapters.length };
@@ -33,7 +35,7 @@ export default function HomePage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "Rust Training by Microsoft | Ruhan Khandakar",
+    name: "Rust Training",
     description:
       "A curated collection of free Rust programming books and tutorials. Learn Rust from beginner to advanced.",
     url: "https://rust.learningz.xyz",
@@ -81,7 +83,7 @@ export default function HomePage() {
                 🦀
               </div>
               <span className="text-xs font-medium text-muted-foreground tracking-wide uppercase">
-                Microsoft Rust Training
+                Rust Training · Unofficial reader
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -103,6 +105,21 @@ export default function HomePage() {
                 (community notes and GitHub links). From C++, C#, Python bridges to
                 async, patterns, and hands-on builds.
               </p>
+              <nav aria-label="Learning tools" className="flex flex-wrap gap-2 mt-4 text-sm">
+                <Link href="/practice" className="rounded-full border border-border px-3 py-1 hover:border-primary/40 hover:text-primary transition-colors">
+                  Practice exercises
+                </Link>
+                <Link href="/concepts" className="rounded-full border border-border px-3 py-1 hover:border-primary/40 hover:text-primary transition-colors">
+                  Topics across books
+                </Link>
+                <Link href="/review" className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1 hover:border-primary/40 hover:text-primary transition-colors">
+                  Review
+                  <ReviewDueBadge />
+                </Link>
+                <Link href="/changes" className="rounded-full border border-border px-3 py-1 hover:border-primary/40 hover:text-primary transition-colors">
+                  What changed
+                </Link>
+              </nav>
             </div>
           </div>
         </div>
@@ -110,6 +127,9 @@ export default function HomePage() {
 
       {/* Book Grid */}
       <main id="books" className="mx-auto max-w-6xl px-6 py-16">
+        <div className="mb-10 max-w-xl empty:hidden">
+          <ContinueReading />
+        </div>
         <h2 className="text-2xl font-bold mb-2">The Library</h2>
         <p className="text-muted-foreground mb-10">
           Pick the book that matches your background and level.
@@ -117,26 +137,15 @@ export default function HomePage() {
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {booksWithCounts.map((book) => {
-            const isFeatured =
-              highlightActive && book.slug === FEATURED_BOOK_SLUG;
             return (
               <Link key={book.slug} href={`/books/${book.slug}`}>
                 <Card
-                  className={cn(
-                    "group h-full transition-all hover:shadow-lg hover:shadow-rust/5 hover:border-primary/30 cursor-pointer",
-                    isFeatured &&
-                    "border-primary/50 shadow-lg shadow-rust/10 ring-1 ring-primary/30 bg-gradient-to-br from-primary/5 to-transparent"
-                  )}
+                  className="group h-full transition-all hover:shadow-lg hover:shadow-rust/5 hover:border-primary/30 cursor-pointer"
                 >
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between mb-2">
                       <span className="text-3xl">{book.icon}</span>
                       <div className="flex items-center gap-2">
-                        {isFeatured && (
-                          <span className="inline-flex items-center rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
-                            Featured
-                          </span>
-                        )}
                         <LevelTooltip level={book.level} color={book.levelColor} />
                       </div>
                     </div>
@@ -210,9 +219,10 @@ export default function HomePage() {
           <div className="rounded-lg border border-border p-5">
             <h3 className="font-semibold mb-1.5">Why sign in with GitHub?</h3>
             <p className="text-sm text-muted-foreground">
-              Signing in syncs your reading progress, bookmarks, and preferences
-              to the cloud — so they follow you across devices. Without signing
-              in, everything is stored locally on your current browser.
+              Signing in syncs your reading progress, bookmarks, preferences,
+              solved exercises, quiz answers and review schedule to the cloud — so
+              they follow you across devices. Without signing in, everything is
+              stored locally in your current browser.
             </p>
           </div>
 
@@ -221,6 +231,17 @@ export default function HomePage() {
             <p className="text-sm text-muted-foreground">
               Chapters are automatically marked as read when you visit them. A
               progress bar on each book card shows how far you&apos;ve gone.
+            </p>
+          </div>
+
+          <div className="rounded-lg border border-border p-5">
+            <h3 className="font-semibold mb-1.5">What do you count?</h3>
+            <p className="text-sm text-muted-foreground">
+              Anonymous daily totals only: how many pages were viewed, visits,
+              exercises marked solved, quiz questions answered, review cards
+              graded and Playground runs.
+              No account, IP address or cookie is attached to those counts.
+              Cloudflare Web Analytics also measures page visits, without cookies.
             </p>
           </div>
 
@@ -263,7 +284,7 @@ export default function HomePage() {
             >
               microsoft/RustTraining
             </a>{" "}
-            — MIT & CC BY 4.0
+            — MIT & CC BY 4.0. Unofficial; not affiliated with or endorsed by Microsoft.
           </p>
           <div className="flex items-center gap-4">
             <a

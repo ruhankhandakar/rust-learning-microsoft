@@ -10,6 +10,5 @@ export interface Rust100ProjectEntry {
 
 export interface Rust100Manifest {
   upstreamRepo: string;
-  generatedAt: string;
   projects: Rust100ProjectEntry[];
 }

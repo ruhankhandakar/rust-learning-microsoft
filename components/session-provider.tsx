@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
 interface SessionUser {
+  id?: string;
   name?: string | null;
   email?: string | null;
   image?: string | null;

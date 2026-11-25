@@ -60,11 +60,10 @@ export function Rust100ProjectSourcePanel({
     async (nextPath: string) => {
       setLoading(true);
       try {
-        const query = new URLSearchParams({
-          chapterSlug,
-          path: nextPath,
-        }).toString();
-        const res = await fetch(`/api/rust-100-source?${query}`);
+        const url = ["/api/rust-100-source", chapterSlug, ...nextPath.split("/").filter(Boolean)]
+          .map((s, i) => (i === 0 ? s : encodeURIComponent(s)))
+          .join("/");
+        const res = await fetch(url);
         if (!res.ok) return;
         const data = await res.json();
         setCurrentPath(data.path ?? "");

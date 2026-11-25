@@ -11,6 +11,7 @@ import {
 } from "@/lib/rust-100-projects";
 import {
   listProjectSourceDir,
+  listRust100SourceParams,
   readProjectSourceFile,
   resolveProjectSourcePath,
 } from "@/lib/rust-100-project-source";
@@ -23,7 +24,11 @@ import { ChevronRight, ExternalLink, File, Folder } from "lucide-react";
 
 const BOOK_SLUG = "100-rust-projects";
 
-export const dynamic = "force-dynamic";
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return listRust100SourceParams();
+}
 
 const BASE_URL = "https://rust.learningz.xyz";
 
@@ -49,6 +54,7 @@ export async function generateMetadata({
   return {
     title,
     description: `Browse synced project files for ${titleBase} from emmaglorypraise/100rustprojects.`,
+    robots: { index: false, follow: true },
     openGraph: {
       title,
       url: `${BASE_URL}/books/${BOOK_SLUG}/${chapterSlug}/source${rel ? `/${rel}` : ""}`,

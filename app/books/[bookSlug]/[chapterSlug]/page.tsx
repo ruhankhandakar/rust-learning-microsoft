@@ -23,6 +23,13 @@ import {
   Rust100ProjectSourcePanel,
 } from "@/components/rust-100-project-source-panel";
 import { Rust100ProjectSourceMobile } from "@/components/rust-100-project-source-mobile";
+import { ReadingPosition } from "@/components/reading-position";
+import { ChapterQuiz } from "@/components/chapter-quiz";
+import { getChapterRunnable } from "@/lib/runnable";
+import { getChapterQuizzes } from "@/lib/quizzes";
+import { getConceptsForChapter } from "@/lib/concepts";
+import { chapterHasTakeaways } from "@/lib/takeaways";
+import { getChapterLastChange } from "@/lib/changelog";
 
 const MarkdownRenderer = dynamic(
   () => import("@/components/markdown-renderer").then((m) => m.MarkdownRenderer),
@@ -58,7 +65,7 @@ export async function generateMetadata({
   const description =
     bookSlug === "100-rust-projects"
       ? `Read "${chapter.title}" from ${book.title}. Notes from emmaglorypraise/100rustprojects.`
-      : `Read "${chapter.title}" from ${book.title}. Free Rust training by Microsoft.`;
+      : `Read "${chapter.title}" from ${book.title}, part of Microsoft's free RustTraining books.`;
   const url = `${BASE_URL}/books/${bookSlug}/${chapterSlug}`;
 
   return {
@@ -69,10 +76,8 @@ export async function generateMetadata({
       title,
       description,
       url,
-      siteName:
-      bookSlug === "100-rust-projects"
-        ? "100 Rust Projects | Ruhan Khandakar"
-        : "Rust Training by Microsoft | Ruhan Khandakar",
+      siteName: "Rust Training",
+      locale: "en_US",
     },
     twitter: {
       card: "summary",
@@ -82,6 +87,8 @@ export async function generateMetadata({
     alternates: { canonical: url },
   };
 }
+
+export const dynamicParams = false;
 
 export function generateStaticParams() {
   const params: { bookSlug: string; chapterSlug: string }[] = [];
@@ -132,28 +139,34 @@ export default async function ChapterPage({
         })()
       : [];
 
+  const isRust100 = bookSlug === "100-rust-projects";
+  const runnable = isRust100 ? undefined : getChapterRunnable(bookSlug, chapterSlug);
+  const quizzes = isRust100 ? [] : getChapterQuizzes(bookSlug, chapterSlug);
+  const concepts = isRust100 ? [] : getConceptsForChapter(bookSlug, chapterSlug);
+  const lastChange = getChapterLastChange(bookSlug, chapterSlug);
+  const upstreamUrl = isRust100
+    ? "https://github.com/emmaglorypraise/100rustprojects"
+    : `https://github.com/microsoft/RustTraining/blob/main/${book.dirName}/src/${chapterSlug}.md`;
+  const bookAuthor = isRust100
+    ? { "@type": "Person", name: "Glory Praise Emmanuel", url: "https://github.com/emmaglorypraise" }
+    : { "@type": "Organization", name: "Microsoft", url: "https://github.com/microsoft/RustTraining" };
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: current.title,
-    description:
-      bookSlug === "100-rust-projects"
-        ? `Project notes from ${book.title} (emmaglorypraise/100rustprojects).`
-        : `Read "${current.title}" from ${book.title}. Free Rust training curated by Microsoft | Ruhan Khandakar.`,
+    description: isRust100
+      ? `Project notes from ${book.title} (emmaglorypraise/100rustprojects).`
+      : `Read "${current.title}" from ${book.title}, part of Microsoft's free RustTraining books.`,
     url: `${BASE_URL}/books/${bookSlug}/${chapterSlug}`,
-    author: { "@type": "Person", name: "Ruhan Khandakar" },
-    publisher: { "@type": "Person", name: "Ruhan Khandakar" },
+    author: bookAuthor,
+    publisher: { "@type": "Person", name: "Ruhan Khandakar", url: "https://github.com/ruhankhandakar" },
+    isBasedOn: upstreamUrl,
+    ...(isRust100 ? {} : { license: "https://creativecommons.org/licenses/by/4.0/" }),
     isPartOf: {
       "@type": "Book",
       name: book.title,
-      author:
-        bookSlug === "100-rust-projects"
-          ? {
-              "@type": "Person",
-              name: "Glory Praise Emmanuel",
-              url: "https://github.com/emmaglorypraise",
-            }
-          : { "@type": "Organization", name: "Microsoft" },
+      author: bookAuthor,
     },
     inLanguage: "en",
     isAccessibleForFree: true,
@@ -166,8 +179,22 @@ export default async function ChapterPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       {bookSlug !== "100-rust-projects" && (
-        <ChapterReadMarker bookSlug={bookSlug} chapterSlug={chapterSlug} />
+        <ChapterReadMarker
+          bookSlug={bookSlug}
+          chapterSlug={chapterSlug}
+          reviewCardId={
+            chapterHasTakeaways(bookSlug, chapterSlug)
+              ? `takeaways:${bookSlug}/${chapterSlug}`
+              : undefined
+          }
+        />
       )}
+      <ReadingPosition
+        bookSlug={bookSlug}
+        chapterSlug={chapterSlug}
+        bookTitle={book.title}
+        chapterTitle={current.title}
+      />
       <ChapterKeyboardNav
         prevHref={prev ? `/books/${bookSlug}/${prev.slug}` : null}
         nextHref={next ? `/books/${bookSlug}/${next.slug}` : null}
@@ -226,6 +253,7 @@ export default async function ChapterPage({
                         content={markdown}
                         bookSlug={bookSlug}
                         chapterSlug={chapterSlug}
+                        runnable={runnable}
                       />
                     </ErrorBoundary>
                   </article>
@@ -254,14 +282,57 @@ export default async function ChapterPage({
                   content={markdown}
                   bookSlug={bookSlug}
                   chapterSlug={chapterSlug}
+                  runnable={runnable}
                 />
               </ErrorBoundary>
+              {quizzes.length > 0 && <ChapterQuiz questions={quizzes} />}
+              {concepts.length > 0 && (
+                <p className="mt-10 flex flex-wrap items-center gap-2 text-sm">
+                  <span className="text-muted-foreground">Topics in this chapter:</span>
+                  {concepts.map((c) => (
+                    <Link
+                      key={c.slug}
+                      href={`/concepts/${c.slug}`}
+                      className="rounded-full border border-border px-2.5 py-0.5 text-xs hover:border-primary/40 hover:text-primary transition-colors"
+                    >
+                      {c.title}
+                    </Link>
+                  ))}
+                </p>
+              )}
             </article>
           )}
 
           <nav
             className={`border-t border-border ${useRustSourceSplit ? "pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0" : ""}`}
           >
+            <p
+              className={`${useRustSourceSplit ? "w-full px-4 md:px-6 xl:px-8" : "mx-auto max-w-3xl px-6 md:px-10"} pt-6 text-xs text-muted-foreground`}
+            >
+              {isRust100 ? (
+                <>Notes by Glory Praise Emmanuel from </>
+              ) : (
+                <>From {book.title} by Microsoft (CC BY 4.0), reformatted for this unofficial reader, which is not affiliated with Microsoft. Source: </>
+              )}
+              <a
+                href={upstreamUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-2 hover:text-primary"
+              >
+                {isRust100 ? "emmaglorypraise/100rustprojects" : "view or suggest an edit on GitHub"}
+              </a>
+              .
+              {lastChange && (
+                <>
+                  {" "}Last changed upstream {lastChange} (
+                  <Link href={`/changes#${lastChange}`} className="underline underline-offset-2 hover:text-primary">
+                    what changed
+                  </Link>
+                  ).
+                </>
+              )}
+            </p>
             <p
               className={`${useRustSourceSplit ? "w-full px-4 md:px-6 xl:px-8" : "mx-auto max-w-3xl px-6 md:px-10"} pt-6 text-[11px] text-muted-foreground/50 text-center hidden sm:block`}
             >

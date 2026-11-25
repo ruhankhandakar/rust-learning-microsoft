@@ -1,5 +1,7 @@
 import fs from "fs";
 import path from "path";
+import { BOOKS } from "./books";
+import { slugify } from "./utils";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
 
@@ -111,13 +113,43 @@ export function getBookStructure(bookDir: string): BookStructure {
   return parseSummary(content);
 }
 
+const BOOK_SLUG_BY_DIR = new Map(BOOKS.map((b) => [b.dirName, b.slug]));
+
+// Upstream mdBook links (`ch02-x.md#Anchor`, `../../async-book/src/ch04.md`, `../async-book/`) → site routes.
+export function rewriteChapterHref(href: string): string {
+  const [target, fragment] = href.split("#", 2);
+  const hash = fragment ? `#${slugify(fragment)}` : "";
+  if (!target) return hash || href;
+
+  const crossBook = target.match(/^(?:\.\.\/)+([\w-]+)\/(?:src\/)?(.*)$/);
+  if (crossBook && BOOK_SLUG_BY_DIR.has(crossBook[1])) {
+    const page = crossBook[2].replace(/\.(md|html)$/, "").replace(/\/$/, "");
+    const bookUrl = `/books/${BOOK_SLUG_BY_DIR.get(crossBook[1])}`;
+    return !page || page.toLowerCase() === "summary" ? bookUrl : `${bookUrl}/${page}${hash}`;
+  }
+
+  const sibling = target.match(/^(?:\.\/)?([\w-]+)\.md$/);
+  return sibling ? `${sibling[1]}${hash}` : href;
+}
+
+function rewriteChapterLinks(markdown: string): string {
+  return markdown
+    .split(/(^[ \t]*```[\s\S]*?^[ \t]*```)/m)
+    .map((part, i) =>
+      i % 2
+        ? part
+        : part.replace(/(\]\(|href=")([^)\s"]+)/g, (_, pre, href) => pre + rewriteChapterHref(href))
+    )
+    .join("");
+}
+
 export function getChapterMarkdown(
   bookDir: string,
   chapterSlug: string
 ): string {
   const filePath = path.join(CONTENT_DIR, bookDir, `${chapterSlug}.md`);
   if (!fs.existsSync(filePath)) return "";
-  return fs.readFileSync(filePath, "utf-8");
+  return rewriteChapterLinks(fs.readFileSync(filePath, "utf-8"));
 }
 
 export function getChapterRawContent(
