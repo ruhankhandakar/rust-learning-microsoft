@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { BellRing, Check } from "lucide-react";
 import { GitHubSignIn } from "@/components/github-sign-in";
 import { useSessionLite } from "@/components/session-provider";
 import { ProgressRing } from "@/components/ui/progress-ring";
 import { setChallengeActive } from "@/lib/challenge-client";
 import type { ChallengeDay, ChallengeProgress } from "@/lib/challenge";
+import { CHALLENGE_OPENS_AT, challengeOpen } from "@/lib/challenge-launch";
 
 const TARGETS = { chapters: 30, readingDays: 15, quizzes: 25 };
 const primary =
@@ -18,6 +20,81 @@ async function call(body?: object): Promise<ChallengeProgress> {
 }
 
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+
+const subscribeSecond = (tick: () => void) => {
+  const t = setInterval(tick, 1000);
+  return () => clearInterval(t);
+};
+/** Current time to the second on the client, 0 during server render. */
+function useSecond(): number {
+  return useSyncExternalStore(subscribeSecond, () => Math.floor(Date.now() / 1000) * 1000, () => 0);
+}
+
+const opensIndia = "1 December 2026 at 00:00 India time";
+
+function Countdown({ now }: { now: number }) {
+  const left = Math.max(0, CHALLENGE_OPENS_AT - now) / 1000;
+  const parts = [
+    [Math.floor(left / 86400), "days"],
+    [Math.floor(left / 3600) % 24, "hours"],
+    [Math.floor(left / 60) % 60, "minutes"],
+    [Math.floor(left) % 60, "seconds"],
+  ] as const;
+  return (
+    <div role="timer" aria-label={`Opens in ${parts.map(([n, u]) => `${n} ${u}`).join(", ")}`} className="grid grid-cols-4 gap-2 sm:gap-3">
+      {parts.map(([n, unit]) => (
+        <div key={unit} aria-hidden="true" className="flex flex-col items-center gap-1 rounded-xl border border-border bg-background/60 px-2 py-3 sm:py-4">
+          <span className="font-heading text-3xl font-bold tabular-nums sm:text-5xl">{String(n).padStart(2, "0")}</span>
+          <span className="text-xs text-muted-foreground sm:text-sm">{unit}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function LaunchPanel({ now, signedIn, p, busy, act }: { now: number; signedIn: boolean; p: ChallengeProgress | null; busy: boolean; act: (body: object) => void }) {
+  const local = new Date(CHALLENGE_OPENS_AT).toLocaleString(undefined, { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
+  return (
+    <section aria-labelledby="launch-title" className="launch-panel flex flex-col gap-5 rounded-2xl border border-primary/40 p-5 sm:p-7">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 id="launch-title" className="text-xl font-bold sm:text-2xl">
+          Opens in
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          {opensIndia}, {local} your time
+        </p>
+      </div>
+      <Countdown now={now} />
+      <div aria-live="polite" className="flex flex-wrap items-center gap-3">
+        {!signedIn ? (
+          <>
+            <GitHubSignIn callbackURL="/challenge" label="Sign in to get a reminder" />
+            <span className="text-sm text-muted-foreground">We&apos;ll email you the day it opens. Free, no spam.</span>
+          </>
+        ) : !p ? null : p.checkedIn ? (
+          <>
+            <span className="inline-flex items-center gap-2 rounded-lg bg-emerald-500/15 px-3 py-2 text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+              <Check className="size-4" aria-hidden="true" />
+              You&apos;re checked in
+            </span>
+            <span className="text-sm text-muted-foreground">We&apos;ll email your GitHub address when it opens.</span>
+            <button type="button" disabled={busy} onClick={() => act({ action: "checkin", on: false })} className="text-sm text-muted-foreground underline-offset-2 hover:text-foreground hover:underline">
+              Cancel reminder
+            </button>
+          </>
+        ) : (
+          <>
+            <button type="button" className={primary} disabled={busy} onClick={() => act({ action: "checkin", on: true })}>
+              <BellRing className="mr-2 size-4" aria-hidden="true" />
+              Remind me on 1 December
+            </button>
+            <span className="text-sm text-muted-foreground">One email to your GitHub address the day it opens.</span>
+          </>
+        )}
+      </div>
+    </section>
+  );
+}
 
 function dayDate(startedAt: string | null, day: number): string | null {
   if (!startedAt) return null;
@@ -203,6 +280,7 @@ const EXAMPLE: ChallengeProgress = {
   completedAt: null,
   showOnWall: false,
   drawOptIn: false,
+  checkedIn: false,
   status: "active",
   today: 9,
   chapters: 11,
@@ -241,9 +319,13 @@ export function ChallengeBoard() {
     setBusy(false);
   }
 
-  const example = !isPending && !user;
+  const now = useSecond();
+  const prelaunch = now > 0 && !challengeOpen(now) && !p?.enrolled;
+  const example = (!isPending && !user) || (prelaunch && !!p);
   const shown = example ? EXAMPLE : p;
-  const headline = example
+  const headline = prelaunch
+    ? "Starts 1 December."
+    : example
     ? "Thirty days. Thirty chapters."
     : !p || p.status === "none"
       ? "Thirty days. Thirty chapters."
@@ -266,6 +348,8 @@ export function ChallengeBoard() {
         </ul>
       </div>
 
+      {prelaunch && !isPending && <LaunchPanel now={now} signedIn={!!user} p={p} busy={busy} act={act} />}
+
       <section aria-label="Your 30 days" className="rounded-2xl border border-border bg-card/60 p-5 sm:p-6">
         <div className="mb-5 flex flex-wrap items-baseline justify-between gap-2 font-mono text-[13px] text-muted-foreground">
           <span>cargo build --challenge --timings</span>
@@ -284,12 +368,14 @@ export function ChallengeBoard() {
       </section>
 
 
-      {isPending ? null : !user ? (
+      {isPending || now === 0 ? null : prelaunch ? (
+        <BuildLog p={EXAMPLE} />
+      ) : !user ? (
         <div className="flex flex-col gap-6">
           <BuildLog p={EXAMPLE} />
           <div className="flex flex-wrap items-center gap-4">
-          <GitHubSignIn callbackURL="/challenge" />
-          <span className="text-sm text-muted-foreground">Sign in to start. Free, and progress is counted on our server from the day you start.</span>
+            <GitHubSignIn callbackURL="/challenge" />
+            <span className="text-sm text-muted-foreground">Sign in to start. Free, and progress is counted on our server from the day you start.</span>
           </div>
         </div>
       ) : !p ? null : p.status === "none" || p.status === "expired" ? (

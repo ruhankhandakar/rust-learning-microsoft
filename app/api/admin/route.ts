@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
-import { clearFlags, isAdmin, revoke, setCommentStatus } from "@/lib/admin";
+import { clearFlags, isAdmin, markCheckinsEmailed, revoke, setCommentStatus } from "@/lib/admin";
 import { markShipped, redraw, runDraw } from "@/lib/swag";
 
-/** Owner-only actions: { action: "comment", id, status } | { action: "revoke", userId } | { action: "looks-fine", userId } | { action: "draw" } | { action: "redraw", winnerId } | { action: "shipped", winnerId }. */
+/** Owner-only actions: { action: "comment", id, status } | { action: "revoke", userId } | { action: "looks-fine", userId } | { action: "emailed", userIds } | { action: "draw" } | { action: "redraw", winnerId } | { action: "shipped", winnerId }. */
 export async function POST(request: Request) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!(await isAdmin(session?.user.id))) return new Response(null, { status: 404 });
@@ -31,6 +31,10 @@ export async function POST(request: Request) {
   }
   if (body.action === "looks-fine" && typeof body.userId === "string") {
     await clearFlags(body.userId);
+    return new Response(null, { status: 204 });
+  }
+  if (body.action === "emailed" && Array.isArray(body.userIds) && body.userIds.every((u) => typeof u === "string")) {
+    await markCheckinsEmailed(body.userIds as string[]);
     return new Response(null, { status: 204 });
   }
   if (body.action === "draw") {

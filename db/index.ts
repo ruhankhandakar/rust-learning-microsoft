@@ -84,6 +84,12 @@ interface SwagWinnersTable {
   shipped_at: string | null;
 }
 
+interface ChallengeCheckinsTable {
+  user_id: string;
+  created_at: string;
+  emailed_at: string | null;
+}
+
 interface SwagAddressesTable {
   winner_id: number;
   full_name: string;
@@ -150,6 +156,7 @@ interface Database {
   swag_draws: SwagDrawsTable;
   swag_winners: SwagWinnersTable;
   swag_addresses: SwagAddressesTable;
+  challenge_checkins: ChallengeCheckinsTable;
 }
 
 export const db = new Kysely<Database>({

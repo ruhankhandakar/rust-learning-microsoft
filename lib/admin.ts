@@ -112,6 +112,20 @@ export async function clearFlags(userId: string): Promise<void> {
   await db.updateTable("challenge_enrollment").set({ flags_cleared_at: new Date().toISOString() }).where("user_id", "=", userId).execute();
 }
 
+export async function listCheckins() {
+  return db
+    .selectFrom("challenge_checkins")
+    .innerJoin("user", "user.id", "challenge_checkins.user_id")
+    .select(["user.id", "user.name", "user.email", "challenge_checkins.created_at as checkedInAt", "challenge_checkins.emailed_at as emailedAt"])
+    .orderBy("challenge_checkins.created_at")
+    .execute();
+}
+
+export async function markCheckinsEmailed(userIds: string[]): Promise<void> {
+  if (userIds.length === 0) return;
+  await db.updateTable("challenge_checkins").set({ emailed_at: new Date().toISOString() }).where("user_id", "in", userIds).where("emailed_at", "is", null).execute();
+}
+
 /** Removes a finish: the badge, the wall listing and draw entry go with it. They may start again. */
 export async function revoke(userId: string): Promise<void> {
   await db
