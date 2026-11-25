@@ -18,6 +18,7 @@ import { APP_VERSION, CONTENT_LAST_UPDATED } from "@/lib/version";
 import { LocalTime } from "@/components/local-time";
 import { ContinueReading } from "@/components/continue-reading";
 import { ReviewDueBadge } from "@/components/review-due-badge";
+import { LogoMark } from "@/components/logo-mark";
 
 export const metadata: Metadata = {
   alternates: {
@@ -79,9 +80,7 @@ export default function HomePage() {
         <div className="relative mx-auto max-w-6xl px-6 py-8 md:py-12">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground text-lg font-bold">
-                🦀
-              </div>
+              <LogoMark size={36} />
               <span className="text-xs font-medium text-muted-foreground tracking-wide uppercase">
                 Rust Training · Unofficial reader
               </span>

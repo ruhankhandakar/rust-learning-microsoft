@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Geist, Geist_Mono, Inter, Lora, Merriweather, JetBrains_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Inter, Lora, Merriweather, JetBrains_Mono, Kode_Mono } from "next/font/google";
 
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -21,6 +21,11 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const kodeMono = Kode_Mono({
+  variable: "--font-kode-mono",
   subsets: ["latin"],
 });
 
@@ -113,7 +118,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${lora.variable} ${merriweather.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${kodeMono.variable} ${inter.variable} ${lora.variable} ${merriweather.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Script

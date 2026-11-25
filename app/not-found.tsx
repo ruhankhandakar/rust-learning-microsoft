@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { HomeButton } from "@/components/home-button";
+import { LogoMark } from "@/components/logo-mark";
 
 export default function NotFound() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center">
-      <span className="text-6xl mb-6">🦀</span>
+      <LogoMark size={72} className="mb-6" />
       <h1 className="text-7xl font-extrabold tracking-tight text-primary mb-2">
         404
       </h1>
