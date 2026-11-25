@@ -11,6 +11,7 @@ const NAV = [
   { href: "/practice", label: "Practice" },
   { href: "/concepts", label: "Topics" },
   { href: "/review", label: "Review", badge: true },
+  { href: "/challenge", label: "Challenge" },
 ];
 
 export async function SiteHeader() {

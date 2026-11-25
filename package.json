@@ -19,7 +19,8 @@
     "check:links": "tsx scripts/check-chapter-links.ts",
     "check:exercises": "tsx scripts/check-exercises.tsx",
     "check:concepts": "tsx scripts/check-concepts.tsx",
-    "check:learner-merge": "tsx scripts/check-learner-merge.ts"
+    "check:learner-merge": "tsx scripts/check-learner-merge.ts",
+    "check:challenge": "tsx scripts/check-challenge.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",

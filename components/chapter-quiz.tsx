@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Check, RotateCcw, X } from "lucide-react";
 import { recordQuizAnswer } from "@/lib/learner-store";
+import { reportChallenge } from "@/lib/challenge-client";
 import type { QuizQuestion } from "@/lib/quizzes";
 
 function Inline({ text }: { text: string }) {
@@ -36,6 +37,7 @@ function Question({ q, n }: { q: QuizQuestion; n: number }) {
     if (recorded.current) return;
     recorded.current = true;
     recordQuizAnswer(q.id, compiles === q.compiles);
+    void reportChallenge("quiz", q.id, { answer: compiles });
   };
 
   const choice = (compiles: boolean, label: string) => (

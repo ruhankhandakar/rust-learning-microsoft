@@ -55,6 +55,20 @@ interface ChapterFeedbackTable {
   created_at: Generated<string>;
 }
 
+interface ChallengeEnrollmentTable {
+  user_id: string;
+  started_at: string;
+  completed_at: string | null;
+  show_on_wall: Generated<number>;
+}
+
+interface ChallengeLogTable {
+  user_id: string;
+  kind: string;
+  ref: string;
+  at: string;
+}
+
 interface Database {
   reading_progress: ReadingProgressTable;
   user_preferences: UserPreferencesTable;
@@ -62,6 +76,8 @@ interface Database {
   learner_state: LearnerStateTable;
   activity_daily: ActivityDailyTable;
   chapter_feedback: ChapterFeedbackTable;
+  challenge_enrollment: ChallengeEnrollmentTable;
+  challenge_log: ChallengeLogTable;
 }
 
 export const db = new Kysely<Database>({

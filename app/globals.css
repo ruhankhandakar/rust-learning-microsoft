@@ -711,3 +711,14 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
 .backdrop-solid {
   color: color-mix(in oklch, var(--primary) 9%, transparent);
 }
+
+.challenge-skip {
+  background: repeating-linear-gradient(135deg, var(--color-amber-400) 0 3px, transparent 3px 6px);
+  opacity: 0.8;
+}
+
+.goal-ring { transition: stroke-dashoffset 1s cubic-bezier(.2, .7, .2, 1); }
+@starting-style { .goal-ring { stroke-dashoffset: 238.76; } }
+@media (prefers-reduced-motion: reduce) {
+  .goal-ring { transition: none; }
+}

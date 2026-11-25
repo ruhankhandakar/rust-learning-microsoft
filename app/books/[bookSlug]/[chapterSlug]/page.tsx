@@ -12,6 +12,7 @@ import { SearchTrigger } from "@/components/search-trigger";
 import { HomeButton } from "@/components/home-button";
 import { ShareMenu } from "@/components/share-menu";
 import { ChapterFeedback } from "@/components/chapter-feedback";
+import { ChallengeReadTracker } from "@/components/challenge-read-tracker";
 import { REPO_URL } from "@/lib/site-stats";
 import { SettingsDropdownLazy as SettingsDropdown } from "@/components/settings-dropdown-lazy";
 import { ArrowLeft, ArrowRight } from "lucide-react";
@@ -205,6 +206,7 @@ export default async function ChapterPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      {!isRust100 && <ChallengeReadTracker bookSlug={bookSlug} chapterSlug={chapterSlug} />}
       {bookSlug !== "100-rust-projects" && (
         <ChapterReadMarker
           bookSlug={bookSlug}

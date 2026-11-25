@@ -308,9 +308,9 @@ export default async function HomePage() {
               <p className="mb-5 max-w-xl text-muted-foreground">
                 Read 30 chapters on at least 15 days and get 25 quizzes right. Finish to earn the challenge badge, a spot on the finishers wall and a chance at Rust swag each quarter.
               </p>
-              <span className="inline-flex min-h-12 items-center rounded-[10px] border border-dashed border-primary/50 px-5 font-semibold text-muted-foreground">
-                Opens soon
-              </span>
+              <Link href="/challenge" className="inline-flex min-h-12 items-center rounded-[10px] bg-primary px-5 font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
+                Start the challenge
+              </Link>
             </div>
             <dl className="relative grid min-w-0 flex-[1_1_280px] grid-cols-3 gap-4">
               {CHALLENGE.map(([n, label, Icon]) => (
