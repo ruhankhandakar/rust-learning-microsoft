@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { reportChallenge, requestReadTicket } from "@/lib/challenge-client";
+import { CHALLENGE_ACTIVE_EVENT, reportChallenge, requestReadTicket } from "@/lib/challenge-client";
 
 /** Counts a chapter for the challenge once its end was reached and it stayed visible long enough. */
 export function ChallengeReadTracker({ bookSlug, chapterSlug }: { bookSlug: string; chapterSlug: string }) {
@@ -14,7 +14,7 @@ export function ChallengeReadTracker({ bookSlug, chapterSlug }: { bookSlug: stri
     let sent = false;
 
     const trySend = () => {
-      if (sent || !ticket || !reachedEnd || visibleSeconds < ticket.seconds) return;
+      if (sent || !ticket || !reachedEnd || visibleSeconds < ticket.seconds + 1) return;
       sent = true;
       clearInterval(clock);
       void reportChallenge("chapter", ref, { ticket: ticket.ticket });
@@ -34,19 +34,21 @@ export function ChallengeReadTracker({ bookSlug, chapterSlug }: { bookSlug: stri
     });
     if (end) io.observe(end);
 
-    requestReadTicket(ref).then((t) => {
-      if (cancelled) return;
-      if (!t) {
-        clearInterval(clock);
-        io.disconnect();
-        return;
-      }
-      ticket = t;
-      trySend();
-    });
+    const start = () =>
+      requestReadTicket(ref).then((t) => {
+        if (cancelled || !t) return;
+        // The server's clock starts at the ticket, so count visible time from here.
+        visibleSeconds = 0;
+        ticket = t;
+        trySend();
+      });
+    void start();
+    // On a new device the sign-in sync may set the flag after this page loaded.
+    window.addEventListener(CHALLENGE_ACTIVE_EVENT, start, { once: true });
 
     return () => {
       cancelled = true;
+      window.removeEventListener(CHALLENGE_ACTIVE_EVENT, start);
       clearInterval(clock);
       io.disconnect();
     };

@@ -5,10 +5,8 @@ import { getBookStructure } from "@/lib/content";
 import { getAllExercises } from "@/lib/exercises";
 import { getAllQuizzes } from "@/lib/quizzes";
 import { getAllTakeaways } from "@/lib/takeaways";
-import { HomeButton } from "@/components/home-button";
-import { SearchTrigger } from "@/components/search-trigger";
-import { SettingsDropdownLazy as SettingsDropdown } from "@/components/settings-dropdown-lazy";
 import { ReviewSession, type ReviewData } from "@/components/review-session";
+import { SiteHeader } from "@/components/site-header";
 
 const title = "Spaced review";
 const description =
@@ -66,15 +64,7 @@ const linkClass = "underline underline-offset-2 hover:text-primary";
 export default function ReviewPage() {
   return (
     <div className="min-h-screen flex flex-col">
-      <nav className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="mx-auto max-w-3xl px-6 flex items-center justify-between h-14">
-          <HomeButton />
-          <div className="flex items-center gap-2">
-            <SearchTrigger />
-            <SettingsDropdown />
-          </div>
-        </div>
-      </nav>
+      <SiteHeader />
 
       <main className="mx-auto max-w-3xl w-full px-6 py-10 flex-1">
         <h1 className="text-2xl lg:text-3xl font-bold tracking-tight mb-2">{title}</h1>

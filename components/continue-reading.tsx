@@ -2,10 +2,12 @@
 
 import { BookOpen, ChevronRight } from "lucide-react";
 import { useLearnerStore } from "@/lib/learner-store";
+import { useSessionLite } from "@/components/session-provider";
 
-export function ContinueReading({ bookSlug }: { bookSlug?: string }) {
+export function ContinueReading({ bookSlug, signedOutOnly }: { bookSlug?: string; signedOutOnly?: boolean }) {
   const last = useLearnerStore("lastRead");
-  if (!last || (bookSlug && last.bookSlug !== bookSlug)) return null;
+  const { user } = useSessionLite();
+  if (!last || (bookSlug && last.bookSlug !== bookSlug) || (signedOutOnly && user)) return null;
 
   const href = `/books/${last.bookSlug}/${last.chapterSlug}${last.headingId ? `#${last.headingId}` : ""}`;
   return (

@@ -2,9 +2,6 @@ import type { Metadata } from "next";
 import fs from "fs";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { HomeButton } from "@/components/home-button";
-import { SearchTrigger } from "@/components/search-trigger";
-import { SettingsDropdownLazy as SettingsDropdown } from "@/components/settings-dropdown-lazy";
 import {
   getRust100ProjectByChapterSlug,
   loadRust100Manifest,
@@ -21,6 +18,7 @@ import {
 } from "@/lib/rust-100-projects-public";
 import { Rust100SourceCopyButton } from "@/components/rust-100-source-copy-button";
 import { ChevronRight, ExternalLink, File, Folder } from "lucide-react";
+import { SiteHeader } from "@/components/site-header";
 
 const BOOK_SLUG = "100-rust-projects";
 
@@ -91,10 +89,9 @@ export default async function Rust100SourcePage({
 
     return (
       <div className="min-h-screen flex flex-col">
-        <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
-          <div className="flex items-center gap-2 px-4 h-14 flex-wrap">
-            <HomeButton />
-            <span className="text-muted-foreground">/</span>
+        <SiteHeader />
+      <div className="z-30 border-b border-border bg-background/90 backdrop-blur-md lg:sticky lg:top-[60px]">
+          <div className="flex items-center gap-2 px-4 min-h-11 flex-wrap">
             <Link
               href={`/books/${BOOK_SLUG}`}
               className="text-sm text-muted-foreground hover:text-primary"
@@ -110,12 +107,8 @@ export default async function Rust100SourcePage({
             </Link>
             <span className="text-muted-foreground">/</span>
             <span className="text-sm font-medium truncate">Source</span>
-            <div className="ml-auto flex items-center gap-2 shrink-0">
-              <SearchTrigger />
-              <SettingsDropdown />
-            </div>
           </div>
-        </header>
+        </div>
 
         <div className="mx-auto max-w-4xl w-full px-6 py-6 flex-1">
           <nav className="flex flex-wrap items-center gap-1 text-sm text-muted-foreground mb-4">
@@ -235,10 +228,9 @@ export default async function Rust100SourcePage({
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="flex items-center gap-2 px-4 h-14 flex-wrap">
-          <HomeButton />
-          <span className="text-muted-foreground">/</span>
+      <SiteHeader />
+      <div className="z-30 border-b border-border bg-background/90 backdrop-blur-md lg:sticky lg:top-[60px]">
+        <div className="flex items-center gap-2 px-4 min-h-11 flex-wrap">
           <Link
             href={`/books/${BOOK_SLUG}`}
             className="text-sm text-muted-foreground hover:text-primary"
@@ -254,12 +246,8 @@ export default async function Rust100SourcePage({
           </Link>
           <span className="text-muted-foreground">/</span>
           <span className="text-sm font-medium truncate">Source</span>
-          <div className="ml-auto flex items-center gap-2 shrink-0">
-            <SearchTrigger />
-            <SettingsDropdown />
-          </div>
         </div>
-      </header>
+      </div>
 
       <div className="mx-auto max-w-4xl w-full px-6 py-6 flex-1">
         <nav className="flex flex-wrap items-center gap-1 text-sm text-muted-foreground mb-4">

@@ -75,6 +75,78 @@ async function main() {
   ok(p.status === "expired", "an unfinished attempt expires after 30 days");
   p = await join(U);
   ok(p.status === "active" && p.chapters === 0, "starting again resets the log");
+  // Achievements, badge visibility and the finishers wall
+  const { getAchievements, recordQuizResult, setPublic } = await import("../lib/achievements");
+  const { getFinisher, getFinishers } = await import("../lib/finishers");
+  await db.deleteFrom("reading_progress").where("user_id", "=", U).execute();
+  let a = await getAchievements(U);
+  ok(a !== null && a.tier === null && !a.isPublic, "a new learner has no tier and a private profile");
+  for (let i = 0; i < 15; i++) await db.insertInto("reading_progress").values({ user_id: U, book_slug: chapters[i].split("/")[0], chapter_slug: chapters[i].split("/")[1], read_at: start }).execute();
+  a = await getAchievements(U);
+  ok(a!.chapters === 15 && a!.tier === "Starter", `15 chapters and no quizzes is Starter (${a!.tier})`);
+  ok(!(await recordQuizResult(U, "no-such-quiz", true)), "unknown quiz is rejected");
+  for (let i = 0; i < 10; i++) await recordQuizResult(U, quizzes[i].id, quizzes[i].compiles);
+  await recordQuizResult(U, quizzes[0].id, !quizzes[0].compiles);
+  a = await getAchievements(U);
+  ok(a!.quizzesRight === 10 && a!.quizzesAnswered === 10, "only the first answer per quiz is stored");
+  ok(a!.tier === "Bronze", `15 chapters and 10 quizzes at 100% is Bronze (${a!.tier})`);
+  for (let i = 10; i < 16; i++) await recordQuizResult(U, quizzes[i].id, !quizzes[i].compiles);
+  a = await getAchievements(U);
+  ok(a!.tier === "Starter", `accuracy under 70% drops back to Starter (${Math.round(a!.accuracy * 100)}%)`);
+  await setPublic(U, true);
+  ok((await getAchievements(U))!.isPublic, "profile can be made public");
+
+  await db.updateTable("challenge_enrollment").set({ completed_at: new Date().toISOString(), show_on_wall: 0 }).where("user_id", "=", U).execute();
+  ok((await getFinisher(U)) === null && !(await getFinishers()).some((f) => f.id === U), "a finisher who did not opt in stays off the wall");
+  await db.updateTable("challenge_enrollment").set({ show_on_wall: 1 }).where("user_id", "=", U).execute();
+  const f = await getFinisher(U);
+  ok(f !== null && (await getFinishers()).some((x) => x.id === U), "an opted-in finisher is on the wall");
+
+  // Swag draw, claims and revoking
+  const { runDraw, eligibleFinishers, claim, parseAddress, markShipped, getWinnerByToken } = await import("../lib/swag");
+  const { revoke, isAdmin } = await import("../lib/admin");
+  const V = "challenge-test-other";
+  await sql`INSERT OR IGNORE INTO user (id, name, email, emailVerified, createdAt, updatedAt) VALUES (${V}, 'Other', 'other@example.invalid', 0, datetime('now'), datetime('now'))`.execute(db);
+  await db.updateTable("challenge_enrollment").set({ draw_opt_in: 0 }).where("user_id", "=", U).execute();
+  ok(!(await eligibleFinishers()).some((e) => e.id === U), "a finisher without the draw switch is not eligible");
+  await db.updateTable("challenge_enrollment").set({ draw_opt_in: 1 }).where("user_id", "=", U).execute();
+  ok((await eligibleFinishers()).some((e) => e.id === U), "a finisher with the draw switch is eligible");
+  const first = await runDraw();
+  ok(first.ok, "the quarter's draw runs");
+  ok(!(await runDraw()).ok, "a quarter is drawn only once");
+  const won = await db.selectFrom("swag_winners").selectAll().where("user_id", "=", U).executeTakeFirst();
+  ok(!!won && !(await eligibleFinishers()).some((e) => e.id === U), "a winner can't win again");
+  const address = { fullName: "Test Winner", line1: "1 Test Road", city: "Pune", state: "Maharashtra", postcode: "411001", phone: "+91 98765 43210", adult: true };
+  ok(parseAddress({ ...address, postcode: "4110" }) === null && parseAddress({ ...address, adult: false }) === null, "bad PIN code or no 18+ box is rejected");
+  ok(!(await claim(won!.claim_token, V, parseAddress(address)!)).ok, "another account can't claim the prize");
+  ok((await claim(won!.claim_token, U, parseAddress(address)!)).ok, "the winner can claim");
+  ok(!(await claim(won!.claim_token, U, parseAddress(address)!)).ok, "a prize can't be claimed twice");
+  await markShipped(won!.id);
+  const addr = await db.selectFrom("swag_addresses").selectAll().where("winner_id", "=", won!.id).executeTakeFirst();
+  ok(!addr && (await getWinnerByToken(won!.claim_token))!.status === "shipped", "shipping deletes the address");
+  const { redraw } = await import("../lib/swag");
+  const W = "challenge-test-lapsed", X = "challenge-test-next", iso = (ms: number) => new Date(ms).toISOString();
+  for (const id of [W, X]) {
+    await sql`INSERT OR IGNORE INTO user (id, name, email, emailVerified, createdAt, updatedAt) VALUES (${id}, ${id}, ${id + "@example.invalid"}, 0, datetime('now'), datetime('now'))`.execute(db);
+    await db.insertInto("challenge_enrollment").values({ user_id: id, started_at: iso(realNow() - 40 * 86400000), completed_at: iso(realNow() - 20 * 86400000), show_on_wall: 0, draw_opt_in: 1 }).execute();
+  }
+  const past = await db.insertInto("swag_draws").values({ quarter: "2000-Q1", seed: "checkseed", drawn_at: iso(realNow()) }).returning("id").executeTakeFirstOrThrow();
+  const lapsed = await db.insertInto("swag_winners").values({ draw_id: past.id, user_id: W, prize: "Sticker pack", claim_token: "lapsed-token", claim_by: iso(realNow() + 86400000) }).returning("id").executeTakeFirstOrThrow();
+  ok(!(await redraw(lapsed.id)).ok, "a prize still inside its claim window can't be redrawn");
+  await db.updateTable("swag_winners").set({ claim_by: iso(realNow() - 86400000) }).where("id", "=", lapsed.id).execute();
+  ok((await redraw(lapsed.id)).ok, "an expired, unclaimed prize can be redrawn");
+  const replacement = await db.selectFrom("swag_winners").selectAll().where("draw_id", "=", past.id).where("user_id", "=", X).executeTakeFirst();
+  ok(replacement?.prize === "Sticker pack" && Date.parse(replacement.claim_by) > realNow(), "the redraw gives the same prize to another entrant with a fresh claim window");
+  ok(!(await redraw(lapsed.id)).ok, "an expired prize is redrawn only once");
+  ok(!(await claim("lapsed-token", W, parseAddress(address)!)).ok, "the lapsed winner's link no longer works");
+  ok(!(await eligibleFinishers(past.id)).some((e) => e.id === W), "the lapsed winner isn't picked again in the same draw");
+  ok((await eligibleFinishers()).some((e) => e.id === W), "the lapsed winner can enter later quarters");
+
+  await revoke(U);
+  ok((await getFinisher(U)) === null && (await getProgress(U)).status !== "complete", "revoking removes the finish and the wall listing");
+  delete process.env.ADMIN_GITHUB_ID;
+  ok(!(await isAdmin(U)), "without ADMIN_GITHUB_ID nobody is admin");
+
   console.log(failed ? `${failed} FAILED` : "all passed");
   process.exit(failed ? 1 : 0);
 }

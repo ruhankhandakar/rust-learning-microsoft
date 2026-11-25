@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Rss } from "lucide-react";
 import { formatChangeDate, getChangelog } from "@/lib/changelog";
-import { HomeButton } from "@/components/home-button";
-import { SearchTrigger } from "@/components/search-trigger";
-import { SettingsDropdownLazy as SettingsDropdown } from "@/components/settings-dropdown-lazy";
+import { SiteHeader } from "@/components/site-header";
 
 const title = "What changed in the books";
 const description =
@@ -37,15 +35,7 @@ export default function ChangesPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <nav className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="mx-auto max-w-3xl px-6 flex items-center justify-between h-14">
-          <HomeButton />
-          <div className="flex items-center gap-2">
-            <SearchTrigger />
-            <SettingsDropdown />
-          </div>
-        </div>
-      </nav>
+      <SiteHeader />
 
       <main className="mx-auto max-w-3xl w-full px-6 py-10 flex-1">
         <h1 className="text-2xl lg:text-3xl font-bold tracking-tight mb-2">{title}</h1>

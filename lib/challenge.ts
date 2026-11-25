@@ -21,6 +21,7 @@ export interface ChallengeProgress {
   startedAt: string | null;
   completedAt: string | null;
   showOnWall: boolean;
+  drawOptIn: boolean;
   status: "none" | "active" | "complete" | "expired";
   today: number;
   chapters: number;
@@ -61,6 +62,7 @@ export async function getProgress(userId: string): Promise<ChallengeProgress> {
     startedAt: null,
     completedAt: null,
     showOnWall: false,
+    drawOptIn: false,
     status: "none",
     today: 0,
     chapters: 0,
@@ -91,6 +93,7 @@ export async function getProgress(userId: string): Promise<ChallengeProgress> {
     startedAt: enrollment.started_at,
     completedAt: enrollment.completed_at,
     showOnWall: enrollment.show_on_wall === 1,
+    drawOptIn: enrollment.draw_opt_in === 1,
     status: enrollment.completed_at ? "complete" : today > CHALLENGE.days ? "expired" : "active",
     today,
     chapters,
@@ -233,4 +236,8 @@ export async function join(userId: string): Promise<ChallengeProgress> {
 
 export async function setShowOnWall(userId: string, show: boolean): Promise<void> {
   await db.updateTable("challenge_enrollment").set({ show_on_wall: show ? 1 : 0 }).where("user_id", "=", userId).execute();
+}
+
+export async function setDrawOptIn(userId: string, optIn: boolean): Promise<void> {
+  await db.updateTable("challenge_enrollment").set({ draw_opt_in: optIn ? 1 : 0 }).where("user_id", "=", userId).execute();
 }

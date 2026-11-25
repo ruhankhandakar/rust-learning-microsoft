@@ -10,9 +10,6 @@ import {
   Layers,
   FileText,
 } from "lucide-react";
-import { SearchTrigger } from "@/components/search-trigger";
-import { SettingsDropdownLazy as SettingsDropdown } from "@/components/settings-dropdown-lazy";
-import { HomeButton } from "@/components/home-button";
 import { BookProgressBar } from "@/components/book-progress";
 import { ContinueReading } from "@/components/continue-reading";
 import { ChapterCheckmark } from "@/components/chapter-checkmark";
@@ -20,6 +17,7 @@ import { BookCacheTrigger } from "@/components/book-cache-trigger";
 import { APP_VERSION } from "@/lib/version";
 import { loadRust100Manifest } from "@/lib/rust-100-projects";
 import { Rust100ProjectsHub } from "@/components/rust-100-projects-hub";
+import { SiteHeader } from "@/components/site-header";
 
 const LEVEL_STYLES: Record<string, string> = {
   green:
@@ -81,6 +79,7 @@ export default async function BookPage({
     const manifest = loadRust100Manifest();
     return (
       <Rust100ProjectsHub
+        header={<SiteHeader />}
         book={book}
         projects={manifest.projects}
         totalChapters={structure.flatChapters.length}
@@ -92,16 +91,7 @@ export default async function BookPage({
   return (
     <div className="min-h-screen flex flex-col">
       <BookCacheTrigger bookSlug={bookSlug} chapterSlugs={allChapterSlugs} />
-      {/* Top nav */}
-      <nav className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="mx-auto max-w-5xl px-6 flex items-center justify-between h-14">
-          <HomeButton />
-            <div className="flex items-center gap-2">
-              <SearchTrigger />
-              <SettingsDropdown />
-            </div>
-        </div>
-      </nav>
+      <SiteHeader />
 
       <div className="mx-auto max-w-5xl w-full px-6 flex-1">
         {/* Two-column layout on desktop */}

@@ -60,6 +60,48 @@ interface ChallengeEnrollmentTable {
   started_at: string;
   completed_at: string | null;
   show_on_wall: Generated<number>;
+  draw_opt_in: Generated<number>;
+  revoked_at: string | null;
+}
+
+interface SwagDrawsTable {
+  id: Generated<number>;
+  quarter: string;
+  seed: string;
+  drawn_at: string;
+}
+
+interface SwagWinnersTable {
+  id: Generated<number>;
+  draw_id: number;
+  user_id: string;
+  prize: string;
+  claim_token: string;
+  status: Generated<string>;
+  claim_by: string;
+  claimed_at: string | null;
+  shipped_at: string | null;
+}
+
+interface SwagAddressesTable {
+  winner_id: number;
+  full_name: string;
+  line1: string;
+  line2: string | null;
+  city: string;
+  state: string;
+  postcode: string;
+  phone: string;
+  size: string | null;
+  colour: string | null;
+  created_at: string;
+}
+
+interface AccountTable {
+  id: string;
+  userId: string;
+  providerId: string;
+  accountId: string;
 }
 
 interface ChallengeLogTable {
@@ -67,6 +109,27 @@ interface ChallengeLogTable {
   kind: string;
   ref: string;
   at: string;
+}
+
+interface QuizResultsTable {
+  user_id: string;
+  quiz_id: string;
+  correct: number;
+  answered_at: string;
+}
+
+interface LearnerProfileTable {
+  user_id: string;
+  is_public: Generated<number>;
+  updated_at: Generated<string>;
+}
+
+interface UserTable {
+  id: string;
+  name: string;
+  email: string;
+  image: string | null;
+  createdAt: string;
 }
 
 interface Database {
@@ -78,6 +141,13 @@ interface Database {
   chapter_feedback: ChapterFeedbackTable;
   challenge_enrollment: ChallengeEnrollmentTable;
   challenge_log: ChallengeLogTable;
+  quiz_results: QuizResultsTable;
+  learner_profile: LearnerProfileTable;
+  user: UserTable;
+  account: AccountTable;
+  swag_draws: SwagDrawsTable;
+  swag_winners: SwagWinnersTable;
+  swag_addresses: SwagAddressesTable;
 }
 
 export const db = new Kysely<Database>({

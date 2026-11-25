@@ -73,10 +73,6 @@ async function createViewer(host: HTMLDivElement, onReady: () => void): Promise<
     const preview = await load(`/3d/${who}-preview.glb`);
     if (disposed || wanted !== who) return;
     place(preview);
-    const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
-    if (conn?.saveData) return;
-    const full = await load(`/3d/${who}-full.glb`);
-    if (!disposed && wanted === who) place(full);
   }
 
   const resize = () => {
@@ -114,7 +110,7 @@ async function createViewer(host: HTMLDivElement, onReady: () => void): Promise<
   };
 }
 
-export function SwagPreview() {
+export function SwagPreview({ large = false }: { large?: boolean }) {
   const [who, setWho] = useState<Who>("male");
   const [ready, setReady] = useState(false);
   const hostRef = useRef<HTMLDivElement>(null);
@@ -156,8 +152,8 @@ export function SwagPreview() {
   }
 
   return (
-    <div className="flex flex-col items-center gap-3">
-      <div className="relative aspect-[900/1300] w-full max-w-[220px] overflow-hidden">
+    <div className="flex w-full flex-col items-center gap-3">
+      <div className={`relative aspect-[900/1300] w-full overflow-hidden ${large ? "max-w-[340px]" : "max-w-[220px]"}`}>
         <Image
           src={`/3d/${who}-poster.webp`}
           alt={model.alt}

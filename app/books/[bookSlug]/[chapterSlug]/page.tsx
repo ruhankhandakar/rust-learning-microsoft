@@ -8,13 +8,10 @@ import { ChapterSidebar } from "@/components/chapter-sidebar";
 import { MobileNav } from "@/components/mobile-nav";
 import { ChapterReadMarker } from "@/components/chapter-read-marker";
 import { ErrorBoundary } from "@/components/error-boundary";
-import { SearchTrigger } from "@/components/search-trigger";
-import { HomeButton } from "@/components/home-button";
 import { ShareMenu } from "@/components/share-menu";
 import { ChapterFeedback } from "@/components/chapter-feedback";
 import { ChallengeReadTracker } from "@/components/challenge-read-tracker";
 import { REPO_URL } from "@/lib/site-stats";
-import { SettingsDropdownLazy as SettingsDropdown } from "@/components/settings-dropdown-lazy";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { ChapterKeyboardNav } from "@/components/chapter-keyboard-nav";
 import { loadRust100Manifest, getRust100ProjectByChapterSlug } from "@/lib/rust-100-projects";
@@ -34,6 +31,7 @@ import { getChapterQuizzes } from "@/lib/quizzes";
 import { getConceptsForChapter } from "@/lib/concepts";
 import { chapterHasTakeaways } from "@/lib/takeaways";
 import { getChapterLastChange } from "@/lib/changelog";
+import { SiteHeader } from "@/components/site-header";
 
 const MarkdownRenderer = dynamic(
   () => import("@/components/markdown-renderer").then((m) => m.MarkdownRenderer),
@@ -84,7 +82,7 @@ export async function generateMetadata({
       locale: "en_US",
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title,
       description,
     },
@@ -229,39 +227,30 @@ export default async function ChapterPage({
         nextHref={next ? `/books/${bookSlug}/${next.slug}` : null}
       />
 
-      <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="flex items-center gap-3 px-4 h-14">
+      <SiteHeader />
+      <div className="z-30 border-b border-border bg-background/90 backdrop-blur-md lg:sticky lg:top-[60px]">
+        <div className="flex h-11 items-center gap-3 px-4">
           <MobileNav
             book={book}
             structure={structure}
             currentSlug={chapterSlug}
           />
-          <HomeButton />
-          <span className="text-muted-foreground">/</span>
           <Link
             href={`/books/${bookSlug}`}
-            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors shrink-0"
+            className="flex shrink-0 items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-primary"
           >
-            <span className="hidden sm:inline font-medium">
-              {book.shortTitle}
-            </span>
-            <span className="sm:hidden font-medium">{book.icon}</span>
+            <span className="hidden font-medium sm:inline">{book.shortTitle}</span>
+            <span className="font-medium sm:hidden">{book.icon}</span>
           </Link>
           <span className="text-muted-foreground">/</span>
-          <span className="text-sm font-medium truncate flex-1">
-            {current.title}
-          </span>
-          <div className="flex items-center gap-2 shrink-0">
-            <ShareMenu url={chapterUrl} title={`${current.title}, ${book.title}`} />
-            <SearchTrigger />
-            <SettingsDropdown />
-          </div>
+          <span className="flex-1 truncate text-sm font-medium">{current.title}</span>
+          <ShareMenu url={chapterUrl} title={`${current.title}, ${book.title}`} />
         </div>
-      </header>
+      </div>
 
       <div className="flex flex-1">
         <aside className="hidden lg:flex w-72 shrink-0 border-r border-border">
-          <div className="sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto p-4 w-full">
+          <div className="sticky top-[104px] h-[calc(100vh-104px)] overflow-y-auto p-4 w-full">
             <ChapterSidebar
               book={book}
               structure={structure}
@@ -288,7 +277,7 @@ export default async function ChapterPage({
                     </ErrorBoundary>
                     {endOfChapter}
                   </article>
-                  <aside className="hidden lg:block w-full lg:w-[min(42rem,48%)] shrink-0 lg:sticky lg:top-[4.5rem] lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto">
+                  <aside className="hidden lg:block w-full lg:w-[min(42rem,48%)] shrink-0 lg:sticky lg:top-[7.5rem] lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
                     <Rust100ProjectSourcePanel
                       chapterSlug={chapterSlug}
                       projectDir={rustProjectDir}
@@ -306,6 +295,27 @@ export default async function ChapterPage({
             </>
           ) : (
             <article className="mx-auto max-w-3xl px-6 md:px-10 py-10">
+              {(lastChange || concepts.length > 0) && (
+                <div className="mb-6 flex flex-wrap items-center gap-2 text-sm">
+                  {lastChange && (
+                    <span className="mr-2 text-muted-foreground">
+                      Last changed upstream on{" "}
+                      <Link href={`/changes#${lastChange}`} className="underline underline-offset-2 hover:text-primary">
+                        {lastChange}
+                      </Link>
+                    </span>
+                  )}
+                  {concepts.map((c) => (
+                    <Link
+                      key={c.slug}
+                      href={`/concepts/${c.slug}`}
+                      className="rounded-full border border-border px-3 py-1 text-xs transition-colors hover:border-primary/40 hover:text-primary"
+                    >
+                      Topic: {c.title}
+                    </Link>
+                  ))}
+                </div>
+              )}
               <ErrorBoundary>
                 {bookSlug === "100-rust-projects" &&
                   chapterSlug === "glossary" && <Rust100ProjectGlossaryToolbar />}
@@ -317,20 +327,6 @@ export default async function ChapterPage({
                 />
               </ErrorBoundary>
               {quizzes.length > 0 && <ChapterQuiz questions={quizzes} />}
-              {concepts.length > 0 && (
-                <p className="mt-10 flex flex-wrap items-center gap-2 text-sm">
-                  <span className="text-muted-foreground">Topics in this chapter:</span>
-                  {concepts.map((c) => (
-                    <Link
-                      key={c.slug}
-                      href={`/concepts/${c.slug}`}
-                      className="rounded-full border border-border px-2.5 py-0.5 text-xs hover:border-primary/40 hover:text-primary transition-colors"
-                    >
-                      {c.title}
-                    </Link>
-                  ))}
-                </p>
-              )}
               {endOfChapter}
             </article>
           )}

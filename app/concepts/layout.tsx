@@ -1,19 +1,9 @@
-import { HomeButton } from "@/components/home-button";
-import { SearchTrigger } from "@/components/search-trigger";
-import { SettingsDropdownLazy as SettingsDropdown } from "@/components/settings-dropdown-lazy";
+import { SiteHeader } from "@/components/site-header";
 
 export default function ConceptsLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col">
-      <nav className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="mx-auto max-w-3xl px-6 flex items-center justify-between h-14">
-          <HomeButton />
-          <div className="flex items-center gap-2">
-            <SearchTrigger />
-            <SettingsDropdown />
-          </div>
-        </div>
-      </nav>
+      <SiteHeader />
 
       <main className="mx-auto max-w-3xl w-full px-6 py-10 flex-1">{children}</main>
 

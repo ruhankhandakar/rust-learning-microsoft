@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useSessionLite } from "./session-provider";
+import { setChallengeActive, syncChallengeFlag } from "@/lib/challenge-client";
 import { sanitizeState } from "@/lib/learner-merge";
 import {
   exportState,
@@ -15,7 +16,14 @@ const PUSH_DELAY_MS = 4000;
 
 /** Syncs solved exercises, quiz answers, review cards and last position to the account when signed in. */
 export function LearnerSync() {
-  const userId = useSessionLite().user?.id;
+  const { user, isPending } = useSessionLite();
+  const userId = user?.id;
+
+  useEffect(() => {
+    if (isPending) return;
+    if (userId) void syncChallengeFlag();
+    else setChallengeActive(false);
+  }, [userId, isPending]);
 
   useEffect(() => {
     if (!userId) return;

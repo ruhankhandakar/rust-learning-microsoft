@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { Check, RotateCcw, X } from "lucide-react";
 import { recordQuizAnswer } from "@/lib/learner-store";
 import { reportChallenge } from "@/lib/challenge-client";
+import { useSessionLite } from "@/components/session-provider";
 import type { QuizQuestion } from "@/lib/quizzes";
 
 function Inline({ text }: { text: string }) {
@@ -26,6 +27,7 @@ const choiceClass =
   "inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
 function Question({ q, n }: { q: QuizQuestion; n: number }) {
+  const { user } = useSessionLite();
   const [answer, setAnswer] = useState<boolean | null>(null);
   const firstChoice = useRef<HTMLButtonElement>(null);
   const recorded = useRef(false);
@@ -38,6 +40,13 @@ function Question({ q, n }: { q: QuizQuestion; n: number }) {
     recorded.current = true;
     recordQuizAnswer(q.id, compiles === q.compiles);
     void reportChallenge("quiz", q.id, { answer: compiles });
+    if (user)
+      fetch("/api/achievements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "quiz", quizId: q.id, answer: compiles }),
+        keepalive: true,
+      }).catch(() => {});
   };
 
   const choice = (compiles: boolean, label: string) => (
@@ -60,7 +69,7 @@ function Question({ q, n }: { q: QuizQuestion; n: number }) {
   );
 
   return (
-    <li id={`quiz-${q.id}`} className="scroll-mt-20 rounded-lg border border-border p-4">
+    <li id={`quiz-${q.id}`} className="scroll-mt-28 rounded-lg border border-border p-4">
       <p className="text-sm font-medium">
         <span className="text-muted-foreground">{n}. </span>
         <Inline text={q.change} />
@@ -70,7 +79,7 @@ function Question({ q, n }: { q: QuizQuestion; n: number }) {
           Was: <code className="font-mono">{q.original.trim()}</code>
         </p>
       )}
-      <pre className="mt-3 overflow-x-auto rounded-lg border border-[oklch(0.24_0.006_260)] bg-[oklch(0.155_0.005_260)] py-3 text-sm leading-relaxed text-[oklch(0.82_0.008_260)]">
+      <pre className="relative mt-3 overflow-x-auto rounded-lg border border-[var(--code-border)] bg-[var(--code-surface)] py-3 text-sm leading-relaxed text-[var(--code-ink)]">
         <code className="block min-w-max font-mono">
           {q.code.split("\n").map((line, i) => {
             const changed = i + 1 === q.changedLine;
@@ -81,7 +90,7 @@ function Question({ q, n }: { q: QuizQuestion; n: number }) {
               >
                 <span
                   aria-hidden
-                  className={`inline-block w-10 select-none pr-3 text-right ${changed ? "font-semibold text-rust" : "text-[oklch(0.5_0.01_260)]"}`}
+                  className={`inline-block w-10 select-none pr-3 text-right ${changed ? "font-semibold text-rust" : "text-[var(--syntax-comment)]"}`}
                 >
                   {i + 1}
                 </span>

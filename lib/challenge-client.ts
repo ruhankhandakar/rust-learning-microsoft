@@ -1,9 +1,23 @@
 const FLAG = "rt:challenge-active";
+export const CHALLENGE_ACTIVE_EVENT = "rs:challenge-active";
 
 export function setChallengeActive(active: boolean) {
   try {
+    if (active === (localStorage.getItem(FLAG) === "1")) return;
     if (active) localStorage.setItem(FLAG, "1");
     else localStorage.removeItem(FLAG);
+  } catch {
+    return;
+  }
+  if (active) window.dispatchEvent(new Event(CHALLENGE_ACTIVE_EVENT));
+}
+
+/** After sign-in on any device, match this browser's flag to the account's challenge. */
+export async function syncChallengeFlag() {
+  try {
+    const res = await fetch("/api/challenge");
+    if (res.status === 401) return setChallengeActive(false);
+    if (res.ok) setChallengeActive((await res.json()).status === "active");
   } catch {}
 }
 

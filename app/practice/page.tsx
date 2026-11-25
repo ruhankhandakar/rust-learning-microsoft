@@ -2,10 +2,8 @@ import type { Metadata } from "next";
 import { BOOKS } from "@/lib/books";
 import { getBookStructure } from "@/lib/content";
 import { getAllExercises } from "@/lib/exercises";
-import { HomeButton } from "@/components/home-button";
-import { SearchTrigger } from "@/components/search-trigger";
-import { SettingsDropdownLazy as SettingsDropdown } from "@/components/settings-dropdown-lazy";
 import { PracticeList, type PracticeBook } from "@/components/practice-list";
+import { SiteHeader } from "@/components/site-header";
 
 const title = "Practice exercises";
 const description =
@@ -45,15 +43,7 @@ export default function PracticePage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <nav className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="mx-auto max-w-3xl px-6 flex items-center justify-between h-14">
-          <HomeButton />
-          <div className="flex items-center gap-2">
-            <SearchTrigger />
-            <SettingsDropdown />
-          </div>
-        </div>
-      </nav>
+      <SiteHeader />
 
       <main className="mx-auto max-w-3xl w-full px-6 py-10 flex-1">
         <h1 className="text-2xl lg:text-3xl font-bold tracking-tight mb-2">{title}</h1>

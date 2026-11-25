@@ -15,6 +15,9 @@ import { RotatingWord } from "@/components/home/rotating-word";
 import { CompileCard, type CompileQuestion } from "@/components/home/compile-card";
 import { SectionDivider } from "@/components/home/section-divider";
 import { SwagPreview } from "@/components/home/swag-preview";
+import { HomeTop } from "@/components/home/home-top";
+import type { RecentChanges } from "@/components/home/returning-dashboard";
+import { getChangelog } from "@/lib/changelog";
 
 export const metadata: Metadata = {
   alternates: {
@@ -47,7 +50,7 @@ const CHALLENGE = [
 const SWAG_FACTS = [
   [Shirt, "A T-shirt bundle or a sticker pack"],
   [Truck, "Shipped free within India"],
-  [Shuffle, "Entry is automatic. Stars never change your odds, but they really help me keep building this."],
+  [Shuffle, "Entry is one switch on your challenge page. Stars never change your odds, but they really help me keep building this."],
 ] as const;
 
 const DISCORD_URL = process.env.NEXT_PUBLIC_DISCORD_URL;
@@ -62,6 +65,17 @@ const FEATURES = [
   { icon: Waypoints, title: "Topics across books", body: "See how each book explains ownership, traits or async.", href: "/concepts" },
   { icon: RotateCcw, title: "Spaced review", body: "What you learned comes back after 1, 3, 7 and 21 days.", href: "/review" },
 ] as const;
+
+function recentChanges(): RecentChanges | null {
+  const latest = getChangelog()[0];
+  if (!latest) return null;
+  return {
+    date: latest.date,
+    chapters: latest.books.flatMap((b) =>
+      b.files.flatMap((f) => (b.slug && f.href ? [{ key: f.href.replace("/books/", ""), title: f.title, href: f.href }] : [])),
+    ),
+  };
+}
 
 function homeQuestions(): CompileQuestion[] {
   const titles = new Map<string, string>();
@@ -162,64 +176,70 @@ export default async function HomePage() {
       />
       <SiteHeader />
 
-      <section id="top" className="relative overflow-hidden">
-        <div
-          aria-hidden="true"
-          className="glyphs pointer-events-none absolute inset-0 grid grid-cols-6 content-around p-6 font-mono text-[15px] md:grid-cols-12 [mask-image:radial-gradient(ellipse_at_70%_40%,black_10%,transparent_75%)]"
-        >
-          {Array.from({ length: 72 }, (_, i) => (
-            <span key={i} className="justify-self-center" style={{ animationDelay: `${(i * 7) % 61 / 6.8}s` }}>
-              {GLYPHS[(i * 5) % GLYPHS.length]}
-            </span>
-          ))}
-        </div>
-        <div className="relative mx-auto flex max-w-6xl flex-wrap items-center gap-12 px-4 pb-16 pt-14 sm:px-6 md:pt-20">
-          <div className="min-w-0 flex-[999_1_520px]">
-            <h1 className="mb-5 text-4xl font-bold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl lg:text-6xl">
-              <span className="blur-in">Learn Rust</span>{" "}
-              <span className="inline-block whitespace-nowrap">
-                <span className="blur-in" style={{ animationDelay: ".12s" }}>from</span> <RotatingWord />
-              </span>
-            </h1>
-            <p className="rise mb-8 max-w-xl text-pretty text-lg text-muted-foreground" style={{ animationDelay: ".35s" }}>
-              Seven free Microsoft books and 100 projects, every quiz checked by rustc.
-            </p>
-            <div className="rise flex flex-wrap gap-3" style={{ animationDelay: ".5s" }}>
-              <a href="#start" className="inline-flex min-h-12 items-center rounded-[10px] bg-primary px-5 font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
-                Start reading
-              </a>
-              <a href="#practice" className="star-border inline-flex min-h-12 items-center rounded-[11px] p-px">
-                <span className="inline-flex h-[46px] items-center rounded-[10px] bg-card px-5 font-semibold">Try a quiz</span>
-              </a>
+      <HomeTop
+        bookTotals={Object.fromEntries(booksWithCounts.map((b) => [b.slug, b.chapterCount]))}
+        recent={recentChanges()}
+        hero={
+          <section id="top" className="relative overflow-hidden">
+            <div
+              aria-hidden="true"
+              className="glyphs pointer-events-none absolute inset-0 grid grid-cols-6 content-around p-6 font-mono text-[15px] md:grid-cols-12 [mask-image:radial-gradient(ellipse_at_70%_40%,black_10%,transparent_75%)]"
+            >
+              {Array.from({ length: 72 }, (_, i) => (
+                <span key={i} className="justify-self-center" style={{ animationDelay: `${(i * 7) % 61 / 6.8}s` }}>
+                  {GLYPHS[(i * 5) % GLYPHS.length]}
+                </span>
+              ))}
             </div>
-          </div>
+            <div className="relative mx-auto flex max-w-6xl flex-wrap items-center gap-12 px-4 pb-16 pt-14 sm:px-6 md:pt-20">
+              <div className="min-w-0 flex-[999_1_520px]">
+                <h1 className="mb-5 text-4xl font-bold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl lg:text-6xl">
+                  <span className="blur-in">Learn Rust</span>{" "}
+                  <span className="inline-block whitespace-nowrap">
+                    <span className="blur-in" style={{ animationDelay: ".12s" }}>from</span> <RotatingWord />
+                  </span>
+                </h1>
+                <p className="rise mb-8 max-w-xl text-pretty text-lg text-muted-foreground" style={{ animationDelay: ".35s" }}>
+                  Seven free Microsoft books and 100 projects, every quiz checked by rustc.
+                </p>
+                <div className="rise flex flex-wrap gap-3" style={{ animationDelay: ".5s" }}>
+                  <a href="#start" className="inline-flex min-h-12 items-center rounded-[10px] bg-primary px-5 font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
+                    Start reading
+                  </a>
+                  <a href="#practice" className="star-border inline-flex min-h-12 items-center rounded-[11px] p-px">
+                    <span className="inline-flex h-[46px] items-center rounded-[10px] bg-card px-5 font-semibold">Try a quiz</span>
+                  </a>
+                </div>
+              </div>
 
-          <div id="start" className="rise min-w-0 flex-[1_1_380px]" style={{ animationDelay: ".6s" }}>
-            <h2 className="mb-1 text-lg font-bold">Where are you coming from?</h2>
-            <p className="mb-4 text-sm text-muted-foreground">Pick one and we&apos;ll open the right book.</p>
-            <div className="flex flex-col gap-2">
-              {STARTS.map((s) => {
-                const book = bySlug.get(s.slug)!;
-                return (
-                  <Link
-                    key={s.slug}
-                    href={`/books/${s.slug}`}
-                    className="group flex min-h-[60px] items-center justify-between gap-3 rounded-[10px] border border-border bg-card px-4 py-3 transition-colors hover:border-primary hover:bg-primary/10"
-                  >
-                    <span className="flex flex-col gap-0.5">
-                      <span className="font-semibold text-foreground">{s.label}</span>
-                      <span className="text-[13px] text-muted-foreground">
-                        {book.title}, {book.chapterCount} chapters
-                      </span>
-                    </span>
-                    <ChevronRight className="h-4 w-4 shrink-0 text-primary transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" aria-hidden="true" />
-                  </Link>
-                );
-              })}
+              <div id="start" className="rise min-w-0 flex-[1_1_380px]" style={{ animationDelay: ".6s" }}>
+                <h2 className="mb-1 text-lg font-bold">Where are you coming from?</h2>
+                <p className="mb-4 text-sm text-muted-foreground">Pick one and we&apos;ll open the right book.</p>
+                <div className="flex flex-col gap-2">
+                  {STARTS.map((s) => {
+                    const book = bySlug.get(s.slug)!;
+                    return (
+                      <Link
+                        key={s.slug}
+                        href={`/books/${s.slug}`}
+                        className="group flex min-h-[60px] items-center justify-between gap-3 rounded-[10px] border border-border bg-card px-4 py-3 transition-colors hover:border-primary hover:bg-primary/10"
+                      >
+                        <span className="flex flex-col gap-0.5">
+                          <span className="font-semibold text-foreground">{s.label}</span>
+                          <span className="text-[13px] text-muted-foreground">
+                            {book.title}, {book.chapterCount} chapters
+                          </span>
+                        </span>
+                        <ChevronRight className="h-4 w-4 shrink-0 text-primary transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" aria-hidden="true" />
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </section>
+          </section>
+        }
+      />
 
       <section aria-label="What's inside" className="border-y border-border bg-card/50">
         <dl className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-4 py-7 sm:px-6 md:grid-cols-5">
@@ -238,7 +258,7 @@ export default async function HomePage() {
       <main className="mx-auto w-full max-w-6xl px-4 sm:px-6">
         <section id="library" className="scroll-mt-4 py-16 md:py-[72px]">
           <div className="mb-8 max-w-xl empty:hidden">
-            <ContinueReading />
+            <ContinueReading signedOutOnly />
           </div>
           <h2 className="mb-2 text-2xl font-bold tracking-[-0.02em] sm:text-3xl lg:text-[40px]">One path, from first steps to expert</h2>
           <p className="mb-8 text-muted-foreground">Start with a bridge book, then go deeper. Every book is free and works offline.</p>
@@ -347,6 +367,9 @@ export default async function HomePage() {
                   </li>
                 ))}
               </ul>
+              <Link href="/swag" className="mt-4 inline-block text-sm font-semibold text-primary hover:underline">
+                How the draw works
+              </Link>
             </div>
             <div className="relative min-w-0 flex-[1_1_240px]">
               <SwagPreview />

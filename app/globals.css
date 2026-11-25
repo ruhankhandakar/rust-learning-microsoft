@@ -75,6 +75,10 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.02 50);
   --primary: oklch(0.65 0.17 45);
+  --tier-starter: oklch(0.6 0.15 45);
+  --tier-bronze: oklch(0.5 0.085 58);
+  --tier-silver: oklch(0.58 0.012 250);
+  --tier-gold: oklch(0.64 0.13 85);
   --primary-foreground: oklch(0.99 0 0);
   --secondary: oklch(0.95 0.01 60);
   --secondary-foreground: oklch(0.25 0.02 50);
@@ -139,6 +143,10 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
   --popover: oklch(0.175 0.005 260);
   --popover-foreground: oklch(0.87 0.005 260);
   --primary: oklch(0.70 0.12 45);
+  --tier-starter: oklch(0.7 0.13 45);
+  --tier-bronze: oklch(0.6 0.08 62);
+  --tier-silver: oklch(0.84 0.012 250);
+  --tier-gold: oklch(0.83 0.14 88);
   --primary-foreground: oklch(0.145 0.004 260);
   --secondary: oklch(0.21 0.005 260);
   --secondary-foreground: oklch(0.87 0.005 260);
@@ -202,7 +210,7 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
 
 .prose :is(h1, h2, h3, h4, h5, h6),
 .prose [id] {
-  scroll-margin-top: 4.5rem;
+  scroll-margin-top: 7rem;
 }
 
 .prose h1 {
@@ -718,7 +726,35 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
 }
 
 .goal-ring { transition: stroke-dashoffset 1s cubic-bezier(.2, .7, .2, 1); }
+.goal-bar { transition: transform 1s cubic-bezier(.2, .7, .2, 1); }
+@starting-style { .goal-bar { transform: scaleX(0); } }
 @starting-style { .goal-ring { stroke-dashoffset: 238.76; } }
 @media (prefers-reduced-motion: reduce) {
-  .goal-ring { transition: none; }
+  .goal-ring, .goal-bar { transition: none; }
+}
+
+.tier-card {
+  transform-style: preserve-3d;
+  border-color: color-mix(in oklch, var(--tc) 60%, transparent);
+  background: linear-gradient(160deg, color-mix(in oklab, var(--tc) 38%, var(--card)), var(--card) 70%);
+}
+.tier-sheen {
+  background: linear-gradient(115deg, transparent 30%, color-mix(in oklch, var(--foreground) 10%, transparent) 45%, transparent 60%);
+}
+.medal-done {
+  background: radial-gradient(circle at 35% 30%, color-mix(in oklch, var(--primary) 40%, white), var(--primary));
+}
+
+.finisher-ribbon { mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent); }
+@keyframes finisher-loop { to { transform: translateX(-50%); } }
+.finisher-loop { animation: finisher-loop 40s linear infinite; }
+.finisher-ribbon:hover .finisher-loop { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .finisher-loop { animation: none; }
+}
+
+@keyframes stamp-in { from { opacity: 0; transform: rotate(-6deg) scale(1.6); } }
+.compiled-stamp { animation: stamp-in .5s cubic-bezier(.2, .8, .2, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .compiled-stamp { animation: none; }
 }

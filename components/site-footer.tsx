@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { LocalTime } from "@/components/local-time";
 import { APP_VERSION, CONTENT_LAST_UPDATED } from "@/lib/version";
 import { REPO_URL } from "@/lib/site-stats";
@@ -26,6 +27,15 @@ export function SiteFooter() {
               Ruhan Khandakar
             </a>
           </span>
+          <Link href="/impact" className={link}>
+            Impact
+          </Link>
+          <Link href="/finishers" className={link}>
+            Finishers
+          </Link>
+          <Link href="/swag" className={link}>
+            Swag draw
+          </Link>
           <a href={REPO_URL} target="_blank" rel="noopener noreferrer" className={link}>
             GitHub
           </a>

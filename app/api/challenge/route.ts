@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
-import { getProgress, isValidRef, issueTicket, join, recordEvent, setShowOnWall, type ChallengeKind } from "@/lib/challenge";
+import { getProgress, isValidRef, issueTicket, join, recordEvent, setDrawOptIn, setShowOnWall, type ChallengeKind } from "@/lib/challenge";
 
 async function userId(): Promise<string | null> {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -17,7 +17,7 @@ export async function GET() {
 /**
  * { action: "join" } starts the challenge; { action: "ticket", ref } timestamps opening a chapter;
  * { action: "event", kind, ref } logs a chapter read (with its ticket) or a quiz answer
- * ({ answer: compiles? }, graded on the server); { action: "wall", show } toggles the finishers wall.
+ * ({ answer: compiles? }, graded on the server); { action: "wall", show } toggles the finishers wall; { action: "draw", optIn } toggles the swag draw email.
  */
 export async function POST(request: Request) {
   const id = await userId();
@@ -46,6 +46,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid event" }, { status: 400 });
     }
     return NextResponse.json(await recordEvent(id, kind, body.ref, { answer: body.answer, ticket: body.ticket }));
+  }
+
+  if (body.action === "draw" && typeof body.optIn === "boolean") {
+    await setDrawOptIn(id, body.optIn);
+    return NextResponse.json(await getProgress(id));
   }
 
   if (body.action === "wall" && typeof body.show === "boolean") {
