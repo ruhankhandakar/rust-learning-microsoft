@@ -1,13 +1,18 @@
 "use client";
 
-import { useState, useRef, useCallback, type ReactNode } from "react";
+import { useState, useRef, useCallback, useMemo, type ReactNode } from "react";
 import dynamic from "next/dynamic";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import rehypeHighlightSafe from "@/lib/rehype-highlight-safe";
+import rehypeExercises from "@/lib/rehype-exercises";
+import { hashCode } from "@/lib/rust-blocks";
+import { RustCodeActions } from "./rust-code-actions";
+import { ExerciseDetails } from "./exercise-details";
 import { Check, Copy, Bookmark as BookmarkIcon } from "lucide-react";
 import { useBookmarks } from "./bookmark-provider";
+import { slugify } from "@/lib/utils";
 
 const MermaidDiagram = dynamic(
   () => import("./mermaid-diagram").then((m) => m.MermaidDiagram),
@@ -41,9 +46,23 @@ function isMermaidBlock(children: ReactNode): string | null {
   return null;
 }
 
-function CodePre({ children }: { children?: ReactNode }) {
+type Runnable = Record<string, "main" | "wrap">;
+
+function codeLang(children: ReactNode): string | undefined {
+  const child = Array.isArray(children) ? children[0] : children;
+  if (!child || typeof child !== "object" || !("props" in child)) return undefined;
+  return (child as React.ReactElement<{ className?: string }>).props.className?.match(/language-([\w-]+)/)?.[1];
+}
+
+function CodePre({ children, runnable }: { children?: ReactNode; runnable?: Runnable }) {
   const [copied, setCopied] = useState(false);
   const preRef = useRef<HTMLPreElement>(null);
+  const lang = codeLang(children);
+  const rust = (() => {
+    if (lang !== "rust" || !runnable) return null;
+    const code = extractText(children).replace(/\n$/, "");
+    return { code, mode: runnable?.[hashCode(code)] };
+  })();
 
   const handleCopy = useCallback(() => {
     const text = preRef.current?.textContent ?? "";
@@ -64,25 +83,17 @@ function CodePre({ children }: { children?: ReactNode }) {
         {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
       </button>
       <pre ref={preRef}>{children}</pre>
+      {rust && <RustCodeActions code={rust.code} mode={rust.mode} />}
     </div>
   );
 }
 
-function CopyablePre({ children }: { children?: ReactNode }) {
+function CopyablePre({ children, runnable }: { children?: ReactNode; runnable?: Runnable }) {
   const mermaidCode = isMermaidBlock(children);
   if (mermaidCode) {
     return <MermaidDiagram chart={mermaidCode} />;
   }
-  return <CodePre>{children}</CodePre>;
-}
-
-function slugify(text: string) {
-  return text
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .trim();
+  return <CodePre runnable={runnable}>{children}</CodePre>;
 }
 
 function BookmarkableHeading({
@@ -162,22 +173,40 @@ export function MarkdownRenderer({
   content,
   bookSlug,
   chapterSlug,
+  runnable,
 }: {
   content: string;
   bookSlug: string;
   chapterSlug: string;
+  runnable?: Runnable;
 }) {
-  const headingComponent =
-    (level: number) =>
-    ({ children }: { children?: ReactNode }) => (
-      <BookmarkableHeading
-        level={level}
-        bookSlug={bookSlug}
-        chapterSlug={chapterSlug}
-      >
-        {children}
-      </BookmarkableHeading>
-    );
+  const components = useMemo<Components>(() => {
+    const heading = (level: number) => {
+      const Heading = ({ children }: { children?: ReactNode }) => (
+        <BookmarkableHeading level={level} bookSlug={bookSlug} chapterSlug={chapterSlug}>
+          {children}
+        </BookmarkableHeading>
+      );
+      return Heading;
+    };
+    return {
+      pre: ({ children }) => <CopyablePre runnable={runnable}>{children}</CopyablePre>,
+      details: (props) => (
+        <ExerciseDetails {...props} bookSlug={bookSlug} chapterSlug={chapterSlug} />
+      ),
+      table: ({ children }) => (
+        <div className="table-wrapper">
+          <table>{children}</table>
+        </div>
+      ),
+      h1: heading(1),
+      h2: heading(2),
+      h3: heading(3),
+      h4: heading(4),
+      h5: heading(5),
+      h6: heading(6),
+    };
+  }, [bookSlug, chapterSlug, runnable]);
 
   return (
     <div className="prose">
@@ -185,22 +214,10 @@ export function MarkdownRenderer({
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[
           rehypeRaw,
+          ...(bookSlug === "100-rust-projects" ? [] : [rehypeExercises]),
           rehypeHighlightSafe,
         ]}
-        components={{
-          pre: CopyablePre,
-          table: ({ children }) => (
-            <div className="table-wrapper">
-              <table>{children}</table>
-            </div>
-          ),
-          h1: headingComponent(1),
-          h2: headingComponent(2),
-          h3: headingComponent(3),
-          h4: headingComponent(4),
-          h5: headingComponent(5),
-          h6: headingComponent(6),
-        }}
+        components={components}
       >
         {content}
       </ReactMarkdown>

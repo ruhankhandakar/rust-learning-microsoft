@@ -3,9 +3,6 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { SearchTrigger } from "@/components/search-trigger";
-import { SettingsDropdownLazy as SettingsDropdown } from "@/components/settings-dropdown-lazy";
-import { HomeButton } from "@/components/home-button";
 import { BookProgressBar } from "@/components/book-progress";
 import { BookCacheTrigger } from "@/components/book-cache-trigger";
 import { ProjectMarkDoneButton } from "@/components/project-mark-done-button";
@@ -43,7 +40,9 @@ export function Rust100ProjectsHub({
   projects,
   totalChapters,
   allChapterSlugs,
+  header,
 }: {
+  header: React.ReactNode;
   book: BookMeta;
   projects: Rust100ProjectEntry[];
   totalChapters: number;
@@ -74,15 +73,7 @@ export function Rust100ProjectsHub({
   return (
     <div className="min-h-screen flex flex-col">
       <BookCacheTrigger bookSlug={BOOK_SLUG} chapterSlugs={allChapterSlugs} />
-      <nav className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="mx-auto max-w-5xl px-6 flex items-center justify-between h-14">
-          <HomeButton />
-          <div className="flex items-center gap-2">
-            <SearchTrigger />
-            <SettingsDropdown />
-          </div>
-        </div>
-      </nav>
+      {header}
 
       <div className="mx-auto max-w-5xl w-full px-6 flex-1 py-8">
         <div className="flex flex-col sm:flex-row sm:items-start gap-6 mb-10">

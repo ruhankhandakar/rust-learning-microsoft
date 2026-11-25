@@ -22,12 +22,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
+          node-version-file: .node-version
 
       - name: Sync content from Microsoft/RustTraining
         run: |
@@ -43,11 +38,37 @@ jobs:
       - name: Check for changes
         id: check
         run: |
-          if git diff --quiet -- content/; then
+          if [ -z "$(git status --porcelain -- content/)" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Update changelog
+        if: steps.check.outputs.changed == 'true'
+        run: node scripts/update-changelog.js
+
+      - name: Setup pnpm
+        if: steps.check.outputs.changed == 'true'
+        uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        if: steps.check.outputs.changed == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup Rust
+        if: steps.check.outputs.changed == 'true'
+        uses: dtolnay/rust-toolchain@stable
+
+      # Type-checks book code blocks with rustc to rebuild data/rust-blocks.json and data/quizzes.json; nothing is executed.
+      - name: Regenerate run and quiz data
+        if: steps.check.outputs.changed == 'true'
+        run: pnpm gen:rust-data
+
+      - name: Check exercises
+        if: steps.check.outputs.changed == 'true'
+        continue-on-error: true
+        run: pnpm check:exercises
 
       - name: Bump patch version & generate content hash
         if: steps.check.outputs.changed == 'true'
@@ -72,7 +93,10 @@ jobs:
             - [microsoft/RustTraining](https://github.com/microsoft/RustTraining) (`src/` markdown)
             - [emmaglorypraise/100rustprojects](https://github.com/emmaglorypraise/100rustprojects) (notes + progress manifest)
 
-            Also bumps patch version and regenerates content hash & service worker cache name when `content/` changes.
+            Also, when `content/` changes:
+            - adds today's entry to `data/changelog.json` (shown on /changes and in /rss.xml)
+            - regenerates the runnable-code and quiz data (`data/rust-blocks.json`, `data/quizzes.json`) with rustc; check the "Check exercises" step log for exercise warnings
+            - bumps the patch version and regenerates the content hash & service worker cache name
 
             Review the diff and merge when ready.
           labels: |

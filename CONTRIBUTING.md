@@ -6,7 +6,7 @@ Thanks for your interest in contributing!
 
 1. Fork and clone the repo
 2. `pnpm install`
-3. `cp .env.example .env.local` and fill in your values (see [README](./README.md#environment-variables))
+3. `cp .env.template .env.local` and fill in your values (see [README](./README.md#environment-variables))
 4. `pnpm db:migrate` to set up the database
 5. `pnpm dev` to start the dev server
 

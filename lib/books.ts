@@ -20,7 +20,7 @@ export const BOOKS: BookMeta[] = [
     levelColor: "green",
     audience: "C/C++ developers",
     description:
-      "Move semantics, RAII, FFI, embedded, no_std — everything a systems programmer needs to cross over.",
+      "Move semantics, RAII, FFI, embedded, no_std: everything a systems programmer needs to cross over.",
     icon: "⚙️",
   },
   {
@@ -56,7 +56,7 @@ export const BOOKS: BookMeta[] = [
     levelColor: "blue",
     audience: "Intermediate Rustaceans",
     description:
-      "Tokio, streams, cancellation safety — master the async ecosystem from futures to production.",
+      "Tokio, streams, cancellation safety. Master the async ecosystem from futures to production.",
     icon: "⚡",
   },
   {
@@ -68,7 +68,7 @@ export const BOOKS: BookMeta[] = [
     levelColor: "yellow",
     audience: "Experienced Rustaceans",
     description:
-      "Pin, allocators, lock-free structures, unsafe — advanced patterns for real-world systems.",
+      "Pin, allocators, lock-free structures, unsafe: advanced patterns for real-world systems.",
     icon: "🧩",
   },
   {
@@ -80,7 +80,7 @@ export const BOOKS: BookMeta[] = [
     levelColor: "purple",
     audience: "Expert Rustaceans",
     description:
-      "Type-state, phantom types, capability tokens — make illegal states unrepresentable.",
+      "Type-state, phantom types, capability tokens. Make illegal states unrepresentable.",
     icon: "🔬",
   },
   {
@@ -92,7 +92,7 @@ export const BOOKS: BookMeta[] = [
     levelColor: "brown",
     audience: "Teams shipping Rust",
     description:
-      "Build scripts, cross-compilation, CI/CD, Miri — production-grade engineering workflows.",
+      "Build scripts, cross-compilation, CI/CD, Miri: production-grade engineering workflows.",
     icon: "🏗️",
   },
   {
@@ -104,7 +104,7 @@ export const BOOKS: BookMeta[] = [
     levelColor: "yellow",
     audience: "Hands-on learners",
     description:
-      "A curated path through 100 small Rust projects — CLI, async, web, databases, and more — with notes and links to upstream source.",
+      "A curated path through 100 small Rust projects (CLI, async, web, databases and more) with notes and links to upstream source.",
     icon: "🧰",
   },
 ];

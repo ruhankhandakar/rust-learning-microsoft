@@ -39,3 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+!.env.template
+*.db
+
+# 3D source exports; only the poster, preview and full tiers ship
+/public/3d/male.glb
+/public/3d/female.glb
+
+# Personal agent tooling; shared skills live in .agents/skills
+/.claude/

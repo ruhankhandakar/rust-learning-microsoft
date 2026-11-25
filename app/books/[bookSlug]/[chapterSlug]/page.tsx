@@ -8,9 +8,10 @@ import { ChapterSidebar } from "@/components/chapter-sidebar";
 import { MobileNav } from "@/components/mobile-nav";
 import { ChapterReadMarker } from "@/components/chapter-read-marker";
 import { ErrorBoundary } from "@/components/error-boundary";
-import { SearchTrigger } from "@/components/search-trigger";
-import { HomeButton } from "@/components/home-button";
-import { SettingsDropdownLazy as SettingsDropdown } from "@/components/settings-dropdown-lazy";
+import { ShareMenu } from "@/components/share-menu";
+import { ChapterFeedback } from "@/components/chapter-feedback";
+import { ChallengeReadTracker } from "@/components/challenge-read-tracker";
+import { REPO_URL } from "@/lib/site-stats";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { ChapterKeyboardNav } from "@/components/chapter-keyboard-nav";
 import { loadRust100Manifest, getRust100ProjectByChapterSlug } from "@/lib/rust-100-projects";
@@ -23,6 +24,14 @@ import {
   Rust100ProjectSourcePanel,
 } from "@/components/rust-100-project-source-panel";
 import { Rust100ProjectSourceMobile } from "@/components/rust-100-project-source-mobile";
+import { ReadingPosition } from "@/components/reading-position";
+import { ChapterQuiz } from "@/components/chapter-quiz";
+import { getChapterRunnable } from "@/lib/runnable";
+import { getChapterQuizzes } from "@/lib/quizzes";
+import { getConceptsForChapter } from "@/lib/concepts";
+import { chapterHasTakeaways } from "@/lib/takeaways";
+import { getChapterLastChange } from "@/lib/changelog";
+import { SiteHeader } from "@/components/site-header";
 
 const MarkdownRenderer = dynamic(
   () => import("@/components/markdown-renderer").then((m) => m.MarkdownRenderer),
@@ -58,7 +67,7 @@ export async function generateMetadata({
   const description =
     bookSlug === "100-rust-projects"
       ? `Read "${chapter.title}" from ${book.title}. Notes from emmaglorypraise/100rustprojects.`
-      : `Read "${chapter.title}" from ${book.title}. Free Rust training by Microsoft.`;
+      : `Read "${chapter.title}" from ${book.title}, part of Microsoft's free RustTraining books.`;
   const url = `${BASE_URL}/books/${bookSlug}/${chapterSlug}`;
 
   return {
@@ -69,19 +78,19 @@ export async function generateMetadata({
       title,
       description,
       url,
-      siteName:
-      bookSlug === "100-rust-projects"
-        ? "100 Rust Projects | Ruhan Khandakar"
-        : "Rust Training by Microsoft | Ruhan Khandakar",
+      siteName: "Rust Training",
+      locale: "en_US",
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title,
       description,
     },
     alternates: { canonical: url },
   };
 }
+
+export const dynamicParams = false;
 
 export function generateStaticParams() {
   const params: { bookSlug: string; chapterSlug: string }[] = [];
@@ -132,28 +141,58 @@ export default async function ChapterPage({
         })()
       : [];
 
+  const isRust100 = bookSlug === "100-rust-projects";
+  const runnable = isRust100 ? undefined : getChapterRunnable(bookSlug, chapterSlug);
+  const quizzes = isRust100 ? [] : getChapterQuizzes(bookSlug, chapterSlug);
+  const concepts = isRust100 ? [] : getConceptsForChapter(bookSlug, chapterSlug);
+  const lastChange = getChapterLastChange(bookSlug, chapterSlug);
+  const upstreamUrl = isRust100
+    ? "https://github.com/emmaglorypraise/100rustprojects"
+    : `https://github.com/microsoft/RustTraining/blob/main/${book.dirName}/src/${chapterSlug}.md`;
+  const chapterUrl = `${BASE_URL}/books/${bookSlug}/${chapterSlug}`;
+  const issueUrl = `${REPO_URL}/issues/new?title=${encodeURIComponent(`Bug on "${current.title}"`)}&body=${encodeURIComponent(`Page: ${chapterUrl}\n\nWhat happened:\n`)}`;
+  const endOfChapter = (
+    <>
+      <ChapterFeedback bookSlug={bookSlug} chapterSlug={chapterSlug} />
+      <section aria-labelledby="report-title" className="mt-8 text-sm">
+        <h2 id="report-title" className="mb-2 font-sans text-sm font-semibold">Found a problem?</h2>
+        <ul className="flex flex-col gap-1.5 text-muted-foreground">
+          <li>
+            Something in the {isRust100 ? "project notes" : "book"} is wrong:{" "}
+            <a href={upstreamUrl} target="_blank" rel="noopener noreferrer" className="font-medium text-foreground underline underline-offset-2 hover:text-primary">
+              suggest a fix on {isRust100 ? "emmaglorypraise/100rustprojects" : "microsoft/RustTraining"}
+            </a>
+          </li>
+          <li>
+            Something on this site is broken:{" "}
+            <a href={issueUrl} target="_blank" rel="noopener noreferrer" className="font-medium text-foreground underline underline-offset-2 hover:text-primary">
+              open an issue
+            </a>
+          </li>
+        </ul>
+      </section>
+    </>
+  );
+  const bookAuthor = isRust100
+    ? { "@type": "Person", name: "Glory Praise Emmanuel", url: "https://github.com/emmaglorypraise" }
+    : { "@type": "Organization", name: "Microsoft", url: "https://github.com/microsoft/RustTraining" };
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: current.title,
-    description:
-      bookSlug === "100-rust-projects"
-        ? `Project notes from ${book.title} (emmaglorypraise/100rustprojects).`
-        : `Read "${current.title}" from ${book.title}. Free Rust training curated by Microsoft | Ruhan Khandakar.`,
+    description: isRust100
+      ? `Project notes from ${book.title} (emmaglorypraise/100rustprojects).`
+      : `Read "${current.title}" from ${book.title}, part of Microsoft's free RustTraining books.`,
     url: `${BASE_URL}/books/${bookSlug}/${chapterSlug}`,
-    author: { "@type": "Person", name: "Ruhan Khandakar" },
-    publisher: { "@type": "Person", name: "Ruhan Khandakar" },
+    author: bookAuthor,
+    publisher: { "@type": "Person", name: "Ruhan Khandakar", url: "https://github.com/ruhankhandakar" },
+    isBasedOn: upstreamUrl,
+    ...(isRust100 ? {} : { license: "https://creativecommons.org/licenses/by/4.0/" }),
     isPartOf: {
       "@type": "Book",
       name: book.title,
-      author:
-        bookSlug === "100-rust-projects"
-          ? {
-              "@type": "Person",
-              name: "Glory Praise Emmanuel",
-              url: "https://github.com/emmaglorypraise",
-            }
-          : { "@type": "Organization", name: "Microsoft" },
+      author: bookAuthor,
     },
     inLanguage: "en",
     isAccessibleForFree: true,
@@ -165,46 +204,53 @@ export default async function ChapterPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      {!isRust100 && <ChallengeReadTracker bookSlug={bookSlug} chapterSlug={chapterSlug} />}
       {bookSlug !== "100-rust-projects" && (
-        <ChapterReadMarker bookSlug={bookSlug} chapterSlug={chapterSlug} />
+        <ChapterReadMarker
+          bookSlug={bookSlug}
+          chapterSlug={chapterSlug}
+          reviewCardId={
+            chapterHasTakeaways(bookSlug, chapterSlug)
+              ? `takeaways:${bookSlug}/${chapterSlug}`
+              : undefined
+          }
+        />
       )}
+      <ReadingPosition
+        bookSlug={bookSlug}
+        chapterSlug={chapterSlug}
+        bookTitle={book.title}
+        chapterTitle={current.title}
+      />
       <ChapterKeyboardNav
         prevHref={prev ? `/books/${bookSlug}/${prev.slug}` : null}
         nextHref={next ? `/books/${bookSlug}/${next.slug}` : null}
       />
 
-      <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="flex items-center gap-3 px-4 h-14">
+      <SiteHeader />
+      <div className="z-30 border-b border-border bg-background/90 backdrop-blur-md lg:sticky lg:top-[60px]">
+        <div className="flex h-11 items-center gap-3 px-4">
           <MobileNav
             book={book}
             structure={structure}
             currentSlug={chapterSlug}
           />
-          <HomeButton />
-          <span className="text-muted-foreground">/</span>
           <Link
             href={`/books/${bookSlug}`}
-            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors shrink-0"
+            className="flex shrink-0 items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-primary"
           >
-            <span className="hidden sm:inline font-medium">
-              {book.shortTitle}
-            </span>
-            <span className="sm:hidden font-medium">{book.icon}</span>
+            <span className="hidden font-medium sm:inline">{book.shortTitle}</span>
+            <span className="font-medium sm:hidden">{book.icon}</span>
           </Link>
           <span className="text-muted-foreground">/</span>
-          <span className="text-sm font-medium truncate flex-1">
-            {current.title}
-          </span>
-          <div className="flex items-center gap-2 shrink-0">
-            <SearchTrigger />
-            <SettingsDropdown />
-          </div>
+          <span className="flex-1 truncate text-sm font-medium">{current.title}</span>
+          <ShareMenu url={chapterUrl} title={`${current.title}, ${book.title}`} />
         </div>
-      </header>
+      </div>
 
       <div className="flex flex-1">
         <aside className="hidden lg:flex w-72 shrink-0 border-r border-border">
-          <div className="sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto p-4 w-full">
+          <div className="sticky top-[104px] h-[calc(100vh-104px)] overflow-y-auto p-4 w-full">
             <ChapterSidebar
               book={book}
               structure={structure}
@@ -226,10 +272,12 @@ export default async function ChapterPage({
                         content={markdown}
                         bookSlug={bookSlug}
                         chapterSlug={chapterSlug}
+                        runnable={runnable}
                       />
                     </ErrorBoundary>
+                    {endOfChapter}
                   </article>
-                  <aside className="hidden lg:block w-full lg:w-[min(42rem,48%)] shrink-0 lg:sticky lg:top-[4.5rem] lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto">
+                  <aside className="hidden lg:block w-full lg:w-[min(42rem,48%)] shrink-0 lg:sticky lg:top-[7.5rem] lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
                     <Rust100ProjectSourcePanel
                       chapterSlug={chapterSlug}
                       projectDir={rustProjectDir}
@@ -247,6 +295,27 @@ export default async function ChapterPage({
             </>
           ) : (
             <article className="mx-auto max-w-3xl px-6 md:px-10 py-10">
+              {(lastChange || concepts.length > 0) && (
+                <div className="mb-6 flex flex-wrap items-center gap-2 text-sm">
+                  {lastChange && (
+                    <span className="mr-2 text-muted-foreground">
+                      Last changed upstream on{" "}
+                      <Link href={`/changes#${lastChange}`} className="underline underline-offset-2 hover:text-primary">
+                        {lastChange}
+                      </Link>
+                    </span>
+                  )}
+                  {concepts.map((c) => (
+                    <Link
+                      key={c.slug}
+                      href={`/concepts/${c.slug}`}
+                      className="rounded-full border border-border px-3 py-1 text-xs transition-colors hover:border-primary/40 hover:text-primary"
+                    >
+                      Topic: {c.title}
+                    </Link>
+                  ))}
+                </div>
+              )}
               <ErrorBoundary>
                 {bookSlug === "100-rust-projects" &&
                   chapterSlug === "glossary" && <Rust100ProjectGlossaryToolbar />}
@@ -254,14 +323,44 @@ export default async function ChapterPage({
                   content={markdown}
                   bookSlug={bookSlug}
                   chapterSlug={chapterSlug}
+                  runnable={runnable}
                 />
               </ErrorBoundary>
+              {quizzes.length > 0 && <ChapterQuiz questions={quizzes} />}
+              {endOfChapter}
             </article>
           )}
 
           <nav
             className={`border-t border-border ${useRustSourceSplit ? "pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0" : ""}`}
           >
+            <p
+              className={`${useRustSourceSplit ? "w-full px-4 md:px-6 xl:px-8" : "mx-auto max-w-3xl px-6 md:px-10"} pt-6 text-xs text-muted-foreground`}
+            >
+              {isRust100 ? (
+                <>Notes by Glory Praise Emmanuel from </>
+              ) : (
+                <>From {book.title} by Microsoft (CC BY 4.0), reformatted for this unofficial reader, which is not affiliated with Microsoft. Source: </>
+              )}
+              <a
+                href={upstreamUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-2 hover:text-primary"
+              >
+                {isRust100 ? "emmaglorypraise/100rustprojects" : "view or suggest an edit on GitHub"}
+              </a>
+              .
+              {lastChange && (
+                <>
+                  {" "}Last changed upstream {lastChange} (
+                  <Link href={`/changes#${lastChange}`} className="underline underline-offset-2 hover:text-primary">
+                    what changed
+                  </Link>
+                  ).
+                </>
+              )}
+            </p>
             <p
               className={`${useRustSourceSplit ? "w-full px-4 md:px-6 xl:px-8" : "mx-auto max-w-3xl px-6 md:px-10"} pt-6 text-[11px] text-muted-foreground/50 text-center hidden sm:block`}
             >

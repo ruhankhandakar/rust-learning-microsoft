@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { loadRust100Manifest } from "./rust-100-projects";
 
 const CONTENT_SUBDIR = path.join("content", "100-rust-projects");
 const PROJECTS_ROOT = path.join(process.cwd(), CONTENT_SUBDIR, "projects");
@@ -74,6 +75,24 @@ export function listProjectSourceDir(absDir: string): SourceListingEntry[] {
     return a.name.localeCompare(b.name);
   });
   return rows;
+}
+
+export function listRust100SourceParams(): { chapterSlug: string; segments: string[] }[] {
+  const out: { chapterSlug: string; segments: string[] }[] = [];
+  const walk = (chapterSlug: string, absDir: string, rel: string[]) => {
+    for (const e of listProjectSourceDir(absDir)) {
+      const segments = [...rel, e.name];
+      out.push({ chapterSlug, segments });
+      if (e.kind === "dir") walk(chapterSlug, path.join(absDir, e.name), segments);
+    }
+  };
+  for (const p of loadRust100Manifest().projects) {
+    const root = p.projectDir ? resolveProjectSourcePath(p.projectDir, []) : null;
+    if (!root) continue;
+    out.push({ chapterSlug: p.chapterSlug, segments: [] });
+    walk(p.chapterSlug, root.absolute, []);
+  }
+  return out;
 }
 
 const MAX_FILE_BYTES = 512 * 1024;

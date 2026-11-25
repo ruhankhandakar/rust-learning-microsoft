@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BOOKS, getBookBySlug } from "@/lib/books";
@@ -9,15 +10,14 @@ import {
   Layers,
   FileText,
 } from "lucide-react";
-import { SearchTrigger } from "@/components/search-trigger";
-import { SettingsDropdownLazy as SettingsDropdown } from "@/components/settings-dropdown-lazy";
-import { HomeButton } from "@/components/home-button";
 import { BookProgressBar } from "@/components/book-progress";
+import { ContinueReading } from "@/components/continue-reading";
 import { ChapterCheckmark } from "@/components/chapter-checkmark";
 import { BookCacheTrigger } from "@/components/book-cache-trigger";
 import { APP_VERSION } from "@/lib/version";
 import { loadRust100Manifest } from "@/lib/rust-100-projects";
 import { Rust100ProjectsHub } from "@/components/rust-100-projects-hub";
+import { SiteHeader } from "@/components/site-header";
 
 const LEVEL_STYLES: Record<string, string> = {
   green:
@@ -33,6 +33,32 @@ const LEVEL_STYLES: Record<string, string> = {
 
 export function generateStaticParams() {
   return BOOKS.map((book) => ({ bookSlug: book.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ bookSlug: string }>;
+}): Promise<Metadata> {
+  const book = getBookBySlug((await params).bookSlug);
+  if (!book) return {};
+  const title = book.slug === "100-rust-projects" ? book.title : `${book.title} — free online Rust book`;
+  const description = `${book.description} For ${book.audience}.`;
+  const url = `/books/${book.slug}`;
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "website",
+      siteName: "Rust Training",
+      locale: "en_US",
+      title,
+      description,
+      url,
+    },
+    twitter: { card: "summary", title, description },
+  };
 }
 
 export default async function BookPage({
@@ -53,6 +79,7 @@ export default async function BookPage({
     const manifest = loadRust100Manifest();
     return (
       <Rust100ProjectsHub
+        header={<SiteHeader />}
         book={book}
         projects={manifest.projects}
         totalChapters={structure.flatChapters.length}
@@ -64,16 +91,7 @@ export default async function BookPage({
   return (
     <div className="min-h-screen flex flex-col">
       <BookCacheTrigger bookSlug={bookSlug} chapterSlugs={allChapterSlugs} />
-      {/* Top nav */}
-      <nav className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="mx-auto max-w-5xl px-6 flex items-center justify-between h-14">
-          <HomeButton />
-            <div className="flex items-center gap-2">
-              <SearchTrigger />
-              <SettingsDropdown />
-            </div>
-        </div>
-      </nav>
+      <SiteHeader />
 
       <div className="mx-auto max-w-5xl w-full px-6 flex-1">
         {/* Two-column layout on desktop */}
@@ -138,6 +156,9 @@ export default async function BookPage({
 
           {/* Right: Table of Contents */}
           <main>
+            <div className="mb-6 empty:hidden">
+              <ContinueReading bookSlug={bookSlug} />
+            </div>
             <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">
               Table of Contents
             </h2>

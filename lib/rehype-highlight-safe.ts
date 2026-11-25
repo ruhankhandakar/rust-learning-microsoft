@@ -33,7 +33,13 @@ function visit(node: Root | Element) {
 }
 
 function highlightCode(node: Element) {
-  const lang = getLanguage(node);
+  const [lang, ...flags] = getLanguage(node)?.split(",") ?? [];
+  if (flags.length) {
+    const classes = (node.properties?.className as string[]).map((c) =>
+      c.startsWith("language-") ? `language-${lang}` : c
+    );
+    node.properties = { ...node.properties, className: classes };
+  }
   const code = getText(node);
   if (!code) return;
 

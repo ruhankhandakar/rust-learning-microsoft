@@ -1,12 +1,15 @@
 const CACHE_NAME = "rust-training-4.3.20";
-const CONTENT_HASH_URL = "/content-hash.json";
 
 const PRECACHE_URLS = ["/", "/~offline", "/manifest.webmanifest", "/icon.svg"];
 
 // Paths that must never be cached (heavy / high-churn / too many pages).
 // The entire 100-rust-projects book has 100+ chapters; caching them bloats
 // storage for little benefit (users rarely revisit the same chapter offline).
-const NO_CACHE_PATH_PATTERNS = [/^\/books\/100-rust-projects(\/|$)/];
+const NO_CACHE_PATH_PATTERNS = [
+  /^\/books\/100-rust-projects(\/|$)/,
+  // Per-user API responses must never be served to a different account.
+  /^\/api\/(?!search$|rust-100-source\/)/,
+];
 
 function shouldBypassCache(pathname) {
   return NO_CACHE_PATH_PATTERNS.some((re) => re.test(pathname));
@@ -129,29 +132,6 @@ self.addEventListener("message", (event) => {
         if (source && "postMessage" in source) {
           source.postMessage({ type: "CACHE_CLEARED" });
         }
-      })()
-    );
-  }
-
-  if (event.data?.type === "CHECK_CONTENT_UPDATE") {
-    event.waitUntil(
-      (async () => {
-        try {
-          const res = await fetch(CONTENT_HASH_URL, { cache: "no-store" });
-          if (!res.ok) return;
-          const remote = await res.json();
-          const cache = await caches.open(CACHE_NAME);
-          const cached = await cache.match(CONTENT_HASH_URL);
-          const local = cached ? await cached.json() : null;
-          if (local && local.version !== remote.version) {
-            self.clients.matchAll().then((clients) => {
-              clients.forEach((c) =>
-                c.postMessage({ type: "CONTENT_UPDATED", version: remote.version })
-              );
-            });
-          }
-          await cache.put(CONTENT_HASH_URL, new Response(JSON.stringify(remote)));
-        } catch { }
       })()
     );
   }

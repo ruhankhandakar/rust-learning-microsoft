@@ -189,7 +189,6 @@ function main() {
 
   const manifest = {
     upstreamRepo: "emmaglorypraise/100rustprojects",
-    generatedAt: new Date().toISOString(),
     projects,
   };
 
