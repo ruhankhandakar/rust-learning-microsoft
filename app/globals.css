@@ -558,3 +558,111 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
   width: fit-content;
   cursor: pointer;
 }
+
+/* Home page motion */
+@property --star-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+@property --n { syntax: "<integer>"; initial-value: 0; inherits: false; }
+
+@keyframes blur-in { from { opacity: 0; filter: blur(12px); transform: translateY(8px); } }
+@keyframes rise { from { opacity: 0; transform: translateY(16px); } }
+@keyframes shine { from { background-position: 150% 0; } to { background-position: -50% 0; } }
+@keyframes star-spin { to { --star-angle: 360deg; } }
+@keyframes word-in { from { opacity: 0; transform: translateY(60%) rotateX(-70deg); } }
+@keyframes glyph-glow {
+  0%, 88%, 100% { color: var(--glyph); text-shadow: none; }
+  92%, 96% { color: var(--rust-light); text-shadow: 0 0 12px var(--rust); }
+}
+@keyframes count-up { from { --n: 0; } }
+
+.blur-in { display: inline-block; animation: blur-in .9s cubic-bezier(.2, .7, .2, 1) both; }
+.rise { animation: rise .7s cubic-bezier(.2, .7, .2, 1) both; }
+.word-in { animation: word-in .55s cubic-bezier(.2, .8, .2, 1) both; }
+.shine {
+  background: linear-gradient(110deg, var(--muted-foreground) 40%, var(--foreground) 50%, var(--muted-foreground) 60%);
+  background-size: 250% 100%;
+  background-clip: text;
+  color: transparent;
+  animation: shine 3.5s linear infinite;
+}
+.star-border {
+  background: conic-gradient(from var(--star-angle), transparent 0 70%, var(--rust-light) 85%, transparent 100%) border-box;
+  animation: star-spin 3s linear infinite;
+}
+.glyphs { --glyph: color-mix(in oklch, var(--foreground) 18%, transparent); }
+.glyphs > span { color: var(--glyph); animation: glyph-glow 9s ease-in-out infinite; }
+.count { animation: count-up 1.4s cubic-bezier(.2, .7, .2, 1) both; counter-reset: n var(--n); }
+.count::after { content: counter(n); }
+
+
+.spotlight:hover {
+  background: radial-gradient(260px circle at var(--x, 50%) var(--y, 50%), color-mix(in oklch, var(--primary) 16%, transparent), transparent 70%), var(--card);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blur-in, .rise, .word-in, .shine, .star-border, .glyphs > span, .count { animation: none; }
+}
+
+.section-rule {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border) 15%, var(--border) 85%, transparent);
+}
+@keyframes rule-sweep { from { background-position: -40% 0; } to { background-position: 140% 0; } }
+@supports (animation-timeline: view()) {
+  .section-rule::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent) no-repeat;
+    background-size: 30% 100%;
+    --rule-timeline: view();
+    animation: rule-sweep linear both;
+    animation-timeline: var(--rule-timeline);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .section-rule::after { display: none; }
+}
+
+/* Three book frames cross-fade in sequence: closed (base), ajar, open */
+.book {
+  position: relative;
+  background-size: 300% 100%;
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  transition: transform .45s cubic-bezier(.3, .7, .2, 1);
+}
+.book-frame {
+  position: absolute;
+  inset: 0;
+  background-image: inherit;
+  background-size: 300% 100%;
+  background-repeat: no-repeat;
+  opacity: 0;
+}
+.book-ajar { background-position: 50% 0; transition: opacity .22s ease-in-out .16s; }
+.book-open { background-position: 100% 0; transition: opacity .26s ease-in-out 0s; }
+.group:hover .book, .group:focus-visible .book { transform: translateY(-3px) rotate(-4deg) scale(1.06); }
+.group:hover .book-ajar, .group:focus-visible .book-ajar { opacity: 1; transition-delay: 0s; }
+.group:hover .book-open, .group:focus-visible .book-open { opacity: 1; transition-delay: .14s; }
+@media (prefers-reduced-motion: reduce) {
+  .book, .book-ajar, .book-open { transition: none; }
+}
+
+.faq summary { list-style: none; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary:hover h3 { color: var(--primary); }
+.faq[open] .faq-chevron { transform: rotate(180deg); }
+.faq { interpolate-size: allow-keywords; }
+.faq::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition: block-size .3s ease, content-visibility .3s allow-discrete;
+}
+.faq[open]::details-content { block-size: auto; }
+@media (prefers-reduced-motion: reduce) {
+  .faq::details-content, .faq-chevron { transition: none; }
+}
