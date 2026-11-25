@@ -21,7 +21,6 @@ export async function SiteHeader() {
         <Link href="/" className="flex items-center gap-2.5 text-foreground">
           <LogoMark size={36} />
           <span className="font-semibold">Rust Training</span>
-          <span className="hidden text-xs text-muted-foreground sm:inline">Unofficial reader</span>
         </Link>
         <nav aria-label="Main" className="order-last -mx-3 flex w-full gap-1 overflow-x-auto md:order-none md:mx-0 md:w-auto md:flex-1">
           {NAV.map((item) => (

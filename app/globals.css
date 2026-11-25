@@ -150,8 +150,22 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
   html {
     @apply font-sans;
   }
+  html, body {
+    overflow-x: clip;
+  }
   h1, h2, h3, h4 {
     font-family: var(--font-heading);
+  }
+  h1, h2 {
+    overflow-wrap: break-word;
+    min-width: 0;
+    text-wrap: balance;
+  }
+  ::selection {
+    background: color-mix(in oklch, var(--primary) 35%, transparent);
+  }
+  html {
+    scrollbar-color: var(--border) var(--background);
   }
 }
 
@@ -565,25 +579,17 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
 
 @keyframes blur-in { from { opacity: 0; filter: blur(12px); transform: translateY(8px); } }
 @keyframes rise { from { opacity: 0; transform: translateY(16px); } }
-@keyframes shine { from { background-position: 150% 0; } to { background-position: -50% 0; } }
 @keyframes star-spin { to { --star-angle: 360deg; } }
 @keyframes word-in { from { opacity: 0; transform: translateY(60%) rotateX(-70deg); } }
 @keyframes glyph-glow {
   0%, 88%, 100% { color: var(--glyph); text-shadow: none; }
-  92%, 96% { color: var(--rust-light); text-shadow: 0 0 12px var(--rust); }
+  92%, 96% { color: var(--rust-light); }
 }
 @keyframes count-up { from { --n: 0; } }
 
 .blur-in { display: inline-block; animation: blur-in .9s cubic-bezier(.2, .7, .2, 1) both; }
 .rise { animation: rise .7s cubic-bezier(.2, .7, .2, 1) both; }
 .word-in { animation: word-in .55s cubic-bezier(.2, .8, .2, 1) both; }
-.shine {
-  background: linear-gradient(110deg, var(--muted-foreground) 40%, var(--foreground) 50%, var(--muted-foreground) 60%);
-  background-size: 250% 100%;
-  background-clip: text;
-  color: transparent;
-  animation: shine 3.5s linear infinite;
-}
 .star-border {
   background: conic-gradient(from var(--star-angle), transparent 0 70%, var(--rust-light) 85%, transparent 100%) border-box;
   animation: star-spin 3s linear infinite;
@@ -594,12 +600,8 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
 .count::after { content: counter(n); }
 
 
-.spotlight:hover {
-  background: radial-gradient(260px circle at var(--x, 50%) var(--y, 50%), color-mix(in oklch, var(--primary) 16%, transparent), transparent 70%), var(--card);
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .blur-in, .rise, .word-in, .shine, .star-border, .glyphs > span, .count { animation: none; }
+  .blur-in, .rise, .word-in, .star-border, .glyphs > span, .count { animation: none; }
 }
 
 .section-rule {
@@ -665,4 +667,22 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
 .faq[open]::details-content { block-size: auto; }
 @media (prefers-reduced-motion: reduce) {
   .faq::details-content, .faq-chevron { transition: none; }
+}
+
+.backdrop-type {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 0.8;
+  letter-spacing: -0.06em;
+  white-space: nowrap;
+}
+.backdrop-outline {
+  color: transparent;
+  -webkit-text-stroke: 1.5px color-mix(in oklch, var(--primary) 30%, transparent);
+}
+.backdrop-solid {
+  color: color-mix(in oklch, var(--primary) 9%, transparent);
 }

@@ -17,7 +17,7 @@ export interface CompileQuestion {
 }
 
 const choice =
-  "flex min-h-14 items-center gap-3 rounded-xl border border-border bg-background/60 px-4 text-left font-semibold transition-[transform,background-color,border-color] duration-200 hover:-translate-y-0.5 active:translate-y-0";
+  "flex min-h-14 items-center gap-3 rounded-xl border border-border bg-background/60 px-4 text-left font-semibold transition-[transform,background-color,border-color] duration-200 hover:-translate-y-0.5 active:translate-y-0 motion-reduce:transition-colors motion-reduce:hover:translate-y-0";
 const kbd = "ml-auto hidden rounded-md border border-border px-1.5 py-0.5 font-mono text-[11px] font-normal text-muted-foreground sm:inline";
 
 export function CompileCard({ questions, rustc }: { questions: CompileQuestion[]; rustc: string }) {
@@ -80,7 +80,7 @@ export function CompileCard({ questions, rustc }: { questions: CompileQuestion[]
       <div className="flex flex-col gap-4 p-5 md:p-6">
         <div className="flex items-center justify-between gap-3">
           <h3 className="text-lg font-bold">Does it compile?</h3>
-          <span className="font-mono text-xs tabular-nums text-muted-foreground">
+          <span className="text-xs tabular-nums text-muted-foreground">
             <span className="sr-only">Question </span>
             {i + 1} / {questions.length}
           </span>

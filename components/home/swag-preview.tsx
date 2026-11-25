@@ -157,7 +157,7 @@ export function SwagPreview() {
 
   return (
     <div className="flex flex-col items-center gap-3">
-      <div className="relative aspect-[900/1300] w-full max-w-[220px] overflow-hidden rounded-2xl border border-border bg-[radial-gradient(ellipse_at_50%_30%,color-mix(in_oklch,var(--primary)_18%,transparent),transparent_65%)]">
+      <div className="relative aspect-[900/1300] w-full max-w-[220px] overflow-hidden">
         <Image
           src={`/3d/${who}-poster.webp`}
           alt={model.alt}
@@ -178,7 +178,7 @@ export function SwagPreview() {
       <div className="relative grid grid-cols-2 rounded-full border border-border bg-card p-1" role="group" aria-label="Model">
         <span
           aria-hidden="true"
-          className="absolute inset-y-1 left-1 w-[calc(50%-4px)] rounded-full bg-primary shadow-[0_0_16px_color-mix(in_oklch,var(--primary)_45%,transparent)] transition-transform duration-300 ease-out motion-reduce:transition-none"
+          className="absolute inset-y-1 left-1 w-[calc(50%-4px)] rounded-full bg-primary transition-transform duration-300 ease-out motion-reduce:transition-none"
           style={{ transform: who === "female" ? "translateX(100%)" : "none" }}
         />
         {MODELS.map((m) => (

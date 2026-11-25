@@ -4,7 +4,7 @@ import type { CSSProperties } from "react";
 import { BOOKS } from "@/lib/books";
 import { getBookStructure } from "@/lib/content";
 import { getAllQuizzes } from "@/lib/quizzes";
-import { Play, ListChecks, Waypoints, RotateCcw, Star, BookOpen, CalendarDays, CircleCheck, Shirt, Truck, Shuffle, Bug, GitPullRequest, ChevronDown } from "lucide-react";
+import { ChevronRight, Play, ListChecks, Waypoints, RotateCcw, Star, BookOpen, CalendarDays, CircleCheck, Shirt, Truck, Shuffle, Bug, GitPullRequest, ChevronDown } from "lucide-react";
 import { REPO_URL, getRepoFacts, getSiteStats, getWeeklyActivity } from "@/lib/site-stats";
 import { CONTENT_LAST_UPDATED } from "@/lib/version";
 import { BookProgressBar } from "@/components/book-progress";
@@ -13,7 +13,6 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { RotatingWord } from "@/components/home/rotating-word";
 import { CompileCard, type CompileQuestion } from "@/components/home/compile-card";
-import { SpotlightLink } from "@/components/home/spotlight-link";
 import { SectionDivider } from "@/components/home/section-divider";
 import { SwagPreview } from "@/components/home/swag-preview";
 
@@ -176,17 +175,14 @@ export default async function HomePage() {
         </div>
         <div className="relative mx-auto flex max-w-6xl flex-wrap items-center gap-12 px-4 pb-16 pt-14 sm:px-6 md:pt-20">
           <div className="min-w-0 flex-[999_1_520px]">
-            <p className="shine mb-4 inline-block font-heading text-[13px] uppercase tracking-[0.04em]">
-              Free · Open source · Microsoft&apos;s RustTraining books
-            </p>
             <h1 className="mb-5 text-4xl font-bold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl lg:text-6xl">
               <span className="blur-in">Learn Rust</span>{" "}
               <span className="inline-block whitespace-nowrap">
                 <span className="blur-in" style={{ animationDelay: ".12s" }}>from</span> <RotatingWord />
               </span>
             </h1>
-            <p className="rise mb-8 max-w-xl text-lg text-muted-foreground" style={{ animationDelay: ".35s" }}>
-              Seven Microsoft books and 100 hands-on projects, with runnable examples, exercises and &ldquo;does it compile?&rdquo; quizzes checked by the real Rust compiler.
+            <p className="rise mb-8 max-w-xl text-pretty text-lg text-muted-foreground" style={{ animationDelay: ".35s" }}>
+              Seven free Microsoft books and 100 projects, every quiz checked by rustc.
             </p>
             <div className="rise flex flex-wrap gap-3" style={{ animationDelay: ".5s" }}>
               <a href="#start" className="inline-flex min-h-12 items-center rounded-[10px] bg-primary px-5 font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
@@ -198,7 +194,7 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <div id="start" className="rise min-w-0 flex-[1_1_380px] rounded-2xl border border-border bg-card/90 p-6" style={{ animationDelay: ".6s" }}>
+          <div id="start" className="rise min-w-0 flex-[1_1_380px]" style={{ animationDelay: ".6s" }}>
             <h2 className="mb-1 text-lg font-bold">Where are you coming from?</h2>
             <p className="mb-4 text-sm text-muted-foreground">Pick one and we&apos;ll open the right book.</p>
             <div className="flex flex-col gap-2">
@@ -208,15 +204,15 @@ export default async function HomePage() {
                   <Link
                     key={s.slug}
                     href={`/books/${s.slug}`}
-                    className="flex min-h-[60px] items-center justify-between gap-3 rounded-[10px] border border-border bg-background px-4 py-3 transition-colors hover:border-primary hover:bg-primary/10"
+                    className="group flex min-h-[60px] items-center justify-between gap-3 rounded-[10px] border border-border bg-card px-4 py-3 transition-colors hover:border-primary hover:bg-primary/10"
                   >
                     <span className="flex flex-col gap-0.5">
                       <span className="font-semibold text-foreground">{s.label}</span>
                       <span className="text-[13px] text-muted-foreground">
-                        {book.title} · {book.chapterCount} chapters
+                        {book.title}, {book.chapterCount} chapters
                       </span>
                     </span>
-                    <span aria-hidden="true" className="text-primary">→</span>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-primary transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" aria-hidden="true" />
                   </Link>
                 );
               })}
@@ -244,19 +240,19 @@ export default async function HomePage() {
           <div className="mb-8 max-w-xl empty:hidden">
             <ContinueReading />
           </div>
-          <h2 className="mb-2 text-2xl font-bold tracking-[-0.02em] sm:text-3xl">One path, from first steps to expert</h2>
+          <h2 className="mb-2 text-2xl font-bold tracking-[-0.02em] sm:text-3xl lg:text-[40px]">One path, from first steps to expert</h2>
           <p className="mb-8 text-muted-foreground">Start with a bridge book, then go deeper. Every book is free and works offline.</p>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {STAGES.map((stage) => (
               <div key={stage.name} className="flex flex-col gap-3">
                 <div className="flex items-center gap-2.5">
-                  <span className={`h-2.5 w-2.5 rounded-full ${stage.dot} shadow-[0_0_10px]`} />
-                  <h3 className="text-[13px] font-bold uppercase tracking-[0.04em] text-foreground/80">{stage.name}</h3>
+                  <span className={`h-2.5 w-2.5 rounded-full ${stage.dot}`} />
+                  <h3 className="font-sans text-sm font-semibold text-muted-foreground">{stage.name}</h3>
                 </div>
                 {stage.slugs.map((slug) => {
                   const book = bySlug.get(slug)!;
                   return (
-                    <SpotlightLink
+                    <Link
                       key={slug}
                       href={`/books/${slug}`}
                       className="group flex flex-col gap-1.5 rounded-xl border border-border bg-card p-[18px] transition-colors hover:border-primary/60"
@@ -275,7 +271,7 @@ export default async function HomePage() {
                         {book.chapterCount} {slug === "100-rust-projects" ? "projects" : "chapters"}
                       </span>
                       <BookProgressBar bookSlug={slug} totalChapters={book.chapterCount} />
-                    </SpotlightLink>
+                    </Link>
                   );
                 })}
               </div>
@@ -286,27 +282,29 @@ export default async function HomePage() {
         <SectionDivider />
 
         <section id="practice" className="scroll-mt-4 py-16 md:py-[72px]">
-          <h2 className="mb-2 text-2xl font-bold tracking-[-0.02em] sm:text-3xl">More than reading</h2>
+          <h2 className="mb-2 text-2xl font-bold tracking-[-0.02em] sm:text-3xl lg:text-[40px]">More than reading</h2>
           <p className="mb-8 text-muted-foreground">Every quiz is one real change to an example from the books. rustc decides the answer.</p>
           <CompileCard questions={questions} rustc={rustc} />
           <div className="mt-10 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
             {FEATURES.map((f) => (
               <Link key={f.title} href={f.href} className="group flex flex-col gap-2">
-                <f.icon className="h-5 w-5 text-primary" aria-hidden="true" />
-                <h3 className="text-base font-bold group-hover:text-primary">{f.title}</h3>
+                <h3 className="flex items-center gap-2 text-base font-bold group-hover:text-primary">
+                  <f.icon className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                  {f.title}
+                </h3>
                 <p className="text-sm text-muted-foreground">{"count" in f ? `${stats.exercises} ${f.body}` : f.body}</p>
               </Link>
             ))}
           </div>
         </section>
 
-        <SectionDivider />
-
         <section id="challenge" aria-labelledby="challenge-title" className="py-16 md:py-[72px]">
-          <div className="flex flex-wrap items-center gap-8 rounded-[20px] border border-primary/45 bg-[radial-gradient(ellipse_at_85%_50%,color-mix(in_oklch,var(--primary)_18%,transparent),transparent_60%)] p-6 sm:p-10">
-            <div className="min-w-0 flex-[999_1_460px]">
-              <p className="mb-2 font-heading text-[13px] font-bold uppercase tracking-[0.14em] text-primary">New</p>
-              <h2 id="challenge-title" className="mb-3 text-2xl font-bold tracking-[-0.02em] sm:text-3xl">The 30-Day Rust Challenge</h2>
+          <div className="relative flex flex-wrap items-center gap-8 overflow-hidden rounded-[20px] border border-primary/45 bg-primary/5 p-6 sm:p-10">
+            <span aria-hidden="true" className="backdrop-type backdrop-outline hidden sm:block -bottom-[0.5em] right-[-0.02em] text-[clamp(240px,36vw,460px)]">
+              30
+            </span>
+            <div className="relative min-w-0 flex-[999_1_460px]">
+              <h2 id="challenge-title" className="mb-3 text-2xl font-bold tracking-[-0.02em] sm:text-3xl lg:text-[40px]">The 30-Day Rust Challenge</h2>
               <p className="mb-5 max-w-xl text-muted-foreground">
                 Read 30 chapters on at least 15 days and get 25 quizzes right. Finish to earn the challenge badge, a spot on the finishers wall and a chance at Rust swag each quarter.
               </p>
@@ -314,7 +312,7 @@ export default async function HomePage() {
                 Opens soon
               </span>
             </div>
-            <dl className="grid min-w-0 flex-[1_1_280px] grid-cols-3 gap-4">
+            <dl className="relative grid min-w-0 flex-[1_1_280px] grid-cols-3 gap-4">
               {CHALLENGE.map(([n, label, Icon]) => (
                 <div key={label} className="flex flex-col-reverse justify-end gap-1">
                   <dt className="text-sm text-muted-foreground">{label}</dt>
@@ -329,16 +327,18 @@ export default async function HomePage() {
         <SectionDivider />
 
         <section id="swag" aria-labelledby="swag-title" className="py-16 md:py-[72px]">
-          <div className="flex flex-wrap items-center gap-8 rounded-[20px] border border-border bg-card/60 p-6 sm:px-10 sm:py-7">
-            <div className="min-w-0 flex-[999_1_420px]">
-              <p className="mb-2 font-heading text-[13px] font-bold uppercase tracking-[0.14em] text-primary">Finishers&apos; swag</p>
-              <h2 id="swag-title" className="mb-3 text-[22px] font-bold tracking-[-0.02em] sm:text-3xl">
-                <span className="block sm:inline">Finish the challenge.</span>{" "}
-                <span className="block sm:inline">
+          <div className="relative flex flex-wrap items-center gap-8 overflow-hidden rounded-[20px] border border-border bg-card/60 p-6 sm:px-10 sm:py-7">
+            <span aria-hidden="true" className="backdrop-type backdrop-solid -right-[0.08em] top-1/2 -translate-y-1/2 text-[clamp(160px,26vw,340px)]">
+              rs::
+            </span>
+            <div className="relative min-w-0 flex-[999_1_420px]">
+              <h2 id="swag-title" className="mb-3 text-[22px] font-bold tracking-[-0.02em] sm:text-3xl lg:text-[40px]">
+                <span className="block sm:inline lg:block">Finish the challenge.</span>{" "}
+                <span className="block sm:inline lg:block">
                   Wear the <span className="text-primary">rs::</span> shirt.
                 </span>
               </h2>
-              <p className="mb-4 max-w-xl text-muted-foreground">Every quarter, 5 people who finished the 30-Day Rust Challenge win.</p>
+              <p className="mb-4 max-w-xl text-muted-foreground">Each quarter, a few people who finished the 30-Day Rust Challenge win.</p>
               <ul className="flex flex-col gap-2.5 text-sm">
                 {SWAG_FACTS.map(([Icon, text]) => (
                   <li key={text} className="flex items-center gap-3">
@@ -348,7 +348,7 @@ export default async function HomePage() {
                 ))}
               </ul>
             </div>
-            <div className="min-w-0 flex-[1_1_240px]">
+            <div className="relative min-w-0 flex-[1_1_240px]">
               <SwagPreview />
             </div>
           </div>
@@ -364,7 +364,7 @@ export default async function HomePage() {
                   <p className="text-muted-foreground">Join the Discord for questions, challenge check-ins and monthly live office hours.</p>
                 </div>
                 <a href={DISCORD_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center rounded-[10px] border border-border px-5 font-semibold transition-colors hover:border-primary/50">
-                  Join the Discord →
+                  Join the Discord
                 </a>
               </div>
             </section>
@@ -376,9 +376,8 @@ export default async function HomePage() {
         <section aria-labelledby="open-source" className="py-16 md:py-[72px]">
           <div className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
             <div className="flex flex-col gap-5 bg-background p-6 sm:p-8">
-              <p className="font-heading text-[13px] font-bold uppercase tracking-[0.14em] text-primary">Open source · MIT</p>
               {repo ? (
-                <h2 id="open-source" className="flex flex-wrap items-baseline gap-x-3 text-2xl font-bold leading-tight">
+                <h2 id="open-source" className="flex flex-wrap items-baseline gap-x-3 text-2xl font-bold leading-tight lg:text-[32px]">
                   <span className="text-6xl tabular-nums tracking-[-0.04em] text-foreground">{repo.stars}</span>
                   people starred this on GitHub.
                 </h2>
@@ -430,16 +429,12 @@ export default async function HomePage() {
         </section>
       </main>
 
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
-        <SectionDivider />
-      </div>
-
       {/* FAQ */}
-      <section aria-labelledby="faq-title" className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-16 sm:px-6 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] md:gap-12 md:py-[72px]">
+      <section aria-labelledby="faq-title" className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-16 sm:px-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] md:gap-12 md:py-[72px]">
         <div>
-          <h2 id="faq-title" className="text-2xl font-bold mb-2">Frequently Asked Questions</h2>
+          <h2 id="faq-title" className="mb-2 text-2xl font-bold tracking-[-0.02em] sm:text-3xl lg:text-[40px]">Frequently Asked Questions</h2>
           <p className="text-muted-foreground mb-8">
-            Everything you need to know about using this site.
+            Offline reading, fonts, sign-in and what we count.
           </p>
         </div>
         <div className="border-t border-border">
@@ -449,7 +444,7 @@ export default async function HomePage() {
               <ChevronDown className="faq-chevron h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-300" aria-hidden="true" />
             </summary>
             <p className="pb-5 pr-8 text-sm text-muted-foreground">
-              Yes. The site is a PWA — once you visit a book, its chapters are
+              Yes. The site is a PWA: once you visit a book, its chapters are
               cached automatically. You can install it on your device and read
               without an internet connection.
             </p>
@@ -482,7 +477,7 @@ export default async function HomePage() {
             </summary>
             <p className="pb-5 pr-8 text-sm text-muted-foreground">
               Signing in syncs your reading progress, bookmarks, preferences,
-              solved exercises, quiz answers and review schedule to the cloud — so
+              solved exercises, quiz answers and review schedule to the cloud, so
               they follow you across devices. Without signing in, everything is
               stored locally in your current browser.
             </p>
@@ -508,6 +503,17 @@ export default async function HomePage() {
               graded and Playground runs.
               No account, IP address or cookie is attached to those counts.
               Cloudflare Web Analytics also measures page visits, without cookies.
+            </p>
+          </details>
+          <details className="faq border-b border-border">
+            <summary className="flex cursor-pointer items-center justify-between gap-4 py-4">
+              <h3 className="font-semibold">Is this an official Microsoft site?</h3>
+              <ChevronDown className="faq-chevron h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-300" aria-hidden="true" />
+            </summary>
+            <p className="pb-5 pr-8 text-sm text-muted-foreground">
+              No. It&apos;s an independent, unofficial reader built by Ruhan Khandakar. The
+              books come from Microsoft&apos;s open-source RustTraining repo, but Microsoft
+              doesn&apos;t run, endorse or support this site.
             </p>
           </details>
           <details className="faq border-b border-border">
