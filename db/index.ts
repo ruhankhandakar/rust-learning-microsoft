@@ -62,6 +62,7 @@ interface ChallengeEnrollmentTable {
   show_on_wall: Generated<number>;
   draw_opt_in: Generated<number>;
   revoked_at: string | null;
+  flags_cleared_at: string | null;
 }
 
 interface SwagDrawsTable {
@@ -102,6 +103,7 @@ interface AccountTable {
   userId: string;
   providerId: string;
   accountId: string;
+  accessToken: string | null;
 }
 
 interface ChallengeLogTable {

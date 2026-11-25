@@ -10,6 +10,18 @@ type Draw = Awaited<ReturnType<typeof drawState>>;
 
 const TABS = ["Comments", "Flagged progress", "Swag draw"] as const;
 const small = "min-h-9 rounded-lg border px-3 text-sm font-semibold transition-colors disabled:opacity-50";
+const pill = "rounded-full px-2.5 py-0.5 text-xs font-semibold";
+const COMMENT_STATUS: Record<string, [string, string]> = {
+  new: ["Waiting", "bg-amber-500/15 text-amber-700 dark:text-amber-300"],
+  approved: ["Approved", "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"],
+  hidden: ["Hidden", "bg-muted text-muted-foreground"],
+};
+const WINNER_STATUS: Record<string, [string, string]> = {
+  drawn: ["Waiting for claim", "bg-muted text-muted-foreground"],
+  claimed: ["Claimed, ship it", "bg-amber-500/15 text-amber-700 dark:text-amber-300"],
+  shipped: ["Shipped", "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"],
+  expired: ["Expired, redrawn", "bg-muted text-muted-foreground"],
+};
 
 export function AdminBoard({ comments, finishers, draw, site }: { comments: Comments; finishers: Finishers; draw: Draw; site: string }) {
   const router = useRouter();
@@ -64,7 +76,7 @@ export function AdminBoard({ comments, finishers, draw, site }: { comments: Comm
           ) : (
             <ul className="flex flex-col gap-3">
               {comments.map((c) => (
-                <li key={c.id} className="flex flex-wrap items-start justify-between gap-4 rounded-xl border border-border p-4">
+                <li key={c.id} className={`flex flex-wrap items-start justify-between gap-4 rounded-xl border border-border p-4 transition-opacity ${c.status === "hidden" ? "opacity-50" : ""}`}>
                   <div className="min-w-0 flex-[1_1_420px]">
                     <p className="text-sm text-muted-foreground">
                       <span className="font-semibold text-foreground">{c.name}</span> on {c.where}, {c.date}
@@ -79,8 +91,8 @@ export function AdminBoard({ comments, finishers, draw, site }: { comments: Comm
                     <p className="mt-2">{c.comment}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={`text-sm ${c.status === "approved" ? "text-emerald-600 dark:text-emerald-500" : c.status === "hidden" ? "text-muted-foreground" : "text-amber-600 dark:text-amber-400"}`}>{c.status}</span>
-                    <button type="button" disabled={busy || c.status === "approved"} onClick={() => act({ action: "comment", id: c.id, status: "approved" })} className={`${small} border-emerald-500/50 hover:bg-emerald-500/10`}>
+                    <span className={`${pill} ${(COMMENT_STATUS[c.status] ?? COMMENT_STATUS.new)[1]}`}>{(COMMENT_STATUS[c.status] ?? COMMENT_STATUS.new)[0]}</span>
+                    <button type="button" disabled={busy || c.status === "approved"} onClick={() => act({ action: "comment", id: c.id, status: "approved" })} className={`${small} border-primary bg-primary text-primary-foreground hover:bg-primary/90`}>
                       Approve
                     </button>
                     <button type="button" disabled={busy || c.status === "hidden"} onClick={() => act({ action: "comment", id: c.id, status: "hidden" })} className={`${small} border-border hover:bg-accent`}>
@@ -122,12 +134,29 @@ export function AdminBoard({ comments, finishers, draw, site }: { comments: Comm
                       <td className="p-3 tabular-nums">{f.accountAgeAtStart} days</td>
                       <td className="p-3 tabular-nums">{f.daysTaken ?? "–"}</td>
                       <td className="p-3 tabular-nums">{f.accuracy === null ? "–" : `${Math.round(f.accuracy * 100)}%`}</td>
-                      <td className="p-3 text-amber-600 dark:text-amber-400">{f.revoked ? <span className="text-muted-foreground">revoked</span> : f.flags.join(", ") || <span className="text-muted-foreground">none</span>}</td>
-                      <td className="p-3 text-right">
+                      <td className="p-3">
+                        {f.revoked ? (
+                          <span className={`${pill} bg-muted text-muted-foreground`}>Revoked</span>
+                        ) : f.flags.length === 0 ? (
+                          <span className="text-muted-foreground">None</span>
+                        ) : f.cleared ? (
+                          <span className="text-muted-foreground">{f.flags.join(", ")}, reviewed</span>
+                        ) : (
+                          <span className="text-amber-700 dark:text-amber-300">{f.flags.join(", ")}</span>
+                        )}
+                      </td>
+                      <td className="p-3">
                         {!f.revoked && (
-                          <button type="button" disabled={busy} onClick={() => act({ action: "revoke", userId: f.id })} className={`${small} border-red-400/50 text-red-400 hover:bg-red-500/10`}>
-                            Revoke
-                          </button>
+                          <div className="flex justify-end gap-2">
+                            {f.flags.length > 0 && !f.cleared && (
+                              <button type="button" disabled={busy} onClick={() => act({ action: "looks-fine", userId: f.id })} className={`${small} whitespace-nowrap border-border hover:bg-accent`}>
+                                Looks fine
+                              </button>
+                            )}
+                            <button type="button" disabled={busy} onClick={() => act({ action: "revoke", userId: f.id })} className={`${small} whitespace-nowrap border-red-500/50 text-red-600 hover:bg-red-500/10 dark:text-red-400`}>
+                              Revoke badges
+                            </button>
+                          </div>
                         )}
                       </td>
                     </tr>
@@ -143,7 +172,7 @@ export function AdminBoard({ comments, finishers, draw, site }: { comments: Comm
         <section>
           <h2 className="mb-1 text-xl font-bold">Swag draw, {draw.quarter}</h2>
           <p className="mb-5 text-sm text-muted-foreground">
-            {draw.eligible} eligible finishers (finished, opted in to the draw, never won). Check each winner&apos;s profile before emailing them their claim link.
+            {draw.eligible} eligible finishers (finished, opted in to the draw, never got a prize). GitHub accounts under 90 days old are skipped when you draw. Check each winner&apos;s profile before emailing them their claim link.
           </p>
           {draw.drawnAt ? (
             <p className="mb-5 text-sm text-muted-foreground">
@@ -161,16 +190,18 @@ export function AdminBoard({ comments, finishers, draw, site }: { comments: Comm
           )}
           {draw.winners.length > 0 && (
             <ul className="flex flex-col gap-3">
-              {draw.winners.map((w) => {
+              {draw.winners.map((w, i) => {
                 const link = `${site}/swag/claim/${w.token}`;
                 return (
-                  <li key={w.id} className="rounded-xl border border-border p-4">
+                  <li key={w.id} className={`rise rounded-xl border border-border p-4 ${w.status === "expired" ? "opacity-60" : ""}`} style={{ animationDelay: `${i * 80}ms` }}>
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <p>
                         <span className="font-semibold">{w.name}</span> <span className="text-muted-foreground">({w.email}), {w.prize}, {w.quarter}</span>
                       </p>
                       <div className="flex items-center gap-2">
-                        <span className={`text-sm ${w.unclaimed ? "text-red-600 dark:text-red-400" : w.status === "shipped" ? "text-emerald-600 dark:text-emerald-500" : w.status === "claimed" ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground"}`}>{w.unclaimed ? "unclaimed, past the date" : w.status}</span>
+                        <span className={`${pill} ${w.unclaimed ? "bg-red-500/15 text-red-700 dark:text-red-300" : (WINNER_STATUS[w.status] ?? WINNER_STATUS.drawn)[1]}`}>
+                          {w.unclaimed ? "Unclaimed, past the date" : (WINNER_STATUS[w.status] ?? WINNER_STATUS.drawn)[0]}
+                        </span>
                         {w.unclaimed && (
                           <button type="button" disabled={busy} onClick={() => act({ action: "redraw", winnerId: w.id })} className={`${small} border-primary/50 hover:bg-primary/10`}>
                             Redraw

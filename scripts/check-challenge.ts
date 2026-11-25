@@ -111,8 +111,32 @@ async function main() {
   ok(!(await eligibleFinishers()).some((e) => e.id === U), "a finisher without the draw switch is not eligible");
   await db.updateTable("challenge_enrollment").set({ draw_opt_in: 1 }).where("user_id", "=", U).execute();
   ok((await eligibleFinishers()).some((e) => e.id === U), "a finisher with the draw switch is eligible");
+  const Y = "challenge-test-young", GH_AGE: Record<string, number> = {};
+  const linkGitHub = async (userId: string, ageDays: number) => {
+    const accountId = String(9000 + Object.keys(GH_AGE).length);
+    GH_AGE[accountId] = ageDays;
+    await sql`INSERT INTO account (id, accountId, providerId, userId, createdAt, updatedAt) VALUES (${"acc-" + userId}, ${accountId}, 'github', ${userId}, datetime('now'), datetime('now'))`.execute(db);
+  };
+  let githubDown = false;
+  const revokedToken = "revoked-token";
+  globalThis.fetch = (async (url: string, init?: RequestInit) => {
+    if (githubDown) return new Response(null, { status: 503 });
+    if ((init?.headers as Record<string, string> | undefined)?.Authorization === `Bearer ${revokedToken}`) return new Response(null, { status: 401 });
+    const age = GH_AGE[String(url).split("/").pop()!];
+    return age === undefined ? new Response(null, { status: 404 }) : Response.json({ created_at: new Date(realNow() - age * 86400000).toISOString() });
+  }) as typeof fetch;
+  await linkGitHub(U, 400);
+  await sql`INSERT OR IGNORE INTO user (id, name, email, emailVerified, createdAt, updatedAt) VALUES (${Y}, 'Young', 'young@example.invalid', 0, datetime('now'), datetime('now'))`.execute(db);
+  await db.insertInto("challenge_enrollment").values({ user_id: Y, started_at: new Date(realNow() - 40 * 86400000).toISOString(), completed_at: new Date(realNow() - 20 * 86400000).toISOString(), show_on_wall: 0, draw_opt_in: 1 }).execute();
+  await linkGitHub(Y, 30);
+  await db.updateTable("account").set({ accessToken: revokedToken }).where("userId", "=", U).execute();
+  githubDown = true;
+  const down = await runDraw();
+  ok(!down.ok && !(await db.selectFrom("swag_draws").select("id").executeTakeFirst()), "if GitHub can't be reached, nothing is drawn");
+  githubDown = false;
   const first = await runDraw();
-  ok(first.ok, "the quarter's draw runs");
+  ok(first.ok, "the quarter's draw runs, even when an entrant revoked the site's GitHub access");
+  ok(!(await db.selectFrom("swag_winners").select("id").where("user_id", "=", Y).executeTakeFirst()), "a GitHub account under 90 days old is never drawn");
   ok(!(await runDraw()).ok, "a quarter is drawn only once");
   const won = await db.selectFrom("swag_winners").selectAll().where("user_id", "=", U).executeTakeFirst();
   ok(!!won && !(await eligibleFinishers()).some((e) => e.id === U), "a winner can't win again");
@@ -129,6 +153,7 @@ async function main() {
   for (const id of [W, X]) {
     await sql`INSERT OR IGNORE INTO user (id, name, email, emailVerified, createdAt, updatedAt) VALUES (${id}, ${id}, ${id + "@example.invalid"}, 0, datetime('now'), datetime('now'))`.execute(db);
     await db.insertInto("challenge_enrollment").values({ user_id: id, started_at: iso(realNow() - 40 * 86400000), completed_at: iso(realNow() - 20 * 86400000), show_on_wall: 0, draw_opt_in: 1 }).execute();
+    await linkGitHub(id, 400);
   }
   const past = await db.insertInto("swag_draws").values({ quarter: "2000-Q1", seed: "checkseed", drawn_at: iso(realNow()) }).returning("id").executeTakeFirstOrThrow();
   const lapsed = await db.insertInto("swag_winners").values({ draw_id: past.id, user_id: W, prize: "Sticker pack", claim_token: "lapsed-token", claim_by: iso(realNow() + 86400000) }).returning("id").executeTakeFirstOrThrow();

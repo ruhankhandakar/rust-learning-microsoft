@@ -4,6 +4,43 @@ import { db } from "@/db";
 // Internal only: sized to the yearly swag budget, never shown on the site.
 const PRIZES = ["T-shirt bundle", "Sticker pack", "Sticker pack"];
 const CLAIM_DAYS = 14;
+export const MIN_GITHUB_AGE_DAYS = 90;
+
+class GitHubUnavailable extends Error {}
+
+/** True if the entrant's GitHub account is old enough. Asked only at draw time, in seed order, so a draw costs a few API calls. */
+async function githubOldEnough(userId: string, now: Date): Promise<boolean> {
+  const account = await db
+    .selectFrom("account")
+    .select(["accountId", "accessToken"])
+    .where("userId", "=", userId)
+    .where("providerId", "=", "github")
+    .executeTakeFirst();
+  if (!account) return false;
+  const lookup = (token?: string | null) =>
+    fetch(`https://api.github.com/user/${account.accountId}`, {
+      headers: { Accept: "application/vnd.github+json", "User-Agent": "rust-training-swag-draw", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      cache: "no-store",
+    }).catch(() => null);
+  let res = await lookup(account.accessToken);
+  // A token the entrant revoked answers 401; the public profile still has created_at.
+  if (res?.status === 401 && account.accessToken) res = await lookup(null);
+  if (res?.status === 404) return false;
+  if (!res?.ok) throw new GitHubUnavailable();
+  const { created_at } = (await res.json()) as { created_at?: string };
+  return !!created_at && +now - Date.parse(created_at) >= MIN_GITHUB_AGE_DAYS * 86_400_000;
+}
+
+async function pickWinners<T extends { id: string }>(seed: string, entrants: T[], count: number, now: Date): Promise<T[]> {
+  const picked: T[] = [];
+  for (const e of byRank(seed, entrants)) {
+    if (picked.length === count) break;
+    if (await githubOldEnough(e.id, now)) picked.push(e);
+  }
+  return picked;
+}
+
+const GITHUB_DOWN = "Couldn't check GitHub account ages right now. Nothing was drawn; try again in a few minutes.";
 
 export function currentQuarter(now = new Date()): string {
   return `${now.getUTCFullYear()}-Q${Math.floor(now.getUTCMonth() / 3) + 1}`;
@@ -43,7 +80,14 @@ export async function runDraw(): Promise<{ ok: true } | { ok: false; error: stri
 
   const seed = randomBytes(16).toString("hex");
   const now = new Date();
-  const winners = byRank(seed, entrants).slice(0, PRIZES.length);
+  let winners: typeof entrants;
+  try {
+    winners = await pickWinners(seed, entrants, PRIZES.length, now);
+  } catch (e) {
+    if (e instanceof GitHubUnavailable) return { ok: false, error: GITHUB_DOWN };
+    throw e;
+  }
+  if (winners.length === 0) return { ok: false, error: `No entrant has a GitHub account at least ${MIN_GITHUB_AGE_DAYS} days old.` };
   const draw = await db
     .insertInto("swag_draws")
     .values({ quarter, seed, drawn_at: now.toISOString() })
@@ -75,7 +119,13 @@ export async function redraw(winnerId: number): Promise<{ ok: true } | { ok: fal
     .where("swag_winners.id", "=", winnerId)
     .executeTakeFirst();
   if (!w || w.status !== "drawn" || !claimExpired(w.claim_by)) return { ok: false, error: "Only an unclaimed prize past its claim date can be redrawn." };
-  const next = byRank(w.seed, await eligibleFinishers(w.draw_id))[0];
+  let next: { id: string } | undefined;
+  try {
+    [next] = await pickWinners(w.seed, await eligibleFinishers(w.draw_id), 1, new Date());
+  } catch (e) {
+    if (e instanceof GitHubUnavailable) return { ok: false, error: GITHUB_DOWN };
+    throw e;
+  }
   await db.updateTable("swag_winners").set({ status: "expired" }).where("id", "=", winnerId).execute();
   if (!next) return { ok: false, error: "Marked expired. Nobody else is eligible, so the prize stays unawarded." };
   await db

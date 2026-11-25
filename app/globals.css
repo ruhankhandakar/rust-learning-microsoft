@@ -758,3 +758,27 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
 @media (prefers-reduced-motion: reduce) {
   .compiled-stamp { animation: none; }
 }
+
+.ticket-stage {
+  background:
+    radial-gradient(ellipse at 50% 0%, color-mix(in oklab, var(--primary) 22%, transparent), transparent 60%),
+    repeating-linear-gradient(0deg, transparent 0 31px, color-mix(in oklab, var(--foreground) 4%, transparent) 31px 32px),
+    repeating-linear-gradient(90deg, transparent 0 31px, color-mix(in oklab, var(--foreground) 4%, transparent) 31px 32px),
+    var(--background);
+}
+.ticket-holo {
+  background: linear-gradient(180deg, var(--tier-starter), var(--tier-gold), oklch(0.8 0.12 160), oklch(0.75 0.13 250), oklch(0.75 0.15 320), var(--tier-starter));
+  background-size: 100% 300px;
+  animation: ticket-holo 4s linear infinite;
+}
+.dark .ticket-holo { mix-blend-mode: screen; }
+@keyframes ticket-holo { to { background-position: 0 300px; } }
+@keyframes ticket-spark {
+  from { opacity: 1; transform: translate(0, 0) scale(.6); }
+  to { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(1); }
+}
+.ticket-spark { animation: ticket-spark 1.1s cubic-bezier(.1, .7, .3, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .ticket-holo { animation: none; }
+  .ticket-spark { display: none; }
+}

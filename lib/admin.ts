@@ -76,6 +76,7 @@ export async function listFinishers() {
       "challenge_enrollment.started_at as startedAt",
       "challenge_enrollment.completed_at as completedAt",
       "challenge_enrollment.revoked_at as revokedAt",
+      "challenge_enrollment.flags_cleared_at as clearedAt",
     ])
     .where((eb) => eb.or([eb("challenge_enrollment.completed_at", "is not", null), eb("challenge_enrollment.revoked_at", "is not", null)]))
     .orderBy("challenge_enrollment.completed_at", "desc")
@@ -103,8 +104,12 @@ export async function listFinishers() {
       accuracy !== null && accuracy < 0.75 ? `${Math.round(accuracy * 100)}% quiz accuracy` : null,
       accountAgeAtStart < 30 ? `account ${accountAgeAtStart} days old at start` : null,
     ].filter(Boolean) as string[];
-    return { id: r.id, name: r.name, accountAgeAtStart, daysTaken, readingDays: Number(s?.days ?? 0), accuracy, flags, revoked: !!r.revokedAt };
+    return { id: r.id, name: r.name, accountAgeAtStart, daysTaken, readingDays: Number(s?.days ?? 0), accuracy, flags, revoked: !!r.revokedAt, cleared: !!r.clearedAt };
   });
+}
+
+export async function clearFlags(userId: string): Promise<void> {
+  await db.updateTable("challenge_enrollment").set({ flags_cleared_at: new Date().toISOString() }).where("user_id", "=", userId).execute();
 }
 
 /** Removes a finish: the badge, the wall listing and draw entry go with it. They may start again. */

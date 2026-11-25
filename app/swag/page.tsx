@@ -39,11 +39,12 @@ export default function SwagPage() {
             <h2 className="mb-3 text-xl font-bold">Who can win</h2>
             <ul className="flex list-disc flex-col gap-2 pl-5 text-muted-foreground">
               <li>Finished the 30-Day Rust Challenge</li>
+              <li>Signed in with a GitHub account at least 90 days old</li>
               <li>
                 Turned on <span className="font-mono text-foreground">draw</span> in the challenge rewards (&ldquo;email me if I&apos;m drawn&rdquo;)
               </li>
               <li>18 or older, with a shipping address in India</li>
-              <li>Hasn&apos;t won before: one prize per person, ever</li>
+              <li>Hasn&apos;t won before: one prize per person, ever (an unclaimed prize doesn&apos;t count)</li>
             </ul>
           </div>
           <div className="rounded-2xl border border-border p-6">

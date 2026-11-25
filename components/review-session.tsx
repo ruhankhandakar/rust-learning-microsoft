@@ -1,7 +1,8 @@
 "use client";
 
 import { Fragment, useRef, useState, type ReactNode } from "react";
-import { Check, Trash2, X } from "lucide-react";
+import Link from "next/link";
+import { Check, CircleHelp, Code2, ListChecks, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNow } from "@/components/review-due-badge";
 import {
@@ -67,21 +68,49 @@ function dueIn(ms: number) {
   return hours < 24 ? relative.format(hours, "hour") : relative.format(Math.round(hours / 24), "day");
 }
 
+const KIND: Record<ReviewSource["kind"], { label: string; Icon: typeof ListChecks }> = {
+  takeaways: { label: "Key takeaways", Icon: ListChecks },
+  exercise: { label: "Exercise", Icon: Code2 },
+  quiz: { label: "Does it compile?", Icon: CircleHelp },
+};
+
 export function ReviewSession(data: ReviewData) {
   const review = useLearnerStore("review");
   const now = useNow();
+  if (!review || !now) return <p className="text-sm text-muted-foreground">Loading your review queue…</p>;
   return (
-    <>
-      <p className="mb-8 leading-relaxed text-muted-foreground">
-        Cards come back after {REVIEW_INTERVAL_DAYS.slice(0, -1).join(", ")} and {REVIEW_INTERVAL_DAYS.at(-1)} days as
-        you keep getting them right. Miss one and it starts again the next day.
-      </p>
-      {review && now ? (
-        <ReviewQueue {...data} review={review} now={now} />
-      ) : (
-        <p className="text-sm text-muted-foreground">Loading your review queue…</p>
-      )}
-    </>
+    <div className="flex flex-col gap-8">
+      <Schedule review={review} now={now} />
+      <ReviewQueue {...data} review={review} now={now} />
+    </div>
+  );
+}
+
+function Schedule({ review, now }: { review: Record<string, ReviewCard>; now: number }) {
+  const cards = Object.values(review);
+  const due = dueReviewIds(review, now).length;
+  const perBox = REVIEW_INTERVAL_DAYS.map((_, i) => cards.filter((c) => Math.min(c.box, REVIEW_INTERVAL_DAYS.length - 1) === i).length);
+  return (
+    <section aria-label="Your review schedule" className="grid grid-cols-2 gap-3 sm:grid-cols-[1.3fr_repeat(4,1fr)]">
+      <div className="col-span-2 flex flex-col justify-between gap-1 rounded-2xl border-2 border-primary bg-primary/[0.08] p-5 sm:col-span-1">
+        <span className="text-sm font-semibold text-primary">Due now</span>
+        <span aria-live="polite" className="font-heading text-5xl font-bold tabular-nums">
+          {due}
+        </span>
+        <span className="text-[13px] text-muted-foreground">of {plural(cards.length, "card")} in your queue</span>
+      </div>
+      {REVIEW_INTERVAL_DAYS.map((days, i) => (
+        <div key={days} className="flex flex-col gap-1 rounded-2xl border border-border p-5">
+          <span className="text-sm text-muted-foreground">Every {plural(days, "day")}</span>
+          <span className="font-heading text-3xl font-bold tabular-nums">{perBox[i]}</span>
+          <div className="mt-auto flex gap-1 pt-2" aria-hidden="true">
+            {REVIEW_INTERVAL_DAYS.map((_, j) => (
+              <span key={j} className={`h-1.5 flex-1 rounded-full ${j <= i ? "bg-primary" : "bg-border"}`} />
+            ))}
+          </div>
+        </div>
+      ))}
+    </section>
   );
 }
 
@@ -103,29 +132,33 @@ function ReviewQueue({
 
   return (
     <div ref={region} tabIndex={-1} aria-label="Review queue" className="outline-none">
-      <p aria-live="polite" className="mb-4 text-sm font-medium">
-        {due.length > 0 ? `${due.length} due now` : "Nothing due"}
-        <span className="text-muted-foreground"> · {plural(total, "card")} in your queue</span>
-      </p>
       {id ? (
-        <ReviewCardView key={id} id={id} box={review[id].box} source={data.cards[id]} data={data} act={act} />
+        <div className="relative">
+          {due.length > 2 && <span aria-hidden="true" className="absolute inset-x-6 -bottom-4 h-full rounded-2xl border border-border bg-card/40" />}
+          {due.length > 1 && <span aria-hidden="true" className="absolute inset-x-3 -bottom-2 h-full rounded-2xl border border-border bg-card/70" />}
+          <ReviewCardView key={id} id={id} box={review[id].box} source={data.cards[id]} data={data} act={act} />
+        </div>
       ) : (
-        <div className="rounded-xl border border-border bg-card p-5 text-sm leading-relaxed">
+        <div className="flex flex-col items-start gap-3 rounded-2xl border border-dashed border-border p-8">
+          <p className="font-heading text-2xl font-bold">{total === 0 ? "No cards yet" : "All caught up"}</p>
           {total === 0 ? (
-            <p>You have no review cards yet. They are added as you learn; see below for how.</p>
+            <p className="max-w-lg text-muted-foreground">Cards are added as you learn. Solve an exercise or answer a quiz and it comes back here the next day.</p>
           ) : (
-            <p>
-              All caught up. The next card is due{" "}
+            <p className="text-muted-foreground">
+              The next card is due{" "}
               <time
                 dateTime={new Date(next).toISOString()}
                 title={new Date(next).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}
-                className="font-medium"
+                className="font-semibold text-foreground"
               >
                 {dueIn(next - now)}
               </time>
               .
             </p>
           )}
+          <Link href="/practice" className="text-sm font-semibold text-primary hover:underline">
+            Find something to practise
+          </Link>
         </div>
       )}
     </div>
@@ -157,13 +190,11 @@ function ReviewCardView({
 
   if (!source)
     return (
-      <article aria-labelledby="review-front" className="rounded-xl border border-border bg-card p-5">
-        <h2 id="review-front" className="font-semibold">
+      <article aria-labelledby="review-front" className="relative rounded-2xl border border-border bg-card p-6 sm:p-8">
+        <h2 id="review-front" className="font-heading text-xl font-bold">
           This item was removed from the book
         </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          The chapter changed upstream, so this card has nothing left to review.
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">The chapter changed upstream, so this card has nothing left to review.</p>
         <div className="mt-5 flex">{remove}</div>
       </article>
     );
@@ -172,28 +203,34 @@ function ReviewCardView({
   const bookTitle = data.books[source.chapter.split("/")[0]];
   const href = `/books/${source.chapter}${source.kind === "takeaways" ? "" : `#${source.anchor}`}`;
   const gotItDays = REVIEW_INTERVAL_DAYS[Math.min(box + 1, REVIEW_INTERVAL_DAYS.length - 1)];
+  const { label, Icon } = KIND[source.kind];
 
   return (
-    <article aria-labelledby="review-front" className="rounded-xl border border-border bg-card p-5">
-      <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        {source.kind === "takeaways" ? "Key takeaways" : source.kind === "exercise" ? "Exercise" : "Quiz"}
-      </p>
-      <h2 id="review-front" className="text-lg font-semibold leading-snug">
-        {source.kind === "takeaways" && `Recall the key takeaways of ${chapterTitle} (${bookTitle})`}
+    <article aria-labelledby="review-front" className="rise relative rounded-2xl border border-border bg-card p-6 shadow-[0_20px_40px_-24px_rgb(0_0_0/0.5)] sm:p-8">
+      <div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-2.5 py-1 font-semibold text-primary">
+          <Icon className="size-4" aria-hidden="true" />
+          {label}
+        </span>
+        <span className="text-muted-foreground">
+          {chapterTitle}, {bookTitle}
+        </span>
+      </div>
+      <h2 id="review-front" className="font-heading text-xl font-bold leading-snug sm:text-2xl">
+        {source.kind === "takeaways" && `Recall the key takeaways of ${chapterTitle}`}
         {source.kind === "exercise" && `Re-solve: ${source.title}`}
-        {source.kind === "quiz" && <>Does it still compile? {inlineMarkdown(source.change)}</>}
+        {source.kind === "quiz" && inlineMarkdown(source.change)}
       </h2>
       {source.kind !== "takeaways" && (
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-2 text-sm text-muted-foreground">
           <a href={href} className={linkClass}>
             {source.kind === "exercise" ? "Open the exercise" : "Open the question"}
-          </a>{" "}
-          in {chapterTitle} ({bookTitle})
+          </a>
         </p>
       )}
 
       {shown && (
-        <div ref={answer} tabIndex={-1} className="mt-4 border-t border-border pt-4 text-sm leading-relaxed outline-none">
+        <div ref={answer} tabIndex={-1} className="rise mt-5 rounded-xl bg-muted/50 p-4 text-sm leading-relaxed outline-none">
           {source.kind === "takeaways" && (
             <>
               <ul className="list-disc space-y-1.5 pl-5">
@@ -211,9 +248,9 @@ function ReviewCardView({
           {source.kind === "exercise" && <p>Did you solve it without opening the solution?</p>}
           {source.kind === "quiz" && (
             <p>
-              {source.compiles
-                ? "It compiles."
-                : `It does not compile${source.errorCode ? ` (${source.errorCode})` : ""}.`}{" "}
+              <span className="font-semibold">
+                {source.compiles ? "It compiles." : `It does not compile${source.errorCode ? ` (${source.errorCode})` : ""}.`}
+              </span>{" "}
               <a href={href} className={linkClass}>
                 Back to the question
               </a>
@@ -222,7 +259,7 @@ function ReviewCardView({
         </div>
       )}
 
-      <div className="mt-5 flex flex-wrap items-center gap-2">
+      <div className="mt-6 flex flex-wrap items-center gap-2">
         {shown ? (
           <>
             <Button onClick={() => act(() => gradeReview(id, true))}>
@@ -248,7 +285,7 @@ function ReviewCardView({
       </div>
       {shown && (
         <p className="mt-3 text-xs text-muted-foreground">
-          Got it: next review in {plural(gotItDays, "day")}. Missed: back to {plural(REVIEW_INTERVAL_DAYS[0], "day")}.
+          Got it: back in {plural(gotItDays, "day")}. Missed: back tomorrow.
         </p>
       )}
     </article>

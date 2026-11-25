@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { GitHubSignIn } from "@/components/github-sign-in";
 import { Checkbox } from "@/components/ui/checkbox";
-import { SwagTicket, type TicketInfo } from "@/components/swag-ticket";
+import { SwagTicket, TicketStage, type TicketInfo } from "@/components/swag-ticket";
 
 const field =
   "w-full rounded-[10px] border border-border bg-card px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-primary";
@@ -46,7 +46,9 @@ export function ClaimFlow({ token, info, shirt }: { token: string; info: TicketI
 
   return (
     <div className="flex flex-col gap-8">
-      <SwagTicket info={info} torn={torn} onTear={() => setTorn(true)} />
+      <TicketStage torn={torn}>
+        <SwagTicket info={info} torn={torn} onTear={() => setTorn(true)} />
+      </TicketStage>
       {torn && (
         <form onSubmit={submit} className="rise grid max-w-2xl gap-4 sm:grid-cols-2" aria-labelledby="claim-title">
           <div className="sm:col-span-2">

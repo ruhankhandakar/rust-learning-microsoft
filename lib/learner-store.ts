@@ -30,7 +30,8 @@ const STORAGE_KEYS: Record<Key, string> = {
 const OWNER_KEY = "rt:sync-owner";
 
 const DAY = 86_400_000;
-export const REVIEW_INTERVAL_DAYS = [1, 3, 7, 21];
+import { REVIEW_INTERVAL_DAYS } from "@/lib/review-schedule";
+export { REVIEW_INTERVAL_DAYS };
 
 export type ActivityKind =
   | "exercise_solved"
