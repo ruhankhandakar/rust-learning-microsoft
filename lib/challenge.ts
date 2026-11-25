@@ -22,6 +22,8 @@ export interface ChallengeProgress {
   completedAt: string | null;
   showOnWall: boolean;
   drawOptIn: boolean;
+  /** Asked to be emailed when the challenge opens. */
+  checkedIn: boolean;
   status: "none" | "active" | "complete" | "expired";
   today: number;
   chapters: number;
@@ -63,6 +65,7 @@ export async function getProgress(userId: string): Promise<ChallengeProgress> {
     completedAt: null,
     showOnWall: false,
     drawOptIn: false,
+    checkedIn: false,
     status: "none",
     today: 0,
     chapters: 0,
@@ -71,7 +74,10 @@ export async function getProgress(userId: string): Promise<ChallengeProgress> {
     misses: 0,
     days: [],
   };
-  if (!enrollment) return empty;
+  if (!enrollment) {
+    const checkin = await db.selectFrom("challenge_checkins").select("user_id").where("user_id", "=", userId).executeTakeFirst();
+    return { ...empty, checkedIn: !!checkin };
+  }
 
   const log = await db.selectFrom("challenge_log").select(["kind", "at"]).where("user_id", "=", userId).execute();
   const days: ChallengeDay[] = Array.from({ length: CHALLENGE.days }, (_, i) => ({ day: i + 1, chapters: 0, quizzes: 0 }));
@@ -90,6 +96,7 @@ export async function getProgress(userId: string): Promise<ChallengeProgress> {
 
   return {
     enrolled: true,
+    checkedIn: false,
     startedAt: enrollment.started_at,
     completedAt: enrollment.completed_at,
     showOnWall: enrollment.show_on_wall === 1,
@@ -221,6 +228,11 @@ export async function recordEvent(
 }
 
 /** Joins, or starts over after an expired attempt. A finished challenge is never reset. */
+export async function setCheckIn(userId: string, on: boolean): Promise<void> {
+  if (on) await db.insertInto("challenge_checkins").values({ user_id: userId, created_at: new Date().toISOString() }).onConflict((oc) => oc.column("user_id").doNothing()).execute();
+  else await db.deleteFrom("challenge_checkins").where("user_id", "=", userId).execute();
+}
+
 export async function join(userId: string): Promise<ChallengeProgress> {
   const current = await getProgress(userId);
   if (current.status === "active" || current.status === "complete") return current;

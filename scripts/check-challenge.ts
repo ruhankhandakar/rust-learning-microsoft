@@ -172,6 +172,23 @@ async function main() {
   delete process.env.ADMIN_GITHUB_ID;
   ok(!(await isAdmin(U)), "without ADMIN_GITHUB_ID nobody is admin");
 
+  // Launch date and check-ins
+  const { challengeOpen } = await import("../lib/challenge-launch");
+  ok(!challengeOpen(Date.parse("2026-11-30T18:29:59Z")) && challengeOpen(Date.parse("2026-11-30T18:30:00Z")), "the challenge opens at midnight India time on 1 December");
+  const { setCheckIn } = await import("../lib/challenge");
+  const { listCheckins, markCheckinsEmailed } = await import("../lib/admin");
+  const C = "challenge-test-checkin";
+  await sql`INSERT OR IGNORE INTO user (id, name, email, emailVerified, createdAt, updatedAt) VALUES (${C}, 'Early', 'early@example.invalid', 0, datetime('now'), datetime('now'))`.execute(db);
+  await setCheckIn(C, true);
+  await setCheckIn(C, true);
+  ok((await getProgress(C)).checkedIn && (await listCheckins()).filter((c) => c.id === C).length === 1, "checking in twice keeps one reminder");
+  await markCheckinsEmailed([C]);
+  const emailed = (await listCheckins()).find((c) => c.id === C)?.emailedAt;
+  await markCheckinsEmailed([C]);
+  ok(!!emailed && (await listCheckins()).find((c) => c.id === C)?.emailedAt === emailed, "marking emailed records the first send only");
+  await setCheckIn(C, false);
+  ok(!(await getProgress(C)).checkedIn, "a reminder can be cancelled");
+
   console.log(failed ? `${failed} FAILED` : "all passed");
   process.exit(failed ? 1 : 0);
 }

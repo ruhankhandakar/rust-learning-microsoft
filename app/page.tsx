@@ -18,6 +18,7 @@ import { SwagPreview } from "@/components/home/swag-preview";
 import { HomeTop } from "@/components/home/home-top";
 import type { RecentChanges } from "@/components/home/returning-dashboard";
 import { getChangelog } from "@/lib/changelog";
+import { challengeOpen } from "@/lib/challenge-launch";
 
 export const metadata: Metadata = {
   alternates: {
@@ -65,6 +66,9 @@ const FEATURES = [
   { icon: Waypoints, title: "Topics across books", body: "See how each book explains ownership, traits or async.", href: "/concepts" },
   { icon: RotateCcw, title: "Spaced review", body: "What you learned comes back after 1, 3, 7 and 21 days.", href: "/review" },
 ] as const;
+
+// Revalidated hourly, so the button flips within an hour of opening.
+const challengeIsOpen = () => challengeOpen(Date.now());
 
 function recentChanges(): RecentChanges | null {
   const latest = getChangelog()[0];
@@ -328,9 +332,12 @@ export default async function HomePage() {
               <p className="mb-5 max-w-xl text-muted-foreground">
                 Read 30 chapters on at least 15 days and get 25 quizzes right. Finish to earn the challenge badge, a spot on the finishers wall and a chance at Rust swag each quarter.
               </p>
-              <Link href="/challenge" className="inline-flex min-h-12 items-center rounded-[10px] bg-primary px-5 font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
-                Start the challenge
-              </Link>
+              <div className="flex flex-wrap items-center gap-4">
+                <Link href="/challenge" className="inline-flex min-h-12 items-center rounded-[10px] bg-primary px-5 font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
+                  {challengeIsOpen() ? "Start the challenge" : "Get a reminder"}
+                </Link>
+                {!challengeIsOpen() && <span className="text-sm font-semibold text-primary">Opens on 1 December</span>}
+              </div>
             </div>
             <dl className="relative grid min-w-0 flex-[1_1_280px] grid-cols-3 gap-4">
               {CHALLENGE.map(([n, label, Icon]) => (

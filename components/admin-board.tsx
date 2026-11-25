@@ -2,13 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import type { drawState, listComments, listFinishers } from "@/lib/admin";
+import type { drawState, listCheckins, listComments, listFinishers } from "@/lib/admin";
 
 type Comments = Awaited<ReturnType<typeof listComments>>;
 type Finishers = Awaited<ReturnType<typeof listFinishers>>;
 type Draw = Awaited<ReturnType<typeof drawState>>;
+type Checkins = Awaited<ReturnType<typeof listCheckins>>;
 
-const TABS = ["Comments", "Flagged progress", "Swag draw"] as const;
+const TABS = ["Comments", "Check-ins", "Flagged progress", "Swag draw"] as const;
 const small = "min-h-9 rounded-lg border px-3 text-sm font-semibold transition-colors disabled:opacity-50";
 const pill = "rounded-full px-2.5 py-0.5 text-xs font-semibold";
 const COMMENT_STATUS: Record<string, [string, string]> = {
@@ -23,12 +24,25 @@ const WINNER_STATUS: Record<string, [string, string]> = {
   expired: ["Expired, redrawn", "bg-muted text-muted-foreground"],
 };
 
-export function AdminBoard({ comments, finishers, draw, site }: { comments: Comments; finishers: Finishers; draw: Draw; site: string }) {
+const launchMessage = (site: string) => `Subject: The 30-Day Rust Challenge is open
+
+Hi,
+
+You asked us to tell you when the 30-Day Rust Challenge opens. It's open now:
+${site}/challenge
+
+Read 30 chapters on at least 15 days and get 25 quizzes right, within 30 days. Your 30 days start when you press Start.
+
+Happy reading,
+Ruhan`;
+
+export function AdminBoard({ comments, checkins, finishers, draw, site }: { comments: Comments; checkins: Checkins; finishers: Finishers; draw: Draw; site: string }) {
   const router = useRouter();
   const [tab, setTab] = useState<(typeof TABS)[number]>("Comments");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState<number | null>(null);
+  const [copied, setCopied] = useState<number | string | null>(null);
+  const pending = checkins.filter((c) => !c.emailedAt && c.email);
 
   async function act(body: object) {
     setBusy(true);
@@ -102,6 +116,69 @@ export function AdminBoard({ comments, finishers, draw, site }: { comments: Comm
                 </li>
               ))}
             </ul>
+          )}
+        </section>
+      )}
+
+      {tab === "Check-ins" && (
+        <section>
+          <h2 className="mb-1 text-xl font-bold">Challenge check-ins</h2>
+          <p className="mb-5 text-sm text-muted-foreground">
+            {checkins.length} {checkins.length === 1 ? "person" : "people"} asked to be emailed when the challenge opens. {pending.length} not emailed yet. Paste the
+            addresses into Bcc, never To, then mark them emailed.
+          </p>
+          <div className="mb-5 flex flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={pending.length === 0}
+              onClick={() => navigator.clipboard.writeText(pending.map((c) => c.email).join(", ")).then(() => setCopied("emails"))}
+              className={`${small} border-primary bg-primary text-primary-foreground hover:bg-primary/90`}
+            >
+              {copied === "emails" ? "Emails copied" : `Copy ${pending.length} ${pending.length === 1 ? "email" : "emails"}`}
+            </button>
+            <button type="button" onClick={() => navigator.clipboard.writeText(launchMessage(site)).then(() => setCopied("message"))} className={`${small} border-border hover:bg-accent`}>
+              {copied === "message" ? "Message copied" : "Copy email text"}
+            </button>
+            <button
+              type="button"
+              disabled={busy || pending.length === 0}
+              onClick={() => act({ action: "emailed", userIds: pending.map((c) => c.id) })}
+              className={`${small} border-border hover:bg-accent`}
+            >
+              Mark {pending.length} as emailed
+            </button>
+          </div>
+          {checkins.length === 0 ? (
+            <p className="text-muted-foreground">No check-ins yet.</p>
+          ) : (
+            <div className="overflow-x-auto rounded-xl border border-border">
+              <table className="w-full text-left text-sm">
+                <thead className="text-muted-foreground">
+                  <tr className="border-b border-border">
+                    <th className="p-3 font-normal">Name</th>
+                    <th className="p-3 font-normal">Email</th>
+                    <th className="p-3 font-normal">Checked in</th>
+                    <th className="p-3 font-normal">Emailed</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {checkins.map((c) => (
+                    <tr key={c.id} className="border-b border-border last:border-0">
+                      <td className="p-3 font-semibold">{c.name}</td>
+                      <td className="p-3">{c.email || <span className="text-muted-foreground">no email on GitHub</span>}</td>
+                      <td className="p-3 tabular-nums">{c.checkedInAt.slice(0, 10)}</td>
+                      <td className="p-3">
+                        {c.emailedAt ? (
+                          <span className={`${pill} bg-emerald-500/15 text-emerald-700 dark:text-emerald-300`}>{c.emailedAt.slice(0, 10)}</span>
+                        ) : (
+                          <span className={`${pill} bg-amber-500/15 text-amber-700 dark:text-amber-300`}>Not yet</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </section>
       )}

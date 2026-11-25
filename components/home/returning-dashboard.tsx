@@ -6,6 +6,7 @@ import { dueReviewIds, useLearnerStore } from "@/lib/learner-store";
 import { useNow } from "@/components/review-due-badge";
 import { useProgress } from "@/components/progress-provider";
 import { TIERS, type Achievements } from "@/lib/achievements-rules";
+import { challengeOpen } from "@/lib/challenge-launch";
 import type { ChallengeProgress } from "@/lib/challenge";
 
 export interface RecentChanges {
@@ -118,9 +119,15 @@ export function ReturningDashboard({ name, bookTotals, recent }: { name: string 
           ) : (
             <>
               <span className={label}>30-Day Challenge</span>
-              <span className="text-sm text-muted-foreground">30 chapters on 15 days and 25 quizzes right, within 30 days.</span>
+              <span className="text-sm text-muted-foreground">
+                {now && !challengeOpen(now)
+                  ? challenge?.checkedIn
+                    ? "Opens on 1 December. You're checked in for a reminder."
+                    : "Opens on 1 December. 30 chapters on 15 days and 25 quizzes right."
+                  : "30 chapters on 15 days and 25 quizzes right, within 30 days."}
+              </span>
               <Link href="/challenge" className="text-sm font-semibold text-primary hover:underline">
-                Start the challenge
+                {now && !challengeOpen(now) ? (challenge?.checkedIn ? "See the countdown" : "Get a reminder") : "Start the challenge"}
               </Link>
             </>
           )}

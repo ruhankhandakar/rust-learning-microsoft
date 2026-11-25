@@ -782,3 +782,9 @@ html[data-font-size="xl"]  { font-size: 1.25rem; }
   .ticket-holo { animation: none; }
   .ticket-spark { display: none; }
 }
+
+.launch-panel {
+  background:
+    radial-gradient(ellipse at 100% 0%, color-mix(in oklab, var(--primary) 18%, transparent), transparent 55%),
+    var(--card);
+}
