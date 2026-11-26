@@ -2,12 +2,13 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { isSameOriginJson } from "@/lib/utils";
-import { answerOf, getAllQuizzes } from "@/lib/quizzes";
+import { answerOf, getAllQuizzes, homeQuizzes } from "@/lib/quizzes";
 import { firstAnswer, recordQuizResult } from "@/lib/achievements";
 import { recordEvent } from "@/lib/challenge";
 
 /**
  * { quizId, answer } grades an answer; for a signed-in learner the first answer is stored before the grade is returned.
+ * { quizId, answer, practice: true } only grades, and is allowed only for the home page's sample questions.
  * { quizId, reveal: true } shows the answer to review a card, which a signed-in learner may do only after answering.
  */
 export async function POST(request: Request) {
@@ -17,7 +18,9 @@ export async function POST(request: Request) {
   if (!quiz) return NextResponse.json({ error: "Invalid quiz" }, { status: 400 });
   const userId = (await auth.api.getSession({ headers: await headers() }))?.user.id;
 
-  if (typeof body.answer === "boolean") {
+  if (body.practice === true) {
+    if (typeof body.answer !== "boolean" || !homeQuizzes().includes(quiz)) return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+  } else if (typeof body.answer === "boolean") {
     if (userId) {
       await recordQuizResult(userId, quiz.id, body.answer);
       await recordEvent(userId, "quiz", quiz.id, { answer: body.answer });

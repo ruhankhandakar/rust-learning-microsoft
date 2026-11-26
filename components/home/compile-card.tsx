@@ -31,7 +31,7 @@ export function CompileCard({ questions, rustc }: { questions: CompileQuestion[]
 
   async function choose(compiles: boolean) {
     setAnswer(compiles);
-    const r = await checkQuiz(q.id, { answer: compiles });
+    const r = await checkQuiz(q.id, { answer: compiles, practice: true });
     setResult(r ?? "failed");
     requestAnimationFrame(() => verdictRef.current?.focus());
   }
