@@ -168,6 +168,7 @@ export async function drawState() {
       "swag_addresses.city",
       "swag_addresses.state",
       "swag_addresses.postcode",
+      "swag_addresses.country",
       "swag_addresses.phone",
       "swag_addresses.size",
       "swag_addresses.colour",

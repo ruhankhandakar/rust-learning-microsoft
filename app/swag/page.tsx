@@ -6,7 +6,7 @@ import { SwagPreview } from "@/components/home/swag-preview";
 import { SwagDemo } from "@/components/swag-demo";
 
 const title = "Quarterly swag draw";
-const description = "Finish the 30-Day Rust Challenge and you could win an rs:: T-shirt bundle or sticker pack, shipped free within India.";
+const description = "Finish the 30-Day Rust Challenge and you could win an rs:: T-shirt bundle or sticker pack, shipped free worldwide.";
 
 export const metadata: Metadata = {
   title,
@@ -43,7 +43,6 @@ export default function SwagPage() {
               <li>
                 Turned on <span className="font-mono text-foreground">draw</span> in the challenge rewards (&ldquo;email me if I&apos;m drawn&rdquo;)
               </li>
-              <li>18 or older, with a shipping address in India</li>
               <li>Hasn&apos;t won before: one prize per person, ever (an unclaimed prize doesn&apos;t count)</li>
             </ul>
           </div>

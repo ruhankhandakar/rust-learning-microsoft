@@ -306,7 +306,7 @@ export function AdminBoard({ comments, checkins, finishers, draw, site }: { comm
                         {w.fullName}, {w.phone}
                         <br />
                         {w.line1}
-                        {w.line2 ? `, ${w.line2}` : ""}, {w.city}, {w.state} {w.postcode}
+                        {w.line2 ? `, ${w.line2}` : ""}, {w.city}, {w.state} {w.postcode}, {w.country}
                         {w.size && (
                           <>
                             <br />

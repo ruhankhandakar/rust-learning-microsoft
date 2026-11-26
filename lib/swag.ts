@@ -162,6 +162,7 @@ export interface Address {
   city: string;
   state: string;
   postcode: string;
+  country: string;
   phone: string;
   size?: string;
   colour?: string;
@@ -176,12 +177,13 @@ export function parseAddress(body: Record<string, unknown>): Address | null {
     line2: typeof body.line2 === "string" ? body.line2.trim().slice(0, 120) : "",
     city: text(body.city, 60),
     state: text(body.state, 60),
-    postcode: typeof body.postcode === "string" && /^\d{6}$/.test(body.postcode.trim()) ? body.postcode.trim() : null,
+    postcode: text(body.postcode, 20),
+    country: text(body.country, 60),
     phone: typeof body.phone === "string" && /^[+\d][\d\s-]{7,15}$/.test(body.phone.trim()) ? body.phone.trim() : null,
     size: typeof body.size === "string" ? body.size.slice(0, 8) : undefined,
     colour: typeof body.colour === "string" ? body.colour.slice(0, 20) : undefined,
   };
-  if (!a.fullName || !a.line1 || !a.city || !a.state || !a.postcode || !a.phone || body.adult !== true) return null;
+  if (!a.fullName || !a.line1 || !a.city || !a.state || !a.postcode || !a.country || !a.phone) return null;
   return a as Address;
 }
 
@@ -200,6 +202,7 @@ export async function claim(token: string, userId: string, address: Address): Pr
       city: address.city,
       state: address.state,
       postcode: address.postcode,
+      country: address.country,
       phone: address.phone,
       size: address.size ?? null,
       colour: address.colour ?? null,
