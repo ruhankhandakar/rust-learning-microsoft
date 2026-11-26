@@ -85,11 +85,11 @@ export function StarPrompt() {
   return (
     <div
       role="status"
-      className={`fixed bottom-6 right-6 z-50 w-[calc(100%-3rem)] max-w-sm transition-[transform,opacity] duration-300 motion-reduce:transition-none sm:w-auto ${
+      className={`fixed bottom-6 right-3 z-50 w-[calc(100%-1.5rem)] max-w-md transition-[transform,opacity] duration-300 motion-reduce:transition-none sm:right-6 sm:w-auto ${
         visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
       }`}
     >
-      <div className="relative rounded-2xl border border-border bg-card p-5 shadow-[0_12px_32px_-8px_rgb(0_0_0/0.45)]">
+      <div className="relative rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-[0_12px_32px_-8px_rgb(0_0_0/0.45)]">
         <button
           type="button"
           onClick={remindLater}
@@ -100,28 +100,28 @@ export function StarPrompt() {
         </button>
         <p className="mb-1 pr-6 font-semibold">You&apos;ve read {read} chapters. Nice work.</p>
         <p className="text-sm text-muted-foreground">If this site helped, a star on GitHub helps other learners find it.</p>
-        <div className="mt-4 flex flex-wrap items-center gap-2">
+        <div className="mt-4 flex flex-wrap items-center gap-1 sm:gap-2">
           <a
             href="https://github.com/ruhankhandakar/rust-learning-microsoft"
             target="_blank"
             rel="noopener noreferrer nofollow"
             onClick={dismiss}
-            className="inline-flex min-h-10 items-center gap-1.5 rounded-[10px] bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex min-h-10 items-center gap-1.5 whitespace-nowrap rounded-[10px] bg-primary px-3 text-[13px] font-semibold max-[360px]:px-2 max-[360px]:text-xs sm:px-4 sm:text-sm text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            <Star className="h-4 w-4" aria-hidden="true" />
+            <Star className="hidden h-4 w-4 sm:block" aria-hidden="true" />
             Star on GitHub
           </a>
           <button
             type="button"
             onClick={remindLater}
-            className="min-h-10 rounded-[10px] px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="min-h-10 whitespace-nowrap rounded-[10px] px-2 text-[13px] font-medium max-[360px]:px-1 max-[360px]:text-xs sm:px-3 sm:text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             Not now
           </button>
           <button
             type="button"
             onClick={dismiss}
-            className="min-h-10 rounded-[10px] px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="min-h-10 whitespace-nowrap rounded-[10px] px-2 text-[13px] font-medium max-[360px]:px-1 max-[360px]:text-xs sm:px-3 sm:text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             Don&apos;t ask again
           </button>

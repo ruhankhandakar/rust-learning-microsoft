@@ -12,6 +12,7 @@ import { BookmarkProvider } from "@/components/bookmark-provider";
 import { SessionProvider } from "@/components/session-provider";
 import { LearnerSync } from "@/components/learner-sync";
 import { StarPrompt } from "@/components/star-prompt";
+import { PeekCoder } from "@/components/peek-coder";
 import { PageViewCounter } from "@/components/page-view-counter";
 
 const geistSans = Geist({
@@ -171,6 +172,7 @@ export default function RootLayout({
                   <OfflineIndicator />
                   <ServiceWorkerRegister />
                   <StarPrompt />
+                  <PeekCoder />
                   <LearnerSync />
                   <PageViewCounter />
                 </BookmarkProvider>
