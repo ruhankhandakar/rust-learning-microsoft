@@ -158,3 +158,11 @@ export function getChapterRawContent(
 ): string {
   return getChapterMarkdown(bookDir, chapterSlug);
 }
+
+let chapterKeys: Set<string> | undefined;
+
+export function isChapter(bookSlug: unknown, chapterSlug: unknown): boolean {
+  if (typeof bookSlug !== "string" || typeof chapterSlug !== "string") return false;
+  chapterKeys ??= new Set(BOOKS.flatMap((b) => getBookStructure(b.dirName).flatChapters.map((c) => `${b.slug}/${c.slug}`)));
+  return chapterKeys.has(`${bookSlug}/${chapterSlug}`);
+}

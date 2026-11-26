@@ -4,6 +4,8 @@ import { Fragment, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { Check, CircleHelp, Code2, ListChecks, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { checkQuiz } from "@/lib/quiz-client";
+import type { QuizAnswer } from "@/lib/quizzes";
 import { useNow } from "@/components/review-due-badge";
 import {
   REVIEW_INTERVAL_DAYS,
@@ -18,7 +20,7 @@ import {
 type ReviewSource =
   | { kind: "takeaways"; chapter: string; items: string[] }
   | { kind: "exercise"; chapter: string; anchor: string; title: string }
-  | { kind: "quiz"; chapter: string; anchor: string; change: string; compiles: boolean; errorCode?: string };
+  | { kind: "quiz"; chapter: string; anchor: string; change: string };
 
 export interface ReviewData {
   books: Record<string, string>;
@@ -179,6 +181,7 @@ function ReviewCardView({
   act: (fn: () => void) => void;
 }) {
   const [shown, setShown] = useState(false);
+  const [quizAnswer, setQuizAnswer] = useState<QuizAnswer | "failed" | null>(null);
   const answer = useRef<HTMLDivElement>(null);
 
   const remove = (
@@ -249,7 +252,13 @@ function ReviewCardView({
           {source.kind === "quiz" && (
             <p>
               <span className="font-semibold">
-                {source.compiles ? "It compiles." : `It does not compile${source.errorCode ? ` (${source.errorCode})` : ""}.`}
+                {quizAnswer === null
+                  ? "Checking…"
+                  : quizAnswer === "failed"
+                    ? "Couldn't load the answer. Check your connection."
+                    : quizAnswer.compiles
+                      ? "It compiles."
+                      : `It does not compile${quizAnswer.errorCode ? ` (${quizAnswer.errorCode})` : ""}.`}
               </span>{" "}
               <a href={href} className={linkClass}>
                 Back to the question
@@ -275,6 +284,7 @@ function ReviewCardView({
           <Button
             onClick={() => {
               setShown(true);
+              if (source.kind === "quiz") void checkQuiz(id.replace(/^quiz:/, ""), { reveal: true }).then((r) => setQuizAnswer(r ?? "failed"));
               requestAnimationFrame(() => answer.current?.focus());
             }}
           >

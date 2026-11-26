@@ -48,6 +48,13 @@ function isMermaidBlock(children: ReactNode): string | null {
 
 type Runnable = Record<string, "main" | "wrap">;
 
+// Synced upstream markdown is third-party input: only plain document elements survive, others are unwrapped to their text.
+const ALLOWED_ELEMENTS = [
+  "a", "b", "blockquote", "br", "code", "del", "details", "div", "em", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "i",
+  "img", "input", "kbd", "li", "ol", "p", "pre", "section", "span", "strong", "sub", "summary", "sup",
+  "table", "tbody", "td", "th", "thead", "tr", "ul",
+];
+
 function codeLang(children: ReactNode): string | undefined {
   const child = Array.isArray(children) ? children[0] : children;
   if (!child || typeof child !== "object" || !("props" in child)) return undefined;
@@ -218,6 +225,8 @@ export function MarkdownRenderer({
           rehypeHighlightSafe,
         ]}
         components={components}
+        allowedElements={ALLOWED_ELEMENTS}
+        unwrapDisallowed
       >
         {content}
       </ReactMarkdown>

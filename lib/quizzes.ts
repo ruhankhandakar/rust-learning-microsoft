@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { isChapter } from "@/lib/content";
 
 export interface QuizQuestion {
   id: string;
@@ -33,4 +34,31 @@ export function getAllQuizzes(): QuizQuestion[] {
 
 export function getChapterQuizzes(bookSlug: string, chapterSlug: string): QuizQuestion[] {
   return getAllQuizzes().filter((q) => q.bookSlug === bookSlug && q.chapterSlug === chapterSlug);
+}
+
+let homePicks: QuizQuestion[] | undefined;
+
+/** The five sample questions on the home page. Answers to them are graded but never stored. */
+export function homeQuizzes(): QuizQuestion[] {
+  homePicks ??= (() => {
+    const short = getAllQuizzes().filter((q) => {
+      const lines = q.code.split("\n");
+      return lines.length <= 12 && lines.every((l) => l.length <= 64) && isChapter(q.bookSlug, q.chapterSlug);
+    });
+    const picked = [...short.filter((q) => !q.compiles).slice(0, 3), ...short.filter((q) => q.compiles).slice(0, 2)];
+    return [0, 3, 1, 4, 2].flatMap((i) => picked[i] ?? []);
+  })();
+  return homePicks;
+}
+
+export type QuizAnswer = Pick<QuizQuestion, "compiles" | "errorCode" | "errorMessage" | "errorLabel" | "errorLine">;
+/** What the page may show before an answer: the grade stays on the server. */
+export type QuizPrompt = Omit<QuizQuestion, keyof QuizAnswer>;
+
+export function toPrompt({ id, bookSlug, chapterSlug, code, changedLine, change, original, rustc }: QuizQuestion): QuizPrompt {
+  return { id, bookSlug, chapterSlug, code, changedLine, change, original, rustc };
+}
+
+export function answerOf(q: QuizQuestion): QuizAnswer {
+  return { compiles: q.compiles, errorCode: q.errorCode, errorMessage: q.errorMessage, errorLabel: q.errorLabel, errorLine: q.errorLine };
 }

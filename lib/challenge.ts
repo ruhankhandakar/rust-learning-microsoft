@@ -1,4 +1,5 @@
 import { createHmac, randomBytes, timingSafeEqual } from "crypto";
+import { sql } from "kysely";
 import { db } from "@/db";
 import { BOOKS } from "@/lib/books";
 import { getBookBySlug } from "@/lib/books";
@@ -101,7 +102,11 @@ export async function getProgress(userId: string): Promise<ChallengeProgress> {
     completedAt: enrollment.completed_at,
     showOnWall: enrollment.show_on_wall === 1,
     drawOptIn: enrollment.draw_opt_in === 1,
-    status: enrollment.completed_at ? "complete" : today > CHALLENGE.days ? "expired" : "active",
+    status: enrollment.completed_at
+      ? "complete"
+      : today > CHALLENGE.days || (enrollment.revoked_at && enrollment.revoked_at >= enrollment.started_at)
+        ? "expired"
+        : "active",
     today,
     chapters,
     readingDays,
@@ -165,12 +170,6 @@ function ticketReady(userId: string, ref: string, ticket: unknown): boolean {
 }
 
 /** Whether `answer` (compiles or not) is right for the quiz `ref`, graded here rather than trusted. */
-function gradeQuiz(ref: string, answer: unknown): boolean | null {
-  if (typeof answer !== "boolean") return null;
-  const quiz = getAllQuizzes().find((q) => q.id === ref);
-  return quiz ? quiz.compiles === answer : null;
-}
-
 /**
  * Records a chapter read or a quiz answer, timestamped by the server. Only a quiz's first
  * answer counts: a wrong one is logged as a miss and blocks a later right one.
@@ -190,9 +189,23 @@ export async function recordEvent(
     if ((before.days[before.today - 1]?.chapters ?? 0) >= CHALLENGE.chaptersPerDay) return before;
   }
   if (kind === "quiz") {
-    const right = gradeQuiz(ref, proof?.answer);
-    if (right === null) return before;
-    const quiz = getAllQuizzes().find((q) => q.id === ref)!;
+    const quiz = getAllQuizzes().find((q) => q.id === ref);
+    if (!quiz || typeof proof?.answer !== "boolean") return before;
+    // The first answer in this attempt decides, even one given before the chapter was read; join() clears it on a restart.
+    await db
+      .insertInto("challenge_log")
+      .values({ user_id: userId, kind: quiz.compiles === proof.answer ? "first_right" : "first_wrong", ref, at: new Date().toISOString() })
+      .onConflict((oc) => oc.doNothing())
+      .execute();
+    const first = await db
+      .selectFrom("challenge_log")
+      .select("kind")
+      .where("user_id", "=", userId)
+      .where("ref", "=", ref)
+      .where("kind", "in", ["first_right", "first_wrong"])
+      .orderBy(sql`rowid`)
+      .executeTakeFirstOrThrow();
+    const right = first.kind === "first_right";
     const chapterRead = await db
       .selectFrom("challenge_log")
       .select("ref")
@@ -212,11 +225,23 @@ export async function recordEvent(
     logKind = right ? "quiz" : "quiz_miss";
   }
 
-  await db
-    .insertInto("challenge_log")
-    .values({ user_id: userId, kind: logKind, ref, at: new Date().toISOString() })
-    .onConflict((oc) => oc.columns(["user_id", "kind", "ref"]).doNothing())
-    .execute();
+  const at = new Date().toISOString();
+  if (kind === "chapter") {
+    // The day's count and the insert are one statement, so parallel reads cannot all pass the daily cap.
+    const dayStart = new Date(Date.parse(before.startedAt!) + (before.today - 1) * DAY_MS).toISOString();
+    await sql`
+      INSERT INTO challenge_log (user_id, kind, ref, at)
+      SELECT ${userId}, 'chapter', ${ref}, ${at}
+      WHERE (SELECT count(*) FROM challenge_log WHERE user_id = ${userId} AND kind = 'chapter' AND at >= ${dayStart}) < ${CHALLENGE.chaptersPerDay}
+      ON CONFLICT (user_id, kind, ref) DO NOTHING
+    `.execute(db);
+  } else {
+    await db
+      .insertInto("challenge_log")
+      .values({ user_id: userId, kind: logKind, ref, at })
+      .onConflict((oc) => oc.columns(["user_id", "kind", "ref"]).doNothing())
+      .execute();
+  }
 
   const after = await getProgress(userId);
   if (passed(after)) {

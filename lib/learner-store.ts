@@ -200,16 +200,16 @@ export function onLocalChange(cb: () => void) {
   };
 }
 
-export function getSyncOwner(): string | null {
+export function getSyncOwner(key = OWNER_KEY): string | null {
   try {
-    return window.localStorage.getItem(OWNER_KEY);
+    return window.localStorage.getItem(key);
   } catch {
     return null;
   }
 }
 
-export function setSyncOwner(userId: string) {
+export function setSyncOwner(userId: string, key = OWNER_KEY) {
   try {
-    window.localStorage.setItem(OWNER_KEY, userId);
+    window.localStorage.setItem(key, userId);
   } catch {}
 }

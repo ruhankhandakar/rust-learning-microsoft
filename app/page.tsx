@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import { BOOKS } from "@/lib/books";
 import { getBookStructure } from "@/lib/content";
-import { getAllQuizzes } from "@/lib/quizzes";
+import { getAllQuizzes, homeQuizzes } from "@/lib/quizzes";
 import { ChevronRight, Play, ListChecks, Waypoints, RotateCcw, Star, BookOpen, CalendarDays, CircleCheck, Shirt, Truck, Shuffle, Bug, GitPullRequest, ChevronDown } from "lucide-react";
 import { REPO_URL, getRepoFacts, getSiteStats, getWeeklyActivity } from "@/lib/site-stats";
 import { CONTENT_LAST_UPDATED } from "@/lib/version";
@@ -86,20 +86,11 @@ function homeQuestions(): CompileQuestion[] {
   for (const book of BOOKS) {
     for (const ch of getBookStructure(book.dirName).flatChapters) titles.set(`${book.slug}/${ch.slug}`, `${book.title} · ${ch.title}`);
   }
-  const short = getAllQuizzes().filter((q) => {
-    const lines = q.code.split("\n");
-    return lines.length <= 12 && lines.every((l) => l.length <= 64) && titles.has(`${q.bookSlug}/${q.chapterSlug}`);
-  });
-  const picked = [...short.filter((q) => !q.compiles).slice(0, 3), ...short.filter((q) => q.compiles).slice(0, 2)];
-  return [0, 3, 1, 4, 2].flatMap((i) => picked[i] ?? []).map((q) => ({
+  return homeQuizzes().map((q) => ({
     id: q.id,
     code: q.code,
     change: q.change,
     changedLine: q.changedLine,
-    compiles: q.compiles,
-    errorCode: q.errorCode,
-    errorMessage: q.errorMessage,
-    errorLine: q.errorLine,
     source: titles.get(`${q.bookSlug}/${q.chapterSlug}`)!,
     href: `/books/${q.bookSlug}/${q.chapterSlug}`,
   }));

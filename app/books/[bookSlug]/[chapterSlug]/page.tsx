@@ -27,7 +27,7 @@ import { Rust100ProjectSourceMobile } from "@/components/rust-100-project-source
 import { ReadingPosition } from "@/components/reading-position";
 import { ChapterQuiz } from "@/components/chapter-quiz";
 import { getChapterRunnable } from "@/lib/runnable";
-import { getChapterQuizzes } from "@/lib/quizzes";
+import { getChapterQuizzes, toPrompt } from "@/lib/quizzes";
 import { getConceptsForChapter } from "@/lib/concepts";
 import { chapterHasTakeaways } from "@/lib/takeaways";
 import { getChapterLastChange } from "@/lib/changelog";
@@ -202,7 +202,7 @@ export default async function ChapterPage({
     <div className="min-h-screen flex flex-col">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
       {!isRust100 && <ChallengeReadTracker bookSlug={bookSlug} chapterSlug={chapterSlug} />}
       {bookSlug !== "100-rust-projects" && (
@@ -326,7 +326,7 @@ export default async function ChapterPage({
                   runnable={runnable}
                 />
               </ErrorBoundary>
-              {quizzes.length > 0 && <ChapterQuiz questions={quizzes} />}
+              {quizzes.length > 0 && <ChapterQuiz questions={quizzes.map(toPrompt)} />}
               {endOfChapter}
             </article>
           )}

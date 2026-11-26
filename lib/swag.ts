@@ -23,8 +23,8 @@ async function githubOldEnough(userId: string, now: Date): Promise<boolean> {
       cache: "no-store",
     }).catch(() => null);
   let res = await lookup(account.accessToken);
-  // A token the entrant revoked answers 401; the public profile still has created_at.
-  if (res?.status === 401 && account.accessToken) res = await lookup(null);
+  // The entrant's own token can fail (revoked, rate limited); the public profile still has created_at.
+  if (!res?.ok && res?.status !== 404 && account.accessToken) res = await lookup(null);
   if (res?.status === 404) return false;
   if (!res?.ok) throw new GitHubUnavailable();
   const { created_at } = (await res.json()) as { created_at?: string };

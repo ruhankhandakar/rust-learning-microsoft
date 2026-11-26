@@ -42,6 +42,7 @@ export async function listComments() {
       "challenge_enrollment.draw_opt_in",
     ])
     .where("chapter_feedback.comment", "is not", null)
+    .orderBy(sql`chapter_feedback.status = 'new'`, "desc")
     .orderBy("chapter_feedback.created_at", "desc")
     .limit(200)
     .execute();
@@ -133,6 +134,12 @@ export async function revoke(userId: string): Promise<void> {
     .set({ completed_at: null, show_on_wall: 0, draw_opt_in: 0, revoked_at: new Date().toISOString() })
     .where("user_id", "=", userId)
     .execute();
+  const live = await db.selectFrom("swag_winners").select("id").where("user_id", "=", userId).where("status", "in", ["drawn", "claimed"]).execute();
+  if (!live.length) return;
+  const ids = live.map((w) => w.id);
+  await db.deleteFrom("swag_addresses").where("winner_id", "in", ids).execute();
+  // Closing the claim window now makes the prize redrawable at once; expired and shipped rows stay as they are.
+  await db.updateTable("swag_winners").set({ status: "drawn", claimed_at: null, claim_by: new Date(Date.now() - 1000).toISOString() }).where("id", "in", ids).execute();
 }
 
 export async function drawState() {

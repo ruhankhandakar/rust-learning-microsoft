@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isSameOriginJson } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
@@ -7,6 +8,7 @@ import { markShipped, redraw, runDraw } from "@/lib/swag";
 
 /** Owner-only actions: { action: "comment", id, status } | { action: "revoke", userId } | { action: "looks-fine", userId } | { action: "emailed", userIds } | { action: "draw" } | { action: "redraw", winnerId } | { action: "shipped", winnerId }. */
 export async function POST(request: Request) {
+  if (!isSameOriginJson(request)) return NextResponse.json({ error: "Invalid request" }, { status: 403 });
   const session = await auth.api.getSession({ headers: await headers() });
   if (!(await isAdmin(session?.user.id))) return new Response(null, { status: 404 });
 

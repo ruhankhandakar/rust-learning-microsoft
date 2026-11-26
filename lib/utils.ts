@@ -13,3 +13,10 @@ export function slugify(text: string) {
     .replace(/-+/g, "-")
     .trim();
 }
+
+/** Cookie-authenticated writes accept only same-origin JSON: another origin cannot send that without a CORS preflight, which these routes never grant. */
+export function isSameOriginJson(request: Request): boolean {
+  const site = request.headers.get("sec-fetch-site");
+  if (site && site !== "same-origin") return false;
+  return request.headers.get("content-type")?.split(";")[0].trim().toLowerCase() === "application/json";
+}

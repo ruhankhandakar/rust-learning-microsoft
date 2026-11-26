@@ -3,9 +3,8 @@
 import { useRef, useState } from "react";
 import { Check, RotateCcw, X } from "lucide-react";
 import { recordQuizAnswer } from "@/lib/learner-store";
-import { reportChallenge } from "@/lib/challenge-client";
-import { useSessionLite } from "@/components/session-provider";
-import type { QuizQuestion } from "@/lib/quizzes";
+import { checkQuiz } from "@/lib/quiz-client";
+import type { QuizAnswer, QuizPrompt } from "@/lib/quizzes";
 
 function Inline({ text }: { text: string }) {
   return (
@@ -26,27 +25,22 @@ function Inline({ text }: { text: string }) {
 const choiceClass =
   "inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
-function Question({ q, n }: { q: QuizQuestion; n: number }) {
-  const { user } = useSessionLite();
+function Question({ q, n }: { q: QuizPrompt; n: number }) {
   const [answer, setAnswer] = useState<boolean | null>(null);
+  const [result, setResult] = useState<QuizAnswer | "failed" | null>(null);
   const firstChoice = useRef<HTMLButtonElement>(null);
   const recorded = useRef(false);
-  const correct = answer === q.compiles;
+  const graded = result !== null && result !== "failed" ? result : null;
+  const correct = graded !== null && answer === graded.compiles;
 
-  const choose = (compiles: boolean) => {
+  const choose = async (compiles: boolean) => {
     if (answer !== null) return;
     setAnswer(compiles);
-    if (recorded.current) return;
+    const r = await checkQuiz(q.id, { answer: compiles });
+    setResult(r ?? "failed");
+    if (!r || recorded.current) return;
     recorded.current = true;
-    recordQuizAnswer(q.id, compiles === q.compiles);
-    void reportChallenge("quiz", q.id, { answer: compiles });
-    if (user)
-      fetch("/api/achievements", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "quiz", quizId: q.id, answer: compiles }),
-        keepalive: true,
-      }).catch(() => {});
+    recordQuizAnswer(q.id, compiles === r.compiles);
   };
 
   const choice = (compiles: boolean, label: string) => (
@@ -109,6 +103,7 @@ function Question({ q, n }: { q: QuizQuestion; n: number }) {
             type="button"
             onClick={() => {
               setAnswer(null);
+              setResult(null);
               firstChoice.current?.focus();
             }}
             className={`${choiceClass} border-transparent text-muted-foreground hover:text-foreground`}
@@ -119,7 +114,9 @@ function Question({ q, n }: { q: QuizQuestion; n: number }) {
         )}
       </div>
       <div aria-live="polite" className="text-sm">
-        {answer !== null && (
+        {answer !== null && result === null && <p className="mt-3 text-muted-foreground">Checking…</p>}
+        {result === "failed" && <p className="mt-3 text-muted-foreground">Couldn&apos;t check your answer. Check your connection and try again.</p>}
+        {graded && (
           <div className="mt-3 space-y-1">
             <p
               className={`flex items-center gap-1.5 font-medium ${correct ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400"}`}
@@ -127,24 +124,24 @@ function Question({ q, n }: { q: QuizQuestion; n: number }) {
               {correct ? <Check className="h-4 w-4" aria-hidden /> : <X className="h-4 w-4" aria-hidden />}
               {correct ? "Correct." : "Not quite."}
             </p>
-            {q.compiles ? (
+            {graded.compiles ? (
               <p>It compiles: rustc accepts this program without errors.</p>
             ) : (
               <p>
                 It doesn&apos;t compile. rustc reports{" "}
                 <a
-                  href={`https://doc.rust-lang.org/error_codes/${q.errorCode}.html`}
+                  href={`https://doc.rust-lang.org/error_codes/${graded.errorCode}.html`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-mono underline underline-offset-2 hover:text-primary"
                 >
-                  error[{q.errorCode}]
+                  error[{graded.errorCode}]
                 </a>
-                {q.errorLine !== undefined && <> on line {q.errorLine}</>}: <Inline text={q.errorMessage ?? ""} />
-                {q.errorLabel && (
+                {graded.errorLine !== undefined && <> on line {graded.errorLine}</>}: <Inline text={graded.errorMessage ?? ""} />
+                {graded.errorLabel && (
                   <>
                     {" "}
-                    (<Inline text={q.errorLabel} />)
+                    (<Inline text={graded.errorLabel} />)
                   </>
                 )}
               </p>
@@ -156,7 +153,7 @@ function Question({ q, n }: { q: QuizQuestion; n: number }) {
   );
 }
 
-export function ChapterQuiz({ questions }: { questions: QuizQuestion[] }) {
+export function ChapterQuiz({ questions }: { questions: QuizPrompt[] }) {
   return (
     <section aria-labelledby="chapter-quiz-heading" className="mt-12 border-t border-border pt-8">
       <h2 id="chapter-quiz-heading" className="text-xl font-semibold">

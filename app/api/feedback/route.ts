@@ -3,16 +3,9 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { getBookBySlug } from "@/lib/books";
-import { getBookStructure } from "@/lib/content";
+import { isChapter } from "@/lib/content";
 
 const MAX_COMMENT = 2000;
-
-function isChapter(bookSlug: unknown, chapterSlug: unknown): boolean {
-  if (typeof bookSlug !== "string" || typeof chapterSlug !== "string") return false;
-  const book = getBookBySlug(bookSlug);
-  return !!book && getBookStructure(book.dirName).flatChapters.some((c) => c.slug === chapterSlug);
-}
 
 async function readJson(request: Request): Promise<Record<string, unknown> | null> {
   try {
