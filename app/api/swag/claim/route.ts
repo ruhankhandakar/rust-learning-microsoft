@@ -16,7 +16,7 @@ export async function POST(request: Request) {
   }
   const address = parseAddress(body);
   if (typeof body.token !== "string" || !address) {
-    return NextResponse.json({ error: "Check every field: a 6-digit PIN code, a phone number, and that you're 18 or older." }, { status: 400 });
+    return NextResponse.json({ error: "Check every field: a postcode, a country and a phone number." }, { status: 400 });
   }
   const result = await claim(body.token, session.user.id, address);
   return result.ok ? new Response(null, { status: 204 }) : NextResponse.json({ error: result.error }, { status: 409 });

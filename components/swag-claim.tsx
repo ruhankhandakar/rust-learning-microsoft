@@ -2,7 +2,6 @@
 
 import { useState, type FormEvent } from "react";
 import { GitHubSignIn } from "@/components/github-sign-in";
-import { Checkbox } from "@/components/ui/checkbox";
 import { SwagTicket, TicketStage, type TicketInfo } from "@/components/swag-ticket";
 
 const field =
@@ -16,7 +15,6 @@ export function SignInToClaim({ path }: { path: string }) {
 
 export function ClaimFlow({ token, info, shirt }: { token: string; info: TicketInfo; shirt: boolean }) {
   const [torn, setTorn] = useState(false);
-  const [adult, setAdult] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "done">("idle");
   const [error, setError] = useState<string | null>(null);
 
@@ -28,7 +26,7 @@ export function ClaimFlow({ token, info, shirt }: { token: string; info: TicketI
     const res = await fetch("/api/swag/claim", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, token, adult }),
+      body: JSON.stringify({ ...form, token }),
     }).catch(() => null);
     if (res?.ok) return setStatus("done");
     setStatus("idle");
@@ -87,7 +85,7 @@ export function ClaimFlow({ token, info, shirt }: { token: string; info: TicketI
           </label>
           <label className="flex flex-col gap-1.5 text-sm">
             Phone (for the courier)
-            <input name="phone" required inputMode="tel" autoComplete="tel" placeholder="+91 98765 43210" className={field} />
+            <input name="phone" required inputMode="tel" autoComplete="tel" placeholder="+1 555 010 2030" className={field} />
           </label>
           <label className="flex flex-col gap-1.5 text-sm sm:col-span-2">
             Address line 1
@@ -102,18 +100,17 @@ export function ClaimFlow({ token, info, shirt }: { token: string; info: TicketI
             <input name="city" required maxLength={60} autoComplete="address-level2" className={field} />
           </label>
           <label className="flex flex-col gap-1.5 text-sm">
-            State
+            State / region
             <input name="state" required maxLength={60} autoComplete="address-level1" className={field} />
           </label>
           <label className="flex flex-col gap-1.5 text-sm">
-            PIN code
-            <input name="postcode" required inputMode="numeric" pattern="\d{6}" autoComplete="postal-code" className={field} />
+            Postcode
+            <input name="postcode" required maxLength={20} autoComplete="postal-code" className={field} />
           </label>
-          <div className="sm:col-span-2">
-            <Checkbox checked={adult} onChange={(e) => setAdult(e.target.checked)} required>
-              I&apos;m 18 or older and this address is in India
-            </Checkbox>
-          </div>
+          <label className="flex flex-col gap-1.5 text-sm">
+            Country
+            <input name="country" required maxLength={60} autoComplete="country-name" className={field} />
+          </label>
           {error && (
             <p role="alert" className="text-sm text-destructive sm:col-span-2">
               {error}
@@ -122,7 +119,7 @@ export function ClaimFlow({ token, info, shirt }: { token: string; info: TicketI
           <div className="sm:col-span-2">
             <button
               type="submit"
-              disabled={status === "sending" || !adult}
+              disabled={status === "sending"}
               className="inline-flex min-h-12 items-center rounded-[10px] bg-primary px-5 font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {status === "sending" ? "Sending" : "Claim my prize"}

@@ -98,6 +98,7 @@ interface SwagAddressesTable {
   city: string;
   state: string;
   postcode: string;
+  country: string;
   phone: string;
   size: string | null;
   colour: string | null;

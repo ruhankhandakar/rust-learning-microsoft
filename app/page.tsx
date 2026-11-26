@@ -50,7 +50,7 @@ const CHALLENGE = [
 
 const SWAG_FACTS = [
   [Shirt, "A T-shirt bundle or a sticker pack"],
-  [Truck, "Shipped free within India"],
+  [Truck, "Shipped free worldwide"],
   [Shuffle, "Entry is one switch on your challenge page. Stars never change your odds, but they really help me keep building this."],
 ] as const;
 

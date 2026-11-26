@@ -102,7 +102,7 @@ export function SwagTicket({ info, torn, onTear }: { info: TicketInfo; torn: boo
           </div>
           <div className="hidden sm:block">
             <dt>Ships to</dt>
-            <dd className="text-[15px] text-foreground">India</dd>
+            <dd className="text-[15px] text-foreground">Worldwide</dd>
           </div>
           <div>
             <dt>Claim by</dt>
