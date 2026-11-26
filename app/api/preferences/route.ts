@@ -3,6 +3,10 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 
+const FONTS = ["geist", "inter", "lora", "merriweather", "jetbrains"];
+const SIZES = ["sm", "base", "lg", "xl"];
+const THEMES = ["light", "dark"];
+
 export async function GET() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) {
@@ -26,12 +30,11 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await request.json();
-  const { font_family, font_size, theme } = body as {
-    font_family?: string;
-    font_size?: string;
-    theme?: string;
-  };
+  const body = await request.json().catch(() => null);
+  const pick = (v: unknown, allowed: readonly string[]) => (typeof v === "string" && allowed.includes(v) ? v : undefined);
+  const font_family = pick(body?.font_family, FONTS);
+  const font_size = pick(body?.font_size, SIZES);
+  const theme = pick(body?.theme, THEMES);
 
   const existing = await db
     .selectFrom("user_preferences")

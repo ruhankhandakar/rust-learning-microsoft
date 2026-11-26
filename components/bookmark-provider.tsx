@@ -14,6 +14,9 @@ import {
   removeBookmark as localRemove,
   type LocalBookmark,
 } from "@/lib/bookmarks-db";
+import { getSyncOwner, setSyncOwner } from "@/lib/learner-store";
+
+const OWNER_KEY = "rt:bookmarks-owner";
 
 export interface Bookmark {
   book_slug: string;
@@ -40,13 +43,13 @@ export function useBookmarks() {
   return useContext(BookmarkContext);
 }
 
-async function pullCloud(): Promise<Bookmark[]> {
+async function pullCloud(): Promise<Bookmark[] | null> {
   try {
     const res = await fetch("/api/bookmarks");
-    if (!res.ok) return [];
+    if (!res.ok) return null;
     return res.json();
   } catch {
-    return [];
+    return null;
   }
 }
 
@@ -77,6 +80,7 @@ export function BookmarkProvider({ children }: { children: React.ReactNode }) {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const { user } = useSessionLite();
   const isLoggedIn = !!user;
+  const userId = user?.id;
 
   useEffect(() => {
     let cancelled = false;
@@ -84,8 +88,9 @@ export function BookmarkProvider({ children }: { children: React.ReactNode }) {
     async function loadAndMerge() {
       const local = await getAllBookmarks().catch(() => [] as LocalBookmark[]);
       const localMap = new Map(local.map((b) => [b.id, b]));
+      const cloud = userId ? await pullCloud() : null;
 
-      if (!isLoggedIn) {
+      if (!cloud) {
         if (!cancelled)
           setBookmarks(
             local.map((b) => ({
@@ -100,7 +105,11 @@ export function BookmarkProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const cloud = await pullCloud();
+      // Bookmarks left by another account in this browser are dropped, not uploaded into this one.
+      if ((getSyncOwner(OWNER_KEY) ?? userId) !== userId) {
+        for (const b of local) await localRemove(b.book_slug, b.chapter_slug, b.heading_id);
+        localMap.clear();
+      }
       const merged = new Map<string, Bookmark>();
 
       for (const c of cloud) {
@@ -140,6 +149,7 @@ export function BookmarkProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
+      setSyncOwner(userId!, OWNER_KEY);
       if (!cancelled) setBookmarks([...merged.values()]);
     }
 
@@ -149,7 +159,7 @@ export function BookmarkProvider({ children }: { children: React.ReactNode }) {
       cancelled = true;
       window.removeEventListener("online", loadAndMerge);
     };
-  }, [isLoggedIn]);
+  }, [userId]);
 
   const isBookmarked = useCallback(
     (bookSlug: string, chapterSlug: string, headingId: string) =>

@@ -13,6 +13,9 @@ import {
   unmarkChapterRead as dbUnmark,
 } from "@/lib/progress-db";
 import { useSessionLite } from "./session-provider";
+import { getSyncOwner, setSyncOwner } from "@/lib/learner-store";
+
+const OWNER_KEY = "rt:progress-owner";
 
 interface ProgressContextValue {
   readSet: Set<string>;
@@ -33,14 +36,14 @@ export function useProgress() {
 }
 
 async function pullCloudProgress(): Promise<
-  { book_slug: string; chapter_slug: string }[]
+  { book_slug: string; chapter_slug: string }[] | null
 > {
   try {
     const res = await fetch("/api/progress");
-    if (!res.ok) return [];
+    if (!res.ok) return null;
     return res.json();
   } catch {
-    return [];
+    return null;
   }
 }
 
@@ -74,20 +77,31 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
   const [readSet, setReadSet] = useState<Set<string>>(new Set());
   const { user } = useSessionLite();
   const isLoggedIn = !!user;
+  const userId = user?.id;
 
   useEffect(() => {
     let cancelled = false;
 
     async function loadAndMerge() {
-      const localRecords = await getReadChapters().catch(() => []);
+      let localRecords = await getReadChapters().catch(() => []);
       const localKeys = new Set(localRecords.map((r) => r.id));
 
-      if (!isLoggedIn) {
+      if (!userId) {
         if (!cancelled) setReadSet(localKeys);
         return;
       }
 
       const cloudRecords = await pullCloudProgress();
+      if (!cloudRecords) {
+        if (!cancelled) setReadSet(localKeys);
+        return;
+      }
+      // Rows left by another account in this browser are dropped, not uploaded into this one.
+      if ((getSyncOwner(OWNER_KEY) ?? userId) !== userId) {
+        for (const r of localRecords) await dbUnmark(r.bookSlug, r.chapterSlug);
+        localRecords = [];
+        localKeys.clear();
+      }
       const merged = new Set(localKeys);
 
       for (const cr of cloudRecords) {
@@ -116,6 +130,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
         );
       }
 
+      setSyncOwner(userId, OWNER_KEY);
       if (!cancelled) setReadSet(merged);
     }
 
@@ -130,7 +145,7 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
       cancelled = true;
       window.removeEventListener("online", onOnline);
     };
-  }, [isLoggedIn]);
+  }, [userId]);
 
   const markRead = useCallback(
     (bookSlug: string, chapterSlug: string) => {

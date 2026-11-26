@@ -96,10 +96,6 @@ function homeQuestions(): CompileQuestion[] {
     code: q.code,
     change: q.change,
     changedLine: q.changedLine,
-    compiles: q.compiles,
-    errorCode: q.errorCode,
-    errorMessage: q.errorMessage,
-    errorLine: q.errorLine,
     source: titles.get(`${q.bookSlug}/${q.chapterSlug}`)!,
     href: `/books/${q.bookSlug}/${q.chapterSlug}`,
   }));

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isSameOriginJson } from "@/lib/utils";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { getProgress, isValidRef, issueTicket, join, recordEvent, setCheckIn, setDrawOptIn, setShowOnWall, type ChallengeKind } from "@/lib/challenge";
@@ -21,6 +22,7 @@ export async function GET() {
  * ({ answer: compiles? }, graded on the server); { action: "wall", show } toggles the finishers wall; { action: "draw", optIn } toggles the swag draw email; { action: "checkin", on } asks to be emailed when the challenge opens.
  */
 export async function POST(request: Request) {
+  if (!isSameOriginJson(request)) return NextResponse.json({ error: "Invalid request" }, { status: 403 });
   const id = await userId();
   if (!id) return NextResponse.json({ error: "Sign in to take the challenge" }, { status: 401 });
 

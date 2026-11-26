@@ -13,7 +13,7 @@ cleanup() { rm -rf "$TMP_DIR"; }
 trap cleanup EXIT
 
 echo "Cloning $UPSTREAM_REPO (shallow)..."
-git clone --depth 1 "$UPSTREAM_REPO" "$TMP_DIR/upstream" 2>&1
+git clone --depth 1 -c core.symlinks=false "$UPSTREAM_REPO" "$TMP_DIR/upstream" 2>&1
 
 changed=0
 

@@ -23,7 +23,7 @@ export function MermaidDiagram({ chart }: { chart: string }) {
         startOnLoad: false,
         theme: "dark",
         fontFamily: "inherit",
-        securityLevel: "loose",
+        securityLevel: "strict",
       });
 
       mermaid

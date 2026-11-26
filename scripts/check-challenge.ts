@@ -16,6 +16,7 @@ async function main() {
   const { db } = await import("../db");
   const { join, recordEvent, getProgress, issueTicket, requiredSeconds } = await import("../lib/challenge");
   const { getAllQuizzes } = await import("../lib/quizzes");
+  const { recordQuizResult } = await import("../lib/achievements");
   const { BOOKS } = await import("../lib/books");
   const { getBookStructure } = await import("../lib/content");
   const ticketFrom = (ref: string, secondsAgo: number) => { Date.now = () => realNow() - secondsAgo * 1000; const t = issueTicket(U, ref).ticket; Date.now = realNow; return t; };
@@ -54,6 +55,16 @@ async function main() {
   ok(p.quizzes === 0 && p.misses === 1, "a miss blocks a later right answer");
   p = await recordEvent(U, "quiz", readQuiz[1].id, { answer: readQuiz[1].compiles });
   ok(p.quizzes === 1, "first right answer on a read chapter counts");
+  const early = quizzes.find((q) => q.id !== unread.id && !chapters.slice(0, 5).includes(`${q.bookSlug}/${q.chapterSlug}`))!;
+  await recordEvent(U, "quiz", early.id, { answer: !early.compiles });
+  await db.insertInto("challenge_log").values({ user_id: U, kind: "chapter", ref: `${early.bookSlug}/${early.chapterSlug}`, at: new Date().toISOString() }).onConflict((oc) => oc.doNothing()).execute();
+  p = await recordEvent(U, "quiz", early.id, { answer: early.compiles });
+  ok(p.misses === 2, "a wrong answer given before reading the chapter still counts as the first answer");
+  const practised = quizzes.filter((q) => q.id !== unread.id && q.id !== early.id && !chapters.slice(0, 5).includes(`${q.bookSlug}/${q.chapterSlug}`))[0];
+  await recordQuizResult(U, practised.id, !practised.compiles);
+  await db.insertInto("challenge_log").values({ user_id: U, kind: "chapter", ref: `${practised.bookSlug}/${practised.chapterSlug}`, at: new Date().toISOString() }).onConflict((oc) => oc.doNothing()).execute();
+  p = await recordEvent(U, "quiz", practised.id, { answer: practised.compiles });
+  ok(p.misses === 2 && p.quizzes === 2, "a wrong answer from practice outside the challenge doesn't count against it");
 
   // Near-finished attempt: 29 chapters over 15 days, 25 right, then decide by accuracy
   const start = new Date(realNow() - 16 * 86400000).toISOString();
@@ -76,9 +87,10 @@ async function main() {
   p = await join(U);
   ok(p.status === "active" && p.chapters === 0, "starting again resets the log");
   // Achievements, badge visibility and the finishers wall
-  const { getAchievements, recordQuizResult, setPublic } = await import("../lib/achievements");
+  const { getAchievements, setPublic } = await import("../lib/achievements");
   const { getFinisher, getFinishers } = await import("../lib/finishers");
   await db.deleteFrom("reading_progress").where("user_id", "=", U).execute();
+  await db.deleteFrom("quiz_results").where("user_id", "=", U).execute();
   let a = await getAchievements(U);
   ok(a !== null && a.tier === null && !a.isPublic, "a new learner has no tier and a private profile");
   for (let i = 0; i < 15; i++) await db.insertInto("reading_progress").values({ user_id: U, book_slug: chapters[i].split("/")[0], chapter_slug: chapters[i].split("/")[1], read_at: start }).execute();
@@ -88,7 +100,7 @@ async function main() {
   for (let i = 0; i < 10; i++) await recordQuizResult(U, quizzes[i].id, quizzes[i].compiles);
   await recordQuizResult(U, quizzes[0].id, !quizzes[0].compiles);
   a = await getAchievements(U);
-  ok(a!.quizzesRight === 10 && a!.quizzesAnswered === 10, "only the first answer per quiz is stored");
+  ok(a!.quizzesRight === 10 && a!.quizzesAnswered === 10, `only the first answer per quiz is stored (${a!.quizzesRight}/${a!.quizzesAnswered})`);
   ok(a!.tier === "Bronze", `15 chapters and 10 quizzes at 100% is Bronze (${a!.tier})`);
   for (let i = 10; i < 16; i++) await recordQuizResult(U, quizzes[i].id, !quizzes[i].compiles);
   a = await getAchievements(U);
@@ -167,8 +179,31 @@ async function main() {
   ok(!(await eligibleFinishers(past.id)).some((e) => e.id === W), "the lapsed winner isn't picked again in the same draw");
   ok((await eligibleFinishers()).some((e) => e.id === W), "the lapsed winner can enter later quarters");
 
+  ok((await claim(replacement!.claim_token, X, parseAddress(address)!)).ok, "the replacement winner can claim");
+  await revoke(X);
+  const voided = await getWinnerByToken(replacement!.claim_token);
+  const voidedAddr = await db.selectFrom("swag_addresses").select("winner_id").where("winner_id", "=", replacement!.id).executeTakeFirst();
+  ok(!voidedAddr && voided!.status === "drawn" && Date.parse(voided!.claimBy) <= realNow(), "revoking a winner deletes their address and closes their claim window");
+  ok(!(await claim(replacement!.claim_token, X, parseAddress(address)!)).ok, "a revoked winner can't claim");
+  ok((await getWinnerByToken("lapsed-token"))!.status === "expired", "revoking leaves expired prizes alone");
+
+  const now = new Date(realNow()).toISOString();
+  await db.updateTable("challenge_enrollment").set({ started_at: start, completed_at: now }).where("user_id", "=", U).execute();
+  for (let i = 0; i < 30; i++) await db.insertInto("challenge_log").values({ user_id: U, kind: "chapter", ref: chapters[i], at: new Date(Date.parse(start) + (i % 15) * 86400000 + 3600000).toISOString() }).onConflict((oc) => oc.doNothing()).execute();
+  const right = quizzes.filter((q) => chapters.slice(0, 30).includes(`${q.bookSlug}/${q.chapterSlug}`));
+  for (const q of right.slice(0, 25)) await db.insertInto("challenge_log").values({ user_id: U, kind: "quiz", ref: q.id, at: start }).onConflict((oc) => oc.doNothing()).execute();
   await revoke(U);
   ok((await getFinisher(U)) === null && (await getProgress(U)).status !== "complete", "revoking removes the finish and the wall listing");
+  p = await recordEvent(U, "quiz", right[0].id, { answer: right[0].compiles });
+  ok(p.status === "expired" && !p.completedAt, "a revoked attempt can't be finished again by replaying an event");
+
+  const R = "challenge-test-race";
+  await sql`INSERT OR IGNORE INTO user (id, name, email, emailVerified, createdAt, updatedAt) VALUES (${R}, 'Race', 'race@example.invalid', 0, datetime('now'), datetime('now'))`.execute(db);
+  await join(R);
+  const ticketFor = (ref: string) => { Date.now = () => realNow() - 300 * 1000; const t = issueTicket(R, ref).ticket; Date.now = realNow; return t; };
+  const tickets = chapters.slice(0, 10).map((c) => [c, ticketFor(c)] as const);
+  await Promise.all(tickets.map(([c, t]) => recordEvent(R, "chapter", c, { ticket: t })));
+  ok((await getProgress(R)).chapters === 5, `parallel chapter reads still stop at 5 a day (${(await getProgress(R)).chapters})`);
   delete process.env.ADMIN_GITHUB_ID;
   ok(!(await isAdmin(U)), "without ADMIN_GITHUB_ID nobody is admin");
 

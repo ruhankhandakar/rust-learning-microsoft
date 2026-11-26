@@ -16,5 +16,7 @@ export const auth = betterAuth({
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     },
   },
+  account: { accountLinking: { enabled: false } },
+  disabledPaths: ["/update-user", "/get-access-token", "/refresh-token", "/account-info", "/link-social", "/unlink-account", "/list-accounts"],
   plugins: [nextCookies()],
 });

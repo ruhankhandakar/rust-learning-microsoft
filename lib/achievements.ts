@@ -66,6 +66,12 @@ export async function recordQuizResult(userId: string, quizId: string, answer: u
   return true;
 }
 
+/** Whether the learner's first answer to this quiz was right, or null if they never answered it. */
+export async function firstAnswer(userId: string, quizId: string): Promise<boolean | null> {
+  const row = await db.selectFrom("quiz_results").select("correct").where("user_id", "=", userId).where("quiz_id", "=", quizId).executeTakeFirst();
+  return row ? row.correct === 1 : null;
+}
+
 export async function setPublic(userId: string, isPublic: boolean): Promise<void> {
   await db
     .insertInto("learner_profile")

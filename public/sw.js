@@ -1,4 +1,4 @@
-const CACHE_NAME = "rust-training-4.3.20";
+const CACHE_NAME = "rust-training-4.3.21";
 
 const PRECACHE_URLS = ["/", "/~offline", "/manifest.webmanifest", "/icon.svg"];
 
@@ -9,6 +9,7 @@ const NO_CACHE_PATH_PATTERNS = [
   /^\/books\/100-rust-projects(\/|$)/,
   // Per-user API responses must never be served to a different account.
   /^\/api\/(?!search$|rust-100-source\/)/,
+  /^\/(admin|swag\/claim)(\/|$)/,
 ];
 
 function shouldBypassCache(pathname) {

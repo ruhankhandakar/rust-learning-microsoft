@@ -2,16 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, CircleCheck, CircleX } from "lucide-react";
+import { checkQuiz } from "@/lib/quiz-client";
+import type { QuizAnswer } from "@/lib/quizzes";
 
 export interface CompileQuestion {
   id: string;
   code: string;
   change: string;
   changedLine: number;
-  compiles: boolean;
-  errorCode?: string;
-  errorMessage?: string;
-  errorLine?: number;
   source: string;
   href: string;
 }
@@ -23,14 +21,18 @@ const kbd = "ml-auto hidden rounded-md border border-border px-1.5 py-0.5 font-m
 export function CompileCard({ questions, rustc }: { questions: CompileQuestion[]; rustc: string }) {
   const [i, setI] = useState(0);
   const [answer, setAnswer] = useState<boolean | null>(null);
+  const [result, setResult] = useState<QuizAnswer | "failed" | null>(null);
   const verdictRef = useRef<HTMLParagraphElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const q = questions[i];
   const answered = answer !== null;
-  const right = answer === q.compiles;
+  const graded = result !== null && result !== "failed" ? result : null;
+  const right = graded !== null && answer === graded.compiles;
 
-  function choose(compiles: boolean) {
+  async function choose(compiles: boolean) {
     setAnswer(compiles);
+    const r = await checkQuiz(q.id, { answer: compiles });
+    setResult(r ?? "failed");
     requestAnimationFrame(() => verdictRef.current?.focus());
   }
 
@@ -62,7 +64,7 @@ export function CompileCard({ questions, rustc }: { questions: CompileQuestion[]
         <pre className="m-0 overflow-x-auto py-4 font-mono text-[13px] leading-[1.7]">
           {q.code.split("\n").map((line, n) => {
             const no = n + 1;
-            const error = answered && !q.compiles && no === q.errorLine;
+            const error = !!graded && !graded.compiles && no === graded.errorLine;
             const changed = no === q.changedLine;
             return (
               <div
@@ -104,13 +106,17 @@ export function CompileCard({ questions, rustc }: { questions: CompileQuestion[]
           </div>
         ) : (
           <div className="mt-auto flex flex-col gap-3">
-            <p ref={verdictRef} tabIndex={-1} className={`text-lg font-bold outline-none ${right ? "text-emerald-500" : "text-red-400"}`}>
-              {right ? "Right" : "Not quite"}: it {q.compiles ? "compiles" : "does not compile"}.
+            <p ref={verdictRef} tabIndex={-1} className={`text-lg font-bold outline-none ${!graded ? "text-muted-foreground" : right ? "text-emerald-500" : "text-red-400"}`}>
+              {result === null
+                ? "Checking…"
+                : !graded
+                  ? "Couldn't check your answer. Check your connection."
+                  : `${right ? "Right" : "Not quite"}: it ${graded.compiles ? "compiles" : "does not compile"}.`}
             </p>
-            {!q.compiles && q.errorMessage && (
+            {graded && !graded.compiles && graded.errorMessage && (
               <p className="font-mono text-[13px] text-foreground/90">
-                error[{q.errorCode}]: {q.errorMessage}
-                {q.errorLine ? ` (line ${q.errorLine})` : ""}
+                error[{graded.errorCode}]: {graded.errorMessage}
+                {graded.errorLine ? ` (line ${graded.errorLine})` : ""}
               </p>
             )}
             <p className="text-xs text-muted-foreground">Checked by {rustc}.</p>
@@ -119,6 +125,7 @@ export function CompileCard({ questions, rustc }: { questions: CompileQuestion[]
               className="inline-flex min-h-11 items-center gap-2 self-start rounded-[10px] bg-primary px-5 font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
               onClick={() => {
                 setAnswer(null);
+                setResult(null);
                 setI((i + 1) % questions.length);
               }}
             >

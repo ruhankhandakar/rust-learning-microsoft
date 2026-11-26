@@ -212,7 +212,7 @@ export function AdminBoard({ comments, checkins, finishers, draw, site }: { comm
                       <td className="p-3 tabular-nums">{f.daysTaken ?? "–"}</td>
                       <td className="p-3 tabular-nums">{f.accuracy === null ? "–" : `${Math.round(f.accuracy * 100)}%`}</td>
                       <td className="p-3">
-                        {f.revoked ? (
+                        {f.revoked && f.daysTaken === null ? (
                           <span className={`${pill} bg-muted text-muted-foreground`}>Revoked</span>
                         ) : f.flags.length === 0 ? (
                           <span className="text-muted-foreground">None</span>
@@ -223,7 +223,7 @@ export function AdminBoard({ comments, checkins, finishers, draw, site }: { comm
                         )}
                       </td>
                       <td className="p-3">
-                        {!f.revoked && (
+                        {f.daysTaken !== null && (
                           <div className="flex justify-end gap-2">
                             {f.flags.length > 0 && !f.cleared && (
                               <button type="button" disabled={busy} onClick={() => act({ action: "looks-fine", userId: f.id })} className={`${small} whitespace-nowrap border-border hover:bg-accent`}>

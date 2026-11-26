@@ -53,8 +53,6 @@ function getReviewData(): ReviewData {
       chapter: `${q.bookSlug}/${q.chapterSlug}`,
       anchor: `quiz-${q.id}`,
       change: q.change,
-      compiles: q.compiles,
-      errorCode: q.errorCode,
     };
 
   const chapters: ReviewData["chapters"] = {};

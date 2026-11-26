@@ -34,3 +34,15 @@ export function getAllQuizzes(): QuizQuestion[] {
 export function getChapterQuizzes(bookSlug: string, chapterSlug: string): QuizQuestion[] {
   return getAllQuizzes().filter((q) => q.bookSlug === bookSlug && q.chapterSlug === chapterSlug);
 }
+
+export type QuizAnswer = Pick<QuizQuestion, "compiles" | "errorCode" | "errorMessage" | "errorLabel" | "errorLine">;
+/** What the page may show before an answer: the grade stays on the server. */
+export type QuizPrompt = Omit<QuizQuestion, keyof QuizAnswer>;
+
+export function toPrompt({ id, bookSlug, chapterSlug, code, changedLine, change, original, rustc }: QuizQuestion): QuizPrompt {
+  return { id, bookSlug, chapterSlug, code, changedLine, change, original, rustc };
+}
+
+export function answerOf(q: QuizQuestion): QuizAnswer {
+  return { compiles: q.compiles, errorCode: q.errorCode, errorMessage: q.errorMessage, errorLabel: q.errorLabel, errorLine: q.errorLine };
+}
